@@ -1,0 +1,7 @@
+#!/usr/bin/python
+
+import os
+import commands  
+
+command = "/usr/lib/linuxmint/mintUpdate/mintUpdate.py show &"
+os.system(command)
