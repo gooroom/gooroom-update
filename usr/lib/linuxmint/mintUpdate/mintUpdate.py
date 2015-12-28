@@ -16,6 +16,7 @@ try:
     import fnmatch
     import urllib2
     import re
+    import apt
     from user import home
     from sets import Set
     import proxygsettings
@@ -1735,7 +1736,13 @@ def open_about(widget):
     except Exception, detail:
         print detail
     try:
-        version = commands.getoutput("/usr/lib/linuxmint/common/version.py mintupdate")
+        cache = apt.Cache()
+        pkg = cache["mintupdate"]
+        if pkg.installed is not None:
+            version = pkg.installed.version
+            print version
+        else:
+            version = ""
         dlg.set_version(version)
     except Exception, detail:
         print detail
