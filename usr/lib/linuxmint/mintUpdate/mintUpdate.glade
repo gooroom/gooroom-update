@@ -971,6 +971,7 @@ Public License instead of this License.
                 <property name="type">tab</property>
               </packing>
             </child>
+<!--
             <child>
               <widget class="GtkVBox" id="vbox23">
                 <property name="visible">True</property>
@@ -1564,6 +1565,7 @@ Public License instead of this License.
                 <property name="type">tab</property>
               </packing>
             </child>
+-->
             <child>
               <widget class="GtkTable" id="table3">
                 <property name="visible">True</property>
