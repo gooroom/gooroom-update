@@ -1241,7 +1241,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("window2").set_title(_("Preferences") + " - " + _("Update Manager"))
 
     #prefs_tree.get_widget("label37").set_text(_("Levels"))
-    #prefs_tree.get_widget("label36").set_text(_("Auto-Refresh"))
+    prefs_tree.get_widget("label36").set_text(_("Auto-Refresh"))
     #prefs_tree.get_widget("label39").set_markup("<b>" + _("Level") + "</b>")
     #prefs_tree.get_widget("label40").set_markup("<b>" + _("Description") + "</b>")
     #prefs_tree.get_widget("label48").set_markup("<b>" + _("Tested?") + "</b>")
