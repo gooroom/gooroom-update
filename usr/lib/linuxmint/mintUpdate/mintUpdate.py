@@ -1740,7 +1740,6 @@ def open_about(widget):
         pkg = cache["mintupdate"]
         if pkg.installed is not None:
             version = pkg.installed.version
-            print version
         else:
             version = ""
         dlg.set_version(version)
