@@ -3,5 +3,5 @@
 import os
 import commands  
 
-command = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.py show &"
+command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show &"
 os.system(command)

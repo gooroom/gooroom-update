@@ -1,5 +1,4 @@
 #!/usr/bin/python2.7
-#-*-coding:utf-8-*-
 
 try:
     import os
@@ -21,7 +20,7 @@ try:
     from user import home
     from sets import Set
     import proxygsettings
-    sys.path.append('/usr/lib/linuxmint/common')
+    sys.path.append('/usr/lib/gooroom/common')
     from configobj import ConfigObj
 except Exception, detail:
     print detail
@@ -58,9 +57,9 @@ else:
         libc.call('prctl', 15, 'gooroomUpdate', 0, 0, 0)
 
 # i18n
-gettext.install("mintupdate", "/usr/share/linuxmint/locale")
+gettext.install("gooroomupdate", "/usr/share/gooroom/locale")
 
-CONFIG_DIR = "%s/.config/linuxmint" % home
+CONFIG_DIR = "%s/.config/gooroom" % home
 KERNEL_INFO_DIR = "/usr/share/mint-kernel-info"
 
 (TAB_UPDATES, TAB_UPTODATE, TAB_ERROR) = range(3)
@@ -135,8 +134,8 @@ class ChangelogRetriever(threading.Thread):
         changelog_sources = []
         if self.origin == "gooroom":
             #TODO changelog
-            changelog_sources.append("http://packages.linuxmint.com/dev/" + self.source_package + "_" + self.version + "_amd64.changes")
-            changelog_sources.append("http://packages.linuxmint.com/dev/" + self.source_package + "_" + self.version + "_i386.changes")
+            changelog_sources.append("http://packages.gooroom.com/dev/" + self.source_package + "_" + self.version + "_amd64.changes")
+            changelog_sources.append("http://packages.gooroom.com/dev/" + self.source_package + "_" + self.version + "_i386.changes")
         elif self.origin == "debian":
             if (self.source_package.startswith("lib")):
                 changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))        
@@ -167,7 +166,7 @@ class ChangelogRetriever(threading.Thread):
                 url.close()
                 
                 changelog = ""
-                if "linuxmint.com" in changelog_source:
+                if "gooroom.com" in changelog_source:
                     changes = source.split("\n")
                     for change in changes:
                         change = change.strip()
@@ -311,8 +310,8 @@ class InstallThread(threading.Thread):
                 proceed = True                
                 try:
                     pkgs = ' '.join(str(pkg) for pkg in packages)
-                    warnings = commands.getoutput("/usr/lib/linuxmint/mintUpdate/checkWarnings.py %s" % pkgs)
-                    #print ("/usr/lib/linuxmint/mintUpdate/checkWarnings.py %s" % pkgs)
+                    warnings = commands.getoutput("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
+                    #print ("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
                     warnings = warnings.split("###")
                     if len(warnings) == 2:
                         installations = warnings[0].split()
@@ -324,7 +323,7 @@ class InstallThread(threading.Thread):
                                 dialog.set_title("")
                                 dialog.set_markup("<b>" + _("This upgrade will trigger additional changes") + "</b>")
                                 #dialog.format_secondary_markup("<i>" + _("All available upgrades for this package will be ignored.") + "</i>")                                
-                                dialog.set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+                                dialog.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
                                 dialog.set_default_size(320, 400)
                                 dialog.set_resizable(True)
                                 
@@ -450,7 +449,7 @@ class InstallThread(threading.Thread):
                         except:
                             pass #cause we might have closed it already
             
-                        command = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.py show &"                        
+                        command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show &"                        
                         os.system(command)
                     
                     else:
@@ -579,7 +578,7 @@ class RefreshThread(threading.Thread):
             model.set_sort_column_id( UPDATE_SORT_STR, gtk.SORT_ASCENDING )
 
             aliases = {}
-            with open("/usr/lib/linuxmint/mintUpdate/aliases") as alias_file:
+            with open("/usr/lib/gooroom/gooroomUpdate/aliases") as alias_file:
                 for line in alias_file:
                     if not line.startswith('#'):
                         splitted = line.split("#####")
@@ -619,9 +618,9 @@ class RefreshThread(threading.Thread):
             wTree.get_widget("vpaned1").set_position(vpaned_position)
             gtk.gdk.threads_leave()            
             if app_hidden:
-                refresh_command = "/usr/lib/linuxmint/mintUpdate/checkAPT.py 2>/dev/null"
+                refresh_command = "/usr/lib/gooroom/gooroomUpdate/checkAPT.py 2>/dev/null"
             else:
-                refresh_command = "/usr/lib/linuxmint/mintUpdate/checkAPT.py --use-synaptic %s 2>/dev/null" % self.wTree.get_widget("window1").window.xid
+                refresh_command = "/usr/lib/gooroom/gooroomUpdate/checkAPT.py --use-synaptic %s 2>/dev/null" % self.wTree.get_widget("window1").window.xid
             if self.root_mode:
                 refresh_command = "sudo %s" % refresh_command
             updates =  commands.getoutput(refresh_command)
@@ -642,8 +641,8 @@ class RefreshThread(threading.Thread):
             download_size = 0
             num_ignored = 0
             ignored_list = []
-            if os.path.exists("%s/mintupdate.ignored" % CONFIG_DIR):
-                blacklist_file = open("%s/mintupdate.ignored" % CONFIG_DIR, "r")
+            if os.path.exists("%s/gooroomupdate.ignored" % CONFIG_DIR):
+                blacklist_file = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "r")
                 for blacklist_line in blacklist_file:
                     ignored_list.append(blacklist_line.strip())
                 blacklist_file.close()                
@@ -728,7 +727,7 @@ class RefreshThread(threading.Thread):
                                 update_type = "package"
                             if origin == "debian":
                                 level = 2
-                            rulesFile = open("/usr/lib/linuxmint/mintUpdate/rules","r")
+                            rulesFile = open("/usr/lib/gooroom/gooroomUpdate/rules","r")
                             rules = rulesFile.readlines()
                             goOn = True
                             foundPackageRule = False # whether we found a rule with the exact package name or not
@@ -818,13 +817,13 @@ class RefreshThread(threading.Thread):
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias + "\n<small><span foreground='#5C5C5C'>%s</span></small>" % shortdesc)
                         else:
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias)
-                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/level" + str(package_update.level) + ".png"))
+                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))
                         model.set_value(iter, UPDATE_OLD_VERSION, package_update.oldVersion)                                
                         model.set_value(iter, UPDATE_NEW_VERSION, package_update.newVersion)                        
                         model.set_value(iter, UPDATE_LEVEL_STR, str(package_update.level))
                         model.set_value(iter, UPDATE_SIZE, package_update.size)
                         model.set_value(iter, UPDATE_SIZE_STR, size_to_string(package_update.size))                        
-                        model.set_value(iter, UPDATE_TYPE_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/update-type-%s.png" % package_update.type))
+                        model.set_value(iter, UPDATE_TYPE_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/update-type-%s.png" % package_update.type))
                         model.set_value(iter, UPDATE_TYPE, package_update.type)
                         model.set_value(iter, UPDATE_TOOLTIP, package_update.tooltip)
                         model.set_value(iter, UPDATE_SORT_STR, "%s%s" % (str(package_update.level), package_update.alias))
@@ -1009,7 +1008,7 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     global icon_unknown
     global icon_apply    
 
-    config = ConfigObj("%s/mintUpdate.conf" % CONFIG_DIR)
+    config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
 
     #Write general config
     config['general'] = {}
@@ -1051,7 +1050,7 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['icons']['apply'] = icon_apply
     
     #Write blacklisted updates
-    ignored_list = open("%s/mintupdate.ignored" % CONFIG_DIR, "w")
+    ignored_list = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "w")
     treeview_blacklist = prefs_tree.get_widget("treeview_blacklist")
     model = treeview_blacklist.get_model()
     iter = model.get_iter_first()
@@ -1087,7 +1086,7 @@ def read_configuration():
     global icon_unknown
     global icon_apply
 
-    config = ConfigObj("%s/mintUpdate.conf" % CONFIG_DIR)
+    config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     prefs = {}
 
     #Read the general config
@@ -1126,12 +1125,12 @@ def read_configuration():
         icon_unknown = config['icons']['unknown']
         icon_apply = config['icons']['apply']
     except:
-        icon_busy = "/usr/lib/linuxmint/mintUpdate/icons/base.svg"
-        icon_up2date = "/usr/lib/linuxmint/mintUpdate/icons/base-apply.svg"
-        icon_updates = "/usr/lib/linuxmint/mintUpdate/icons/base-info.svg"
-        icon_error = "/usr/lib/linuxmint/mintUpdate/icons/base-error2.svg"
-        icon_unknown = "/usr/lib/linuxmint/mintUpdate/icons/base.svg"
-        icon_apply = "/usr/lib/linuxmint/mintUpdate/icons/base-exec.svg"
+        icon_busy = "/usr/lib/gooroom/gooroomUpdate/icons/base.svg"
+        icon_up2date = "/usr/lib/gooroom/gooroomUpdate/icons/base-apply.svg"
+        icon_updates = "/usr/lib/gooroom/gooroomUpdate/icons/base-info.svg"
+        icon_error = "/usr/lib/gooroom/gooroomUpdate/icons/base-error2.svg"
+        icon_unknown = "/usr/lib/gooroom/gooroomUpdate/icons/base.svg"
+        icon_apply = "/usr/lib/gooroom/gooroomUpdate/icons/base-exec.svg"
 
     #Read levels config
     try:
@@ -1225,7 +1224,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     global icon_unknown
     global icon_apply
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window2")
     prefs_tree.get_widget("window2").set_title(_("Preferences") + " - " + _("Update Manager"))
 
@@ -1237,9 +1236,9 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("label54").set_markup("<b>" + _("Origin") + "</b>")
     prefs_tree.get_widget("label41").set_markup("<b>" + _("Safe?") + "</b>")
     prefs_tree.get_widget("label42").set_markup("<b>" + _("Visible?") + "</b>")
-    prefs_tree.get_widget("label43").set_text(_("구름에서 제공하는 패키지입니다."))
-    prefs_tree.get_widget("label44").set_text(_("데비안에서 제공하는 패키지입니다."))
-    prefs_tree.get_widget("label45").set_text(_("서드파티에서 제공하는 패키지입니다."))
+    prefs_tree.get_widget("label43").set_text(_("Packages provided by Gooroom"))
+    prefs_tree.get_widget("label44").set_text(_("Packages provided by Debian"))
+    prefs_tree.get_widget("label45").set_text(_("Packages provided by 3rd-party"))
     #prefs_tree.get_widget("label46").set_text(_("Unsafe updates. Could potentially affect the stability of the system."))
     #prefs_tree.get_widget("label47").set_text(_("Dangerous updates. Known to affect the stability of the systems depending on certain specs or hardware."))
     prefs_tree.get_widget("label55").set_text(_("Gooroom"))
@@ -1267,7 +1266,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("checkbutton_hide_window_after_update").set_label(_("Hide the update manager after applying updates"))
     prefs_tree.get_widget("checkbutton_hide_systray").set_label(_("Only show a tray icon when updates are available or in case of errors"))
 
-    prefs_tree.get_widget("window2").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+    prefs_tree.get_widget("window2").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     prefs_tree.get_widget("window2").show()
     prefs_tree.get_widget("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
     prefs_tree.get_widget("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
@@ -1329,8 +1328,8 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     model.set_sort_column_id( 0, gtk.SORT_ASCENDING )
     treeview_blacklist.set_model(model)
 
-    if os.path.exists("%s/mintupdate.ignored" % CONFIG_DIR):
-        ignored_list = open("%s/mintupdate.ignored" % CONFIG_DIR, "r")
+    if os.path.exists("%s/gooroomupdate.ignored" % CONFIG_DIR):
+        ignored_list = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "r")
         for ignored_pkg in ignored_list:            
             iter = model.insert_before(None, None)
             model.set_value(iter, 0, ignored_pkg.strip())
@@ -1345,7 +1344,7 @@ def add_blacklisted_package(widget, treeview_blacklist):
     dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK, None)
     dialog.set_markup("<b>" + _("Please specify the name of the update to ignore:") + "</b>")
     dialog.set_title(_("Ignore an update"))
-    dialog.set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+    dialog.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     entry = gtk.Entry()
     hbox = gtk.HBox()
     hbox.pack_start(gtk.Label(_("Name:")), False, 5, 5)
@@ -1370,10 +1369,10 @@ def remove_blacklisted_package(widget, treeview_blacklist):
 
 def open_history(widget):
     #Set the Glade file
-    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     wTree = gtk.glade.XML(gladefile, "window4")
     treeview_update = wTree.get_widget("treeview_history")
-    wTree.get_widget("window4").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+    wTree.get_widget("window4").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
 
     wTree.get_widget("window4").set_title(_("History of updates") + " - " + _("Update Manager"))
 
@@ -1442,10 +1441,10 @@ def open_information(widget):
     global logFile
     global pid
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window3")
     prefs_tree.get_widget("window3").set_title(_("Information") + " - " + _("Update Manager"))
-    prefs_tree.get_widget("window3").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+    prefs_tree.get_widget("window3").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     prefs_tree.get_widget("close_button").connect("clicked", info_cancel, prefs_tree)    
     prefs_tree.get_widget("label4").set_text(_("Process ID:"))
     prefs_tree.get_widget("label5").set_text(_("Log file:"))
@@ -1470,7 +1469,7 @@ def install_kernel(widget, selection, wTree, window):
         else:
             message = _("Are you sure you want to install the %s kernel?") % version
         image = gtk.Image()
-        image.set_from_file("/usr/lib/linuxmint/mintUpdate/icons/warning.png")
+        image.set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/warning.png")
         d = gtk.MessageDialog(window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_YES_NO, message) 
         image.show()
         d.set_image(image)    
@@ -1487,11 +1486,11 @@ def open_kernels(widget):
     global logFile
     global pid
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     tree = gtk.glade.XML(gladefile, "window5")
     window = tree.get_widget("window5")
     window.set_title(_("Linux kernels") + " - " + _("Update Manager"))
-    window.set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")    
+    window.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")    
     tree.get_widget("close_button").connect("clicked", kernels_cancel, tree)
 
     tree.get_widget("label_warning").connect("size-allocate", label_size_allocate)
@@ -1555,7 +1554,7 @@ def open_kernels(widget):
 
     model = gtk.TreeStore(str, str, gtk.gdk.Pixbuf, gtk.gdk.Pixbuf, gtk.gdk.Pixbuf, gtk.gdk.Pixbuf, gtk.gdk.Pixbuf, object) # (version, label, loaded, recommended, installed, fixes, regressions, values)
 
-    kernels = commands.getoutput("/usr/lib/linuxmint/mintUpdate/checkKernels.py | grep \"###\"")
+    kernels = commands.getoutput("/usr/lib/gooroom/gooroomUpdate/checkKernels.py | grep \"###\"")
     kernels = kernels.split("\n")
     column = 2
     for kernel in kernels:
@@ -1571,9 +1570,9 @@ def open_kernels(widget):
             installable = (installable == "1")
             label = version
 
-            tick = gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/tick.png")
-            pix_fixes = gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/fixes.png")
-            pix_bugs = gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/regressions.png")
+            tick = gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/tick.png")
+            pix_fixes = gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/fixes.png")
+            pix_bugs = gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/regressions.png")
 
 
             iter = model.insert_before(None, None)
@@ -1704,7 +1703,7 @@ def display_selected_kernel(selection, wTree):
         print detail
 
 def open_help(widget):
-    os.system("yelp help:linuxmint/software-updates &")
+    os.system("yelp help:gooroom/software-updates &")
 
 def open_rel_upgrade(widget):
     os.system("/usr/bin/mint-release-upgrade &")
@@ -1735,9 +1734,9 @@ def open_about(widget):
     except Exception, detail:
         print detail
 
-    dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>"])
-    dlg.set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
-    dlg.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg"))
+    dlg.set_authors(["Clement Lefebvre <root@gooroom.com>", "Chris Hodapp <clhodapp@live.com>"])
+    dlg.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
+    dlg.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg"))
     def close(w, res):
         if res == gtk.RESPONSE_CANCEL:
             w.hide()
@@ -1792,7 +1791,7 @@ def activate_icon_cb(widget, data, wTree):
 
 def save_window_size(window, vpaned):
 
-    config = ConfigObj("%s/mintUpdate.conf" % CONFIG_DIR)
+    config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     config['dimensions'] = {}
     config['dimensions']['x'] = window.get_size()[0]
     config['dimensions']['y'] = window.get_size()[1]
@@ -1959,7 +1958,7 @@ def size_to_string(size):
     return strSize
 
 def setVisibleColumn(checkmenuitem, column, configName):
-    config = ConfigObj("%s/mintUpdate.conf" % CONFIG_DIR)
+    config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     if (config.has_key('visible_columns')):
         config['visible_columns'][configName] = checkmenuitem.get_active()
     else:
@@ -1969,7 +1968,7 @@ def setVisibleColumn(checkmenuitem, column, configName):
     column.set_visible(checkmenuitem.get_active())
 
 def setVisibleDescriptions(checkmenuitem, treeView, statusIcon, wTree, prefs):
-    config = ConfigObj("%s/mintUpdate.conf" % CONFIG_DIR)
+    config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     if (not config.has_key('visible_columns')):
         config['visible_columns'] = {}
     config['visible_columns']['description'] = checkmenuitem.get_active()
@@ -1991,7 +1990,7 @@ def menuPopup(widget, event, treeview_update, statusIcon, wTree):
             menu.popup( None, None, None, 3, 0)
         
 def add_to_ignore_list(widget, treeview_update, pkg, statusIcon, wTree):
-    os.system("echo \"%s\" >> %s/mintupdate.ignored" % (pkg, CONFIG_DIR))
+    os.system("echo \"%s\" >> %s/gooroomupdate.ignored" % (pkg, CONFIG_DIR))
     refresh = RefreshThread(treeview_update, statusIcon, wTree)
     refresh.start()
 
@@ -2008,7 +2007,7 @@ gtk.gdk.threads_init()
 
 # prepare the log
 pid = os.getpid()
-logdir = "/tmp/mintUpdate/"
+logdir = "/tmp/gooroomUpdate/"
 
 if not os.path.exists(logdir):
     os.system("mkdir -p " + logdir)
@@ -2045,7 +2044,7 @@ try:
     statusIcon.set_visible(not prefs["hide_systray"])
 
     #Set the Glade file
-    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     wTree = gtk.glade.XML(gladefile, "window1")
     wTree.get_widget("window1").set_title(_("Update Manager"))
     wTree.get_widget("window1").set_default_size(prefs['dimensions_x'], prefs['dimensions_y'])
@@ -2056,7 +2055,7 @@ try:
 
     vbox = wTree.get_widget("vbox_main")
     treeview_update = wTree.get_widget("treeview_update")
-    wTree.get_widget("window1").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
+    wTree.get_widget("window1").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
 
     accel_group = gtk.AccelGroup()
     wTree.get_widget("window1").add_accel_group(accel_group)
@@ -2154,8 +2153,8 @@ try:
 
     wTree.get_widget("label_success").set_markup("<b>" + _("Your system is up to date") + "</b>")
     wTree.get_widget("label_error").set_markup("<b>" + _("Could not refresh the list of updates") + "</b>")
-    wTree.get_widget("image_success_status").set_from_file("/usr/lib/linuxmint/mintUpdate/icons/yes.png")
-    wTree.get_widget("image_error_status").set_from_file("/usr/lib/linuxmint/mintUpdate/rel_upgrades/failure.png")
+    wTree.get_widget("image_success_status").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/yes.png")
+    wTree.get_widget("image_error_status").set_from_file("/usr/lib/gooroom/gooroomUpdate/rel_upgrades/failure.png")
 
     wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
 
@@ -2176,7 +2175,7 @@ try:
     editSubmenu.append(prefsMenuItem)
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/software-properties.png"))
+        sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
         sourcesMenuItem.set_label(_("Software sources"))
         sourcesMenuItem.connect("activate", open_repositories)
         editSubmenu.append(sourcesMenuItem)
@@ -2184,7 +2183,7 @@ try:
     rel_edition = 'unknown'
     rel_codename = 'unknown'
     if os.path.exists("/etc/linuxmint/info"):
-        with open("/etc/linuxmint/info", "r") as info:
+        with open("/etc/gooroom/info", "r") as info:
             for line in info:
                 line = line.strip()
                 if "EDITION=" in line:
@@ -2198,7 +2197,7 @@ try:
         if rel_edition.lower() in config['general']['editions']:
             rel_target = config['general']['target_name']
             relUpgradeMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-            relUpgradeMenuItem.set_image(gtk.image_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/rel_upgrade.png"))
+            relUpgradeMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/rel_upgrade.png"))
             relUpgradeMenuItem.set_label(_("Upgrade to %s") % rel_target)
             relUpgradeMenuItem.connect("activate", open_rel_upgrade)
             editSubmenu.append(relUpgradeMenuItem)
@@ -2276,7 +2275,7 @@ try:
     helpMenu = gtk.MenuItem(_("_Help"))
     helpSubmenu = gtk.Menu()
     helpMenu.set_submenu(helpSubmenu)
-    if os.path.exists("/usr/share/help/C/linuxmint"):
+    if os.path.exists("/usr/share/help/C/gooroom"):
         helpMenuItem = gtk.ImageMenuItem(gtk.STOCK_HELP)
         helpMenuItem.set_label(_("Contents"))
         helpMenuItem.connect("activate", open_help)

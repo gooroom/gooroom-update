@@ -1,3 +1,9 @@
+gooroomupdate (4.9.4) gooroom; urgency=medium
+
+  * Gooroom ported
+
+ -- Gooroom <gooroom@gooroom.kr>  Mon, 07 Mar 2016 13:18:32 +0900
+
 mintupdate (4.9.3.2) rafaela; urgency=medium
 
   * Desktop file: Removed generic name, used icon name, added to Xfce Settings, removed category duplication in KDE

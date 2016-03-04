@@ -6,16 +6,16 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
-    <property name="title" translatable="yes" context="yes">About mintUpdate</property>
+    <property name="title" translatable="yes" context="yes">About gooroomUpdate</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">/usr/lib/linuxmint/mintUpdate/icons/icon.png</property>
+    <property name="icon">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
-    <property name="program_name">mintUpdate</property>
+    <property name="program_name">gooroomUpdate</property>
     <property name="comments" translatable="yes" context="yes">Update Manager for Linux Mint</property>
     <property name="license" translatable="yes" context="yes">		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
@@ -357,8 +357,8 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
 </property>
-    <property name="authors">Clement Lefebvre &lt;root@linuxmint.com&gt;</property>
-    <property name="logo">/usr/lib/linuxmint/mintUpdate/icons/icon.png</property>
+    <property name="authors">Clement Lefebvre &lt;root@gooroom.com&gt;</property>
+    <property name="logo">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -382,7 +382,7 @@ Public License instead of this License.
   </widget>
   <widget class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">mintUpdate</property>
+    <property name="title" translatable="yes">gooroomUpdate</property>
     <property name="window_position">center</property>
     <child>
       <widget class="GtkVBox" id="vbox1">
@@ -862,7 +862,7 @@ Public License instead of this License.
   </widget>
   <widget class="GtkWindow" id="window2">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes" context="yes">mintUpdate</property>
+    <property name="title" translatable="yes" context="yes">gooroomUpdate</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
@@ -1390,7 +1390,7 @@ Public License instead of this License.
                       <widget class="GtkImage" id="image14">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/level5.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level5.png</property>
                       </widget>
                       <packing>
                         <property name="top_attach">5</property>
@@ -1402,7 +1402,7 @@ Public License instead of this License.
                       <widget class="GtkImage" id="image13">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/level4.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level4.png</property>
                       </widget>
                       <packing>
                         <property name="top_attach">4</property>
@@ -1415,7 +1415,7 @@ Public License instead of this License.
                       <widget class="GtkImage" id="image12">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/level3.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level3.png</property>
                       </widget>
                       <packing>
                         <property name="top_attach">3</property>
@@ -1427,7 +1427,7 @@ Public License instead of this License.
                       <widget class="GtkImage" id="image11">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/level2.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level2.png</property>
                       </widget>
                       <packing>
                         <property name="top_attach">2</property>
@@ -1439,7 +1439,7 @@ Public License instead of this License.
                       <widget class="GtkImage" id="image10">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/level1.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level1.png</property>
                       </widget>
                       <packing>
                         <property name="top_attach">1</property>
@@ -1480,7 +1480,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/no.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/no.png</property>
                       </widget>
                       <packing>
                         <property name="left_attach">2</property>
@@ -1496,7 +1496,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/no.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/no.png</property>
                       </widget>
                       <packing>
                         <property name="left_attach">2</property>
@@ -1512,7 +1512,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/tick.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/tick.png</property>
                       </widget>
                       <packing>
                         <property name="left_attach">2</property>
@@ -1527,7 +1527,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/tick.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/tick.png</property>
                       </widget>
                       <packing>
                         <property name="left_attach">2</property>
@@ -1543,7 +1543,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/linuxmint/mintUpdate/icons/no.png</property>
+                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/no.png</property>
                       </widget>
                       <packing>
                         <property name="left_attach">2</property>
@@ -1716,7 +1716,7 @@ Public License instead of this License.
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">1.1175871339474952e-09</property>
-                    <property name="label" translatable="yes" context="yes">&lt;i&gt;Note: The list only gets refreshed while the mintUpdate window is closed (system tray mode).&lt;/i&gt;</property>
+                    <property name="label" translatable="yes" context="yes">&lt;i&gt;Note: The list only gets refreshed while the gooroomUpdate window is closed (system tray mode).&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
                   </widget>
                   <packing>
@@ -2278,9 +2278,9 @@ Public License instead of this License.
     <property name="can_focus">False</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">10</property>
-    <property name="title" translatable="yes" context="yes">mintUpdate</property>
+    <property name="title" translatable="yes" context="yes">gooroomUpdate</property>
     <property name="window_position">center</property>
-    <property name="icon">/usr/lib/linuxmint/mintUpdate/icons/icon.png</property>
+    <property name="icon">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -2438,12 +2438,12 @@ Public License instead of this License.
     <property name="height_request">400</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes" context="yes">mintUpdate</property>
+    <property name="title" translatable="yes" context="yes">gooroomUpdate</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="default_width">1000</property>
     <property name="default_height">500</property>
-    <property name="icon">/usr/lib/linuxmint/mintUpdate/icons/icon.png</property>
+    <property name="icon">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <child>
       <widget class="GtkVBox" id="vbox3">
         <property name="width_request">475</property>
@@ -2508,12 +2508,12 @@ Public License instead of this License.
     <property name="height_request">400</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes" context="yes">mintUpdate</property>
+    <property name="title" translatable="yes" context="yes">gooroomUpdate</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
-    <property name="icon">/usr/lib/linuxmint/mintUpdate/icons/icon.png</property>
+    <property name="icon">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <child>
       <widget class="GtkVBox" id="vbox3">
         <property name="width_request">600</property>
