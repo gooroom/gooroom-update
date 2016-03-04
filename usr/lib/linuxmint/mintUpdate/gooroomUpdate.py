@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+#-*-coding:utf-8-*-
 
 try:
     import os
@@ -36,9 +37,9 @@ except Exception, detail:
 from subprocess import Popen, PIPE
 
 try:
-    numMintUpdate = commands.getoutput("ps -A | grep mintUpdate | wc -l")
+    numMintUpdate = commands.getoutput("ps -A | grep gooroomUpdate | wc -l")
     if (numMintUpdate != "0"):
-        os.system("killall mintUpdate")        
+        os.system("killall gooroomUpdate")        
 except Exception, detail:
     print detail
 
@@ -46,15 +47,15 @@ architecture = commands.getoutput("uname -a")
 if (architecture.find("x86_64") >= 0):
     import ctypes
     libc = ctypes.CDLL('libc.so.6')
-    libc.prctl(15, 'mintUpdate', 0, 0, 0)
+    libc.prctl(15, 'gooroomUpdate', 0, 0, 0)
 else:
     import dl
     if os.path.exists('/lib/libc.so.6'):
         libc = dl.open('/lib/libc.so.6')
-        libc.call('prctl', 15, 'mintUpdate', 0, 0, 0)
+        libc.call('prctl', 15, 'gooroomUpdate', 0, 0, 0)
     elif os.path.exists('/lib/i386-linux-gnu/libc.so.6'):
         libc = dl.open('/lib/i386-linux-gnu/libc.so.6')
-        libc.call('prctl', 15, 'mintUpdate', 0, 0, 0)
+        libc.call('prctl', 15, 'gooroomUpdate', 0, 0, 0)
 
 # i18n
 gettext.install("mintupdate", "/usr/share/linuxmint/locale")
@@ -132,20 +133,10 @@ class ChangelogRetriever(threading.Thread):
         gtk.gdk.threads_leave()       
         
         changelog_sources = []
-        if self.origin == "linuxmint":
+        if self.origin == "gooroom":
+            #TODO changelog
             changelog_sources.append("http://packages.linuxmint.com/dev/" + self.source_package + "_" + self.version + "_amd64.changes")
             changelog_sources.append("http://packages.linuxmint.com/dev/" + self.source_package + "_" + self.version + "_i386.changes")
-        elif self.origin == "ubuntu":
-            if (self.source_package.startswith("lib")):
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/main/%s/%s/%s_%s/changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))        
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/multiverse/%s/%s/%s_%s/changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/universe/%s/%s/%s_%s/changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))        
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/restricted/%s/%s/%s_%s/changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-            else:
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/main/%s/%s/%s_%s/changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))        
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/multiverse/%s/%s/%s_%s/changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/universe/%s/%s/%s_%s/changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))        
-                changelog_sources.append("http://changelogs.ubuntu.com/changelogs/pool/restricted/%s/%s/%s_%s/changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
         elif self.origin == "debian":
             if (self.source_package.startswith("lib")):
                 changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))        
@@ -228,7 +219,7 @@ class AutomaticRefreshThread(threading.Thread):
                         refresh.start()
                     else:
                         try:
-                            log.writelines("++ The mintUpdate window is open, skipping auto-refresh\n")
+                            log.writelines("++ The gooroomUpdate window is open, skipping auto-refresh\n")
                             log.flush()
                         except:
                             pass # cause it might be closed already
@@ -450,7 +441,7 @@ class InstallThread(threading.Thread):
                         self.wTree.get_widget("window1").hide()
                         gtk.gdk.threads_leave()
 
-                    if "mintupdate" in packages or "mint-upgrade-info" in packages:
+                    if "gooroomupdate" in packages or "gooroom-upgrade-info" in packages:
                         # Restart                        
                         try:
                             log.writelines("++ Mintupdate was updated, restarting it...\n")
@@ -459,7 +450,7 @@ class InstallThread(threading.Thread):
                         except:
                             pass #cause we might have closed it already
             
-                        command = "/usr/lib/linuxmint/mintUpdate/mintUpdate.py show &"                        
+                        command = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.py show &"                        
                         os.system(command)
                     
                     else:
@@ -635,11 +626,11 @@ class RefreshThread(threading.Thread):
                 refresh_command = "sudo %s" % refresh_command
             updates =  commands.getoutput(refresh_command)
 
-            # Look for mintupdate
-            if ("UPDATE###mintupdate###" in updates or "UPDATE###mint-upgrade-info###" in updates):                
-                new_mintupdate = True
+            # Look for gooroomupdate
+            if ("UPDATE###gooroomupdate###" in updates or "UPDATE###gooroom-upgrade-info###" in updates):                
+                new_gooroomupdate = True
             else:
-                new_mintupdate = False
+                new_gooroomupdate = False
            
             updates = string.split(updates, "---EOL---")         
 
@@ -692,6 +683,7 @@ class RefreshThread(threading.Thread):
                         return False
 
                     values = string.split(pkg, "###")
+                    print(pkg)
                     if len(values) == 10:
                         status = values[0]
                         package = values[1]
@@ -717,11 +709,6 @@ class RefreshThread(threading.Thread):
                             if updateIsBlacklisted:
                                 continue
 
-                            is_a_mint_package = False
-                            if (update_type == "linuxmint"):
-                                update_type = "package"
-                                is_a_mint_package = True
-
                             security_update = (update_type == "security")
 
                             if update_type == "security":
@@ -735,10 +722,12 @@ class RefreshThread(threading.Thread):
 
                             extraInfo = ""
                             warning = ""
-                            if is_a_mint_package:
+                            level = 3 # Level 3 by default
+                            if update_type == "gooroom":
                                 level = 1 # Level 1 by default
-                            else:
-                                level = 3 # Level 3 by default
+                                update_type = "package"
+                            if origin == "debian":
+                                level = 2
                             rulesFile = open("/usr/lib/linuxmint/mintUpdate/rules","r")
                             rules = rulesFile.readlines()
                             goOn = True
@@ -790,7 +779,7 @@ class RefreshThread(threading.Thread):
                     
                     package_update = package_updates[source_package]
 
-                    if (new_mintupdate and package_update.name != "mintupdate" and package_update.name != "mint-upgrade-info"):
+                    if (new_gooroomupdate and package_update.name != "gooroomupdate" and package_update.name != "gooroom-upgrade-info"):
                         continue
 
                     if source_package in aliases.keys():
@@ -843,13 +832,13 @@ class RefreshThread(threading.Thread):
                         num_visible = num_visible + 1
 
                 gtk.gdk.threads_enter()  
-                if (new_mintupdate):
+                if (new_gooroomupdate):
                     self.statusString = _("A new version of the update manager is available")
                     self.statusIcon.set_from_file(icon_updates)
                     self.statusIcon.set_tooltip(self.statusString)
                     self.statusIcon.set_visible(True)
                     statusbar.push(context_id, self.statusString)
-                    log.writelines("++ Found a new version of mintupdate\n")
+                    log.writelines("++ Found a new version of gooroomupdate\n")
                     log.flush()
                 else:
                     if (num_safe > 0):
@@ -1032,13 +1021,13 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['levels']['level1_visible'] = prefs_tree.get_widget("visible1").get_active()
     config['levels']['level2_visible'] = prefs_tree.get_widget("visible2").get_active()
     config['levels']['level3_visible'] = prefs_tree.get_widget("visible3").get_active()
-    config['levels']['level4_visible'] = prefs_tree.get_widget("visible4").get_active()
-    config['levels']['level5_visible'] = prefs_tree.get_widget("visible5").get_active()
+    #config['levels']['level4_visible'] = prefs_tree.get_widget("visible4").get_active()
+    #config['levels']['level5_visible'] = prefs_tree.get_widget("visible5").get_active()
     config['levels']['level1_safe'] = prefs_tree.get_widget("safe1").get_active()
     config['levels']['level2_safe'] = prefs_tree.get_widget("safe2").get_active()
     config['levels']['level3_safe'] = prefs_tree.get_widget("safe3").get_active()
-    config['levels']['level4_safe'] = prefs_tree.get_widget("safe4").get_active()
-    config['levels']['level5_safe'] = prefs_tree.get_widget("safe5").get_active()    
+    #config['levels']['level4_safe'] = prefs_tree.get_widget("safe4").get_active()
+    #config['levels']['level5_safe'] = prefs_tree.get_widget("safe5").get_active()    
     config['levels']['security_visible'] = prefs_tree.get_widget("checkbutton_security_visible").get_active()
     config['levels']['security_safe'] = prefs_tree.get_widget("checkbutton_security_safe").get_active()
 
@@ -1149,26 +1138,26 @@ def read_configuration():
         prefs["level1_visible"] = (config['levels']['level1_visible'] == "True")
         prefs["level2_visible"] = (config['levels']['level2_visible'] == "True")
         prefs["level3_visible"] = (config['levels']['level3_visible'] == "True")
-        prefs["level4_visible"] = (config['levels']['level4_visible'] == "True")
-        prefs["level5_visible"] = (config['levels']['level5_visible'] == "True")
+        #prefs["level4_visible"] = (config['levels']['level4_visible'] == "True")
+        #prefs["level5_visible"] = (config['levels']['level5_visible'] == "True")
         prefs["level1_safe"] = (config['levels']['level1_safe'] == "True")
         prefs["level2_safe"] = (config['levels']['level2_safe'] == "True")
         prefs["level3_safe"] = (config['levels']['level3_safe'] == "True")
-        prefs["level4_safe"] = (config['levels']['level4_safe'] == "True")
-        prefs["level5_safe"] = (config['levels']['level5_safe'] == "True")
+        #prefs["level4_safe"] = (config['levels']['level4_safe'] == "True")
+        #prefs["level5_safe"] = (config['levels']['level5_safe'] == "True")
         prefs["security_visible"] = (config['levels']['security_visible'] == "True")
         prefs["security_safe"] = (config['levels']['security_safe'] == "True")
     except:
         prefs["level1_visible"] = True
         prefs["level2_visible"] = True
         prefs["level3_visible"] = True
-        prefs["level4_visible"] = False
-        prefs["level5_visible"] = False
+        #prefs["level4_visible"] = False
+        #prefs["level5_visible"] = False
         prefs["level1_safe"] = True
         prefs["level2_safe"] = True
         prefs["level3_safe"] = True
-        prefs["level4_safe"] = False
-        prefs["level5_safe"] = False    
+        #prefs["level4_safe"] = False
+        #prefs["level5_safe"] = False    
         prefs["security_visible"] = False
         prefs["security_safe"] = False
 
@@ -1236,26 +1225,26 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     global icon_unknown
     global icon_apply
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/mintUpdate.glade"
+    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window2")
     prefs_tree.get_widget("window2").set_title(_("Preferences") + " - " + _("Update Manager"))
 
-    #prefs_tree.get_widget("label37").set_text(_("Levels"))
+    prefs_tree.get_widget("label37").set_text(_("Levels"))
     prefs_tree.get_widget("label36").set_text(_("Auto-Refresh"))
-    #prefs_tree.get_widget("label39").set_markup("<b>" + _("Level") + "</b>")
-    #prefs_tree.get_widget("label40").set_markup("<b>" + _("Description") + "</b>")
-    #prefs_tree.get_widget("label48").set_markup("<b>" + _("Tested?") + "</b>")
-    #prefs_tree.get_widget("label54").set_markup("<b>" + _("Origin") + "</b>")
-    #prefs_tree.get_widget("label41").set_markup("<b>" + _("Safe?") + "</b>")
-    #prefs_tree.get_widget("label42").set_markup("<b>" + _("Visible?") + "</b>")
-    #prefs_tree.get_widget("label43").set_text(_("Certified updates. Tested through Romeo or directly maintained by Linux Mint."))
-    #prefs_tree.get_widget("label44").set_text(_("Recommended updates. Tested and approved by Linux Mint."))
-    #prefs_tree.get_widget("label45").set_text(_("Safe updates. Not tested but believed to be safe."))
+    prefs_tree.get_widget("label39").set_markup("<b>" + _("Level") + "</b>")
+    prefs_tree.get_widget("label40").set_markup("<b>" + _("Description") + "</b>")
+    prefs_tree.get_widget("label48").set_markup("<b>" + _("Tested?") + "</b>")
+    prefs_tree.get_widget("label54").set_markup("<b>" + _("Origin") + "</b>")
+    prefs_tree.get_widget("label41").set_markup("<b>" + _("Safe?") + "</b>")
+    prefs_tree.get_widget("label42").set_markup("<b>" + _("Visible?") + "</b>")
+    prefs_tree.get_widget("label43").set_text(_("구름에서 제공하는 패키지입니다."))
+    prefs_tree.get_widget("label44").set_text(_("데비안에서 제공하는 패키지입니다."))
+    prefs_tree.get_widget("label45").set_text(_("서드파티에서 제공하는 패키지입니다."))
     #prefs_tree.get_widget("label46").set_text(_("Unsafe updates. Could potentially affect the stability of the system."))
     #prefs_tree.get_widget("label47").set_text(_("Dangerous updates. Known to affect the stability of the systems depending on certain specs or hardware."))
-    #prefs_tree.get_widget("label55").set_text(_("Linux Mint"))
-    #prefs_tree.get_widget("label56").set_text(_("Upstream"))
-    #prefs_tree.get_widget("label57").set_text(_("Upstream"))
+    prefs_tree.get_widget("label55").set_text(_("Gooroom"))
+    prefs_tree.get_widget("label56").set_text(_("Debian"))
+    prefs_tree.get_widget("label57").set_text(_("3rd-party"))
     #prefs_tree.get_widget("label58").set_text(_("Upstream"))
     #prefs_tree.get_widget("label59").set_text(_("Upstream"))
     prefs_tree.get_widget("label81").set_text(_("Refresh the list of updates every:"))
@@ -1292,14 +1281,14 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
     prefs = read_configuration()
 
-    #prefs_tree.get_widget("visible1").set_active(prefs["level1_visible"])
-    #prefs_tree.get_widget("visible2").set_active(prefs["level2_visible"])
-    #prefs_tree.get_widget("visible3").set_active(prefs["level3_visible"])
+    prefs_tree.get_widget("visible1").set_active(prefs["level1_visible"])
+    prefs_tree.get_widget("visible2").set_active(prefs["level2_visible"])
+    prefs_tree.get_widget("visible3").set_active(prefs["level3_visible"])
     #prefs_tree.get_widget("visible4").set_active(prefs["level4_visible"])
     #prefs_tree.get_widget("visible5").set_active(prefs["level5_visible"])
-    #prefs_tree.get_widget("safe1").set_active(prefs["level1_safe"])
-    #prefs_tree.get_widget("safe2").set_active(prefs["level2_safe"])
-    #prefs_tree.get_widget("safe3").set_active(prefs["level3_safe"])
+    prefs_tree.get_widget("safe1").set_active(prefs["level1_safe"])
+    prefs_tree.get_widget("safe2").set_active(prefs["level2_safe"])
+    prefs_tree.get_widget("safe3").set_active(prefs["level3_safe"])
     #prefs_tree.get_widget("safe4").set_active(prefs["level4_safe"])
     #prefs_tree.get_widget("safe5").set_active(prefs["level5_safe"])
     prefs_tree.get_widget("checkbutton_security_visible").set_active(prefs["security_visible"])
@@ -1381,7 +1370,7 @@ def remove_blacklisted_package(widget, treeview_blacklist):
 
 def open_history(widget):
     #Set the Glade file
-    gladefile = "/usr/lib/linuxmint/mintUpdate/mintUpdate.glade"
+    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
     wTree = gtk.glade.XML(gladefile, "window4")
     treeview_update = wTree.get_widget("treeview_history")
     wTree.get_widget("window4").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
@@ -1453,7 +1442,7 @@ def open_information(widget):
     global logFile
     global pid
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/mintUpdate.glade"
+    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window3")
     prefs_tree.get_widget("window3").set_title(_("Information") + " - " + _("Update Manager"))
     prefs_tree.get_widget("window3").set_icon_from_file("/usr/lib/linuxmint/mintUpdate/icons/base.svg")
@@ -1498,7 +1487,7 @@ def open_kernels(widget):
     global logFile
     global pid
 
-    gladefile = "/usr/lib/linuxmint/mintUpdate/mintUpdate.glade"
+    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
     tree = gtk.glade.XML(gladefile, "window5")
     window = tree.get_widget("window5")
     window.set_title(_("Linux kernels") + " - " + _("Update Manager"))
@@ -1723,7 +1712,7 @@ def open_rel_upgrade(widget):
 def open_about(widget):
     dlg = gtk.AboutDialog()
     dlg.set_title(_("About") + " - " + _("Update Manager"))
-    dlg.set_program_name("mintUpdate")
+    dlg.set_program_name("gooroomUpdate")
     dlg.set_comments(_("Update Manager"))
     try:
         h = open('/usr/share/common-licenses/GPL','r')
@@ -1737,7 +1726,7 @@ def open_about(widget):
         print detail
     try:
         cache = apt.Cache()
-        pkg = cache["mintupdate"]
+        pkg = cache["gooroomupdate"]
         if pkg.installed is not None:
             version = pkg.installed.version
         else:
@@ -2032,7 +2021,7 @@ try:
 except Exception, detail:
     print detail
 
-log.writelines("++ Launching mintUpdate \n")
+log.writelines("++ Launching gooroomUpdate \n")
 log.flush()
 
 if (not os.path.exists(CONFIG_DIR)):
@@ -2056,14 +2045,14 @@ try:
     statusIcon.set_visible(not prefs["hide_systray"])
 
     #Set the Glade file
-    gladefile = "/usr/lib/linuxmint/mintUpdate/mintUpdate.glade"
+    gladefile = "/usr/lib/linuxmint/mintUpdate/gooroomUpdate.glade"
     wTree = gtk.glade.XML(gladefile, "window1")
     wTree.get_widget("window1").set_title(_("Update Manager"))
     wTree.get_widget("window1").set_default_size(prefs['dimensions_x'], prefs['dimensions_y'])
     wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
     
     statusbar = wTree.get_widget("statusbar")
-    context_id = statusbar.get_context_id("mintUpdate")
+    context_id = statusbar.get_context_id("gooroomUpdate")
 
     vbox = wTree.get_widget("vbox_main")
     treeview_update = wTree.get_widget("treeview_update")

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo rm -rf /usr/lib/linuxmint/mintUpdate
+sudo rm -rf /usr/lib/linuxmint/gooroomUpdate
 sudo cp -R etc /
 sudo cp -R usr /
-mintupdate
+gooroomupdate

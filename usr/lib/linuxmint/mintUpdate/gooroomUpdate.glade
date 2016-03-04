@@ -971,7 +971,6 @@ Public License instead of this License.
                 <property name="type">tab</property>
               </packing>
             </child>
-<!--
             <child>
               <widget class="GtkVBox" id="vbox23">
                 <property name="visible">True</property>
@@ -987,6 +986,7 @@ Public License instead of this License.
                     <property name="n_columns">6</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
+<!--
                     <child>
                       <widget class="GtkLabel" id="label59">
                         <property name="visible">True</property>
@@ -1018,12 +1018,13 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkLabel" id="label57">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Ubuntu or 3rd party</property>
+                        <property name="label" translatable="yes" context="yes">3rd party</property>
                       </widget>
                       <packing>
                         <property name="left_attach">3</property>
@@ -1039,7 +1040,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Ubuntu or 3rd party</property>
+                        <property name="label" translatable="yes" context="yes">Debian</property>
                       </widget>
                       <packing>
                         <property name="left_attach">3</property>
@@ -1055,7 +1056,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Linux Mint or Romeo</property>
+                        <property name="label" translatable="yes" context="yes">Gooroom</property>
                       </widget>
                       <packing>
                         <property name="left_attach">3</property>
@@ -1111,6 +1112,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkCheckButton" id="safe5">
                         <property name="visible">True</property>
@@ -1145,6 +1147,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkCheckButton" id="safe3">
                         <property name="visible">True</property>
@@ -1196,6 +1199,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkCheckButton" id="visible5">
                         <property name="visible">True</property>
@@ -1230,6 +1234,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkCheckButton" id="visible3">
                         <property name="visible">True</property>
@@ -1296,6 +1301,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkLabel" id="label47">
                         <property name="visible">True</property>
@@ -1330,12 +1336,13 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkLabel" id="label45">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Safe packages. Not tested but believed to be safe.</property>
+                        <property name="label" translatable="yes" context="yes">서드파티에서 제공하는 패키지입니다.</property>
                         <property name="wrap">True</property>
                       </widget>
                       <packing>
@@ -1351,7 +1358,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Recommended packages. Tested and approved by Linux Mint.</property>
+                        <property name="label" translatable="yes" context="yes">데비안에서 제공하는 패키지입니다.</property>
                         <property name="wrap">True</property>
                       </widget>
                       <packing>
@@ -1367,7 +1374,7 @@ Public License instead of this License.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Certified packages. Tested through Romeo or directly maintained by Linux Mint.</property>
+                        <property name="label" translatable="yes" context="yes">구름에서 제공하는 패키지입니다.</property>
                         <property name="wrap">True</property>
                       </widget>
                       <packing>
@@ -1378,6 +1385,7 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkImage" id="image14">
                         <property name="visible">True</property>
@@ -1402,6 +1410,7 @@ Public License instead of this License.
                         <property name="x_options">GTK_FILL</property>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkImage" id="image12">
                         <property name="visible">True</property>
@@ -1481,6 +1490,7 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkImage" id="image2">
                         <property name="visible">True</property>
@@ -1496,6 +1506,7 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
+-->
                     <child>
                       <widget class="GtkImage" id="image3">
                         <property name="visible">True</property>
@@ -1526,6 +1537,7 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
+<!--
                     <child>
                       <widget class="GtkImage" id="image5">
                         <property name="visible">True</property>
@@ -1541,6 +1553,7 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
+-->
                   </widget>
                   <packing>
                     <property name="expand">True</property>
@@ -1565,7 +1578,6 @@ Public License instead of this License.
                 <property name="type">tab</property>
               </packing>
             </child>
--->
             <child>
               <widget class="GtkTable" id="table3">
                 <property name="visible">True</property>

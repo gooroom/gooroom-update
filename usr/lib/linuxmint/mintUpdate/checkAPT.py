@@ -77,27 +77,15 @@ try:
             description = pkg.candidate.description
             if (newVersion != oldVersion):
                 update_type = "package"
-                update_origin = "linuxmint"
+                update_origin = "gooroom"
                 for origin in pkg.candidate.origins:
-                    if origin.origin == "Ubuntu":
-                        update_origin = "ubuntu"
-                    elif origin.origin == "Debian":
+                    if origin.origin == "Debian":
                         update_origin = "debian"
-                    if origin.origin == "Ubuntu" and '-security' in origin.archive:
-                        update_type = "security"
-                        break
                     if origin.origin == "Debian" and '-Security' in origin.label:
                         update_type = "security"
                         break
-                    if origin.origin == "linuxmint":
-                        if origin.component == "romeo":
-                            update_type = "unstable"
-                            break
-                        elif origin.component == "backport":
-                            update_type = "backport"
-                            break
-                        else:
-                            update_type = "linuxmint"                
+                    if origin.origin == "gooroom":
+                        update_type = "gooroom"                
                     
                 resultString = u"UPDATE###%s###%s###%s###%s###%s###%s###%s###%s###%s---EOL---" % (package, newVersion, oldVersion, size, sourcePackage, update_type, update_origin, short_description, description)
                 print resultString.encode('ascii', 'xmlcharrefreplace')

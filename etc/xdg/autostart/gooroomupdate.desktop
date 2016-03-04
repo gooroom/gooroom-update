@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=mintUpdate
-Comment=Linux Mint Update Manager
+Name=gooroomUpdate
+Comment=Gooroom Update Manager
 Icon=stock_lock
-Exec=mintupdate-launcher
+Exec=gooroomupdate-launcher
 Terminal=false
 Type=Application
 Categories=
