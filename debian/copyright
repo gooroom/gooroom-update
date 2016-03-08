@@ -1,10 +1,10 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: gooroomupdate
-Upstream-Contact: gooroom <Gooroom@gooroom.kr>
+Upstream-Name: gooroom-update
+Upstream-Contact: gooroom <gooroom@gooroom.kr>
 Source: http://git.gooroom.kr/gitweb/gooroom-update.git
 
 Files: *
-Copyright: 2007-2015 Gooroom <Gooroom@gooroom.kr>
+Copyright: 2007-2015 Gooroom <gooroom@gooroom.kr>
 License: GPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

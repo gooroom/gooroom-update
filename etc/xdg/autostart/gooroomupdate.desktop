@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=gooroomUpdate
+Name=gooroom-update
 Comment=Gooroom Update Manager
 Icon=stock_lock
-Exec=gooroomupdate-launcher
+Exec=gooroom-update-launcher
 Terminal=false
 Type=Application
 Categories=

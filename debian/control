@@ -1,4 +1,4 @@
-Source: gooroomupdate
+Source: gooroom-update
 Section: admin
 Priority: optional
 Maintainer: Gooroom <gooroom@gooroom.kr>
@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9),
                dh-python
 Standards-Version: 3.9.5
 
-Package: gooroomupdate
+Package: gooroom-update
 Architecture: all
 Depends:
  ${python:Depends},

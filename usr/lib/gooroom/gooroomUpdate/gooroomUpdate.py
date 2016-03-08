@@ -57,7 +57,7 @@ else:
         libc.call('prctl', 15, 'gooroomUpdate', 0, 0, 0)
 
 # i18n
-gettext.install("gooroomupdate", "/usr/share/gooroom/locale")
+gettext.install("gooroom-update", "/usr/share/gooroom/locale")
 
 CONFIG_DIR = "%s/.config/gooroom" % home
 KERNEL_INFO_DIR = "/usr/share/mint-kernel-info"
@@ -440,7 +440,7 @@ class InstallThread(threading.Thread):
                         self.wTree.get_widget("window1").hide()
                         gtk.gdk.threads_leave()
 
-                    if "gooroomupdate" in packages or "gooroom-upgrade-info" in packages:
+                    if "gooroom-update" in packages or "gooroom-upgrade-info" in packages:
                         # Restart                        
                         try:
                             log.writelines("++ Mintupdate was updated, restarting it...\n")
@@ -625,8 +625,8 @@ class RefreshThread(threading.Thread):
                 refresh_command = "sudo %s" % refresh_command
             updates =  commands.getoutput(refresh_command)
 
-            # Look for gooroomupdate
-            if ("UPDATE###gooroomupdate###" in updates or "UPDATE###gooroom-upgrade-info###" in updates):                
+            # Look for gooroom-update
+            if ("UPDATE###gooroom-update###" in updates or "UPDATE###gooroom-upgrade-info###" in updates):                
                 new_gooroomupdate = True
             else:
                 new_gooroomupdate = False
@@ -641,8 +641,8 @@ class RefreshThread(threading.Thread):
             download_size = 0
             num_ignored = 0
             ignored_list = []
-            if os.path.exists("%s/gooroomupdate.ignored" % CONFIG_DIR):
-                blacklist_file = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "r")
+            if os.path.exists("%s/gooroom-update.ignored" % CONFIG_DIR):
+                blacklist_file = open("%s/gooroom-update.ignored" % CONFIG_DIR, "r")
                 for blacklist_line in blacklist_file:
                     ignored_list.append(blacklist_line.strip())
                 blacklist_file.close()                
@@ -778,7 +778,7 @@ class RefreshThread(threading.Thread):
                     
                     package_update = package_updates[source_package]
 
-                    if (new_gooroomupdate and package_update.name != "gooroomupdate" and package_update.name != "gooroom-upgrade-info"):
+                    if (new_gooroomupdate and package_update.name != "gooroom-update" and package_update.name != "gooroom-upgrade-info"):
                         continue
 
                     if source_package in aliases.keys():
@@ -837,7 +837,7 @@ class RefreshThread(threading.Thread):
                     self.statusIcon.set_tooltip(self.statusString)
                     self.statusIcon.set_visible(True)
                     statusbar.push(context_id, self.statusString)
-                    log.writelines("++ Found a new version of gooroomupdate\n")
+                    log.writelines("++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
                     if (num_safe > 0):
@@ -1050,7 +1050,7 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['icons']['apply'] = icon_apply
     
     #Write blacklisted updates
-    ignored_list = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "w")
+    ignored_list = open("%s/gooroom-update.ignored" % CONFIG_DIR, "w")
     treeview_blacklist = prefs_tree.get_widget("treeview_blacklist")
     model = treeview_blacklist.get_model()
     iter = model.get_iter_first()
@@ -1328,8 +1328,8 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     model.set_sort_column_id( 0, gtk.SORT_ASCENDING )
     treeview_blacklist.set_model(model)
 
-    if os.path.exists("%s/gooroomupdate.ignored" % CONFIG_DIR):
-        ignored_list = open("%s/gooroomupdate.ignored" % CONFIG_DIR, "r")
+    if os.path.exists("%s/gooroom-update.ignored" % CONFIG_DIR):
+        ignored_list = open("%s/gooroom-update.ignored" % CONFIG_DIR, "r")
         for ignored_pkg in ignored_list:            
             iter = model.insert_before(None, None)
             model.set_value(iter, 0, ignored_pkg.strip())
@@ -1725,7 +1725,7 @@ def open_about(widget):
         print detail
     try:
         cache = apt.Cache()
-        pkg = cache["gooroomupdate"]
+        pkg = cache["gooroom-update"]
         if pkg.installed is not None:
             version = pkg.installed.version
         else:
@@ -1734,7 +1734,7 @@ def open_about(widget):
     except Exception, detail:
         print detail
 
-    dlg.set_authors(["Clement Lefebvre <root@gooroom.com>", "Chris Hodapp <clhodapp@live.com>"])
+    dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>","Gooroom <gooroom@gooroom.com>"])
     dlg.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     dlg.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg"))
     def close(w, res):
@@ -1990,7 +1990,7 @@ def menuPopup(widget, event, treeview_update, statusIcon, wTree):
             menu.popup( None, None, None, 3, 0)
         
 def add_to_ignore_list(widget, treeview_update, pkg, statusIcon, wTree):
-    os.system("echo \"%s\" >> %s/gooroomupdate.ignored" % (pkg, CONFIG_DIR))
+    os.system("echo \"%s\" >> %s/gooroom-update.ignored" % (pkg, CONFIG_DIR))
     refresh = RefreshThread(treeview_update, statusIcon, wTree)
     refresh.start()
 

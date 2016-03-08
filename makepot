@@ -1,3 +1,3 @@
 #!/bin/bash
 
-xgettext --language=Python --keyword=_ --output=gooroomupdate.pot usr/lib/gooroom/gooroomUpdate/*.py generate_desktop_files usr/bin/gooroom-release-upgrade usr/bin/gooroom-release-upgrade-root usr/lib/gooroom/gooroomUpdate/aliases
+xgettext --language=Python --keyword=_ --output=gooroom-update.pot usr/lib/gooroom/gooroomUpdate/*.py generate_desktop_files usr/bin/gooroom-release-upgrade usr/bin/gooroom-release-upgrade-root usr/lib/gooroom/gooroomUpdate/aliases

@@ -357,7 +357,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
 </property>
-    <property name="authors">Clement Lefebvre &lt;root@gooroom.com&gt;</property>
+    <property name="authors">Gooroom &lt;gooroom@gooroom.com&gt;</property>
     <property name="logo">/usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
