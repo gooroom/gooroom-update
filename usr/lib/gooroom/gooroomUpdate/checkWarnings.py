@@ -5,9 +5,9 @@ import apt_pkg
 
     
 try:
-    sys.path.append('/usr/lib/linuxmint/common')
+    sys.path.append('/usr/lib/gooroom/common')
     from configobj import ConfigObj
-    config = ConfigObj("/etc/linuxmint/mintUpdate.conf")
+    config = ConfigObj("/etc/gooroom/gooroomUpdate.conf")
     try:
         if (config['update']['dist_upgrade'] == "True"):
             dist_upgrade = True
