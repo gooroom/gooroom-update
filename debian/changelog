@@ -1,3 +1,13 @@
+gooroom-update (0.9.1) gooroom; urgency=medium
+
+  [ gooroom ]
+  * removed deprecated codes
+
+  [ ryanlee ]
+  * Get changelog of gooroom packages
+
+ -- Gooroom <gooroom@gooroom.kr>  Wed, 06 Apr 2016 10:41:50 +0900
+
 gooroom-update (0.9) gooroom; urgency=high
 
   * Gooroom ported
