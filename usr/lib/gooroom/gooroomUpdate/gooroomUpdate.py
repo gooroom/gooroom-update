@@ -1326,9 +1326,11 @@ def pref_cancel(widget, prefs_tree):
 
 def set_auto_upgrade(widget, prefs_tree):
     if prefs_tree.get_widget("auto_upgrade").get_active()== False:
+        os.system("gksudo \"sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
         prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(False)
     else:
+        os.system("gksudo \"sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
         prefs_tree.get_widget("auto_upgrade_date").set_sensitive(True)
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
 
