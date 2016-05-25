@@ -982,43 +982,10 @@ Public License instead of this License.
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="border_width">3</property>
-                    <property name="n_rows">6</property>
+                    <property name="n_rows">4</property>
                     <property name="n_columns">6</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
-<!--
-                    <child>
-                      <widget class="GtkLabel" id="label59">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Ubuntu or 3rd party</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">3</property>
-                        <property name="right_attach">4</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label58">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Ubuntu or 3rd party</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">3</property>
-                        <property name="right_attach">4</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkLabel" id="label57">
                         <property name="visible">True</property>
@@ -1112,42 +1079,6 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkCheckButton" id="safe5">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">4</property>
-                        <property name="right_attach">5</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkCheckButton" id="safe4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">4</property>
-                        <property name="right_attach">5</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkCheckButton" id="safe3">
                         <property name="visible">True</property>
@@ -1199,42 +1130,6 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkCheckButton" id="visible5">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">5</property>
-                        <property name="right_attach">6</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkCheckButton" id="visible4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">5</property>
-                        <property name="right_attach">6</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkCheckButton" id="visible3">
                         <property name="visible">True</property>
@@ -1301,42 +1196,6 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkLabel" id="label47">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Dangerous packages. Known to affect the stability of the  systems depending on certain specs or hardware. </property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label46">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes" context="yes">Unsafe packages. Could potentially affect the stability of the system.</property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"/>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkLabel" id="label45">
                         <property name="visible">True</property>
@@ -1385,32 +1244,6 @@ Public License instead of this License.
                         <property name="y_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkImage" id="image14">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level5.png</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkImage" id="image13">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/level4.png</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkImage" id="image12">
                         <property name="visible">True</property>
@@ -1490,23 +1323,6 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkImage" id="image2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/no.png</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="right_attach">3</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options"/>
-                      </packing>
-                    </child>
--->
                     <child>
                       <widget class="GtkImage" id="image3">
                         <property name="visible">True</property>
@@ -1537,23 +1353,6 @@ Public License instead of this License.
                         <property name="x_options"/>
                       </packing>
                     </child>
-<!--
-                    <child>
-                      <widget class="GtkImage" id="image5">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="pixbuf">/usr/lib/gooroom/gooroomUpdate/icons/no.png</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="right_attach">3</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options"/>
-                      </packing>
-                    </child>
--->
                   </widget>
                   <packing>
                     <property name="expand">True</property>
@@ -1583,8 +1382,8 @@ Public License instead of this License.
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">12</property>
-                <property name="n_rows">5</property>
-                <property name="n_columns">3</property>
+                <property name="n_rows">6</property>
+                <property name="n_columns">6</property>
                 <property name="column_spacing">6</property>
                 <property name="row_spacing">6</property>
                 <child>
@@ -1596,7 +1395,7 @@ Public License instead of this License.
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
-                    <property name="right_attach">3</property>
+                    <property name="right_attach">6</property>
                     <property name="y_options">GTK_FILL</property>
                     <property name="y_padding">6</property>
                   </packing>
@@ -1614,11 +1413,27 @@ Public License instead of this License.
                     <property name="adjustment">5 0 59 1 10 0</property>
                   </widget>
                   <packing>
-                    <property name="right_attach">2</property>
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
                     <property name="x_options"/>
                     <property name="y_options">GTK_FILL</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label82">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">1.1175871339474952e-009</property>
+                    <property name="label" translatable="yes" context="yes">&lt;i&gt;Note: The list only gets refreshed while the gooroomUpdate window is closed (system tray mode).&lt;/i&gt;</property>
+                    <property name="use_markup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">6</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                    <property name="y_options">GTK_FILL</property>
+                    <property name="y_padding">6</property>
                   </packing>
                 </child>
                 <child>
@@ -1630,8 +1445,8 @@ Public License instead of this License.
                     <property name="label" translatable="yes" context="yes">minutes</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
                     <property name="x_options">GTK_FILL</property>
@@ -1651,9 +1466,10 @@ Public License instead of this License.
                     <property name="adjustment">0 0 24 1 10 0</property>
                   </widget>
                   <packing>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="left_attach">2</property>
+                    <property name="right_attach">3</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                     <property name="x_options"/>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1667,10 +1483,10 @@ Public License instead of this License.
                     <property name="label" translatable="yes" context="yes">hours</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="left_attach">3</property>
+                    <property name="right_attach">4</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
                 </child>
@@ -1687,9 +1503,10 @@ Public License instead of this License.
                     <property name="adjustment">0 0 365 1 10 0</property>
                   </widget>
                   <packing>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="left_attach">4</property>
+                    <property name="right_attach">5</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                     <property name="x_options"/>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1703,28 +1520,124 @@ Public License instead of this License.
                     <property name="label" translatable="yes" context="yes">days</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="left_attach">5</property>
+                    <property name="right_attach">6</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label82">
+                  <widget class="GtkCheckButton" id="auto_upgrade">
+                    <property name="label" translatable="yes">Auto upgrade</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">1.1175871339474952e-09</property>
-                    <property name="label" translatable="yes" context="yes">&lt;i&gt;Note: The list only gets refreshed while the gooroomUpdate window is closed (system tray mode).&lt;/i&gt;</property>
-                    <property name="use_markup">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="focus_on_click">False</property>
+                    <property name="draw_indicator">True</property>
                   </widget>
                   <packing>
+                    <property name="right_attach">6</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkComboBox" id="auto_upgrade_date">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="focus_on_click">False</property>
+                    <property name="entry_text_column">0</property>
+                    <property name="items" translatable="yes">Every Day
+Every Sunday
+Every Monday
+Every Tuesday
+Every Wednesday
+Every Thursday
+Every Friday
+Every Saturday</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">4</property>
                     <property name="bottom_attach">5</property>
-                    <property name="y_options">GTK_FILL</property>
-                    <property name="y_padding">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label4">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">New Upgrade</property>
+                  </widget>
+                  <packing>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkComboBox" id="auto_upgrade_time">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">0</property>
+                    <property name="entry_text_column">0</property>
+                    <property name="items" translatable="yes">AM 12:00
+AM 1:00
+AM 2:00
+AM 3:00
+AM 4:00
+AM 5:00
+AM 6:00
+AM 7:00
+AM 8:00
+AM 9:00
+AM 10:00
+AM 11:00
+PM 12:00
+PM 1:00
+PM 2:00
+PM 3:00
+PM 4:00
+PM 5:00
+PM 6:00
+PM 7:00
+PM 8:00
+PM 9:00
+PM 10:00
+PM 11:00
+                  </property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">4</property>
+                    <property name="right_attach">6</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label5">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Time</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="right_attach">4</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label6">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">The system will be upgraded automatically with the latest software if it is on and running at the time.</property>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">6</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                   </packing>
                 </child>
               </widget>
