@@ -1494,7 +1494,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("window2").set_title(_("Preferences") + " - " + _("Update Manager"))
 
     prefs_tree.get_widget("label37").set_text(_("Levels"))
-    prefs_tree.get_widget("label36").set_text(_("Auto-Refresh"))
+    prefs_tree.get_widget("label36").set_text(_("Auto-Refresh & Upgrade"))
     prefs_tree.get_widget("label39").set_markup("<b>" + _("Level") + "</b>")
     prefs_tree.get_widget("label40").set_markup("<b>" + _("Description") + "</b>")
     prefs_tree.get_widget("label48").set_markup("<b>" + _("Tested?") + "</b>")
@@ -1526,6 +1526,19 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("label2").set_text(_("Unknown state"))
     prefs_tree.get_widget("label3").set_text(_("Applying updates"))
     prefs_tree.get_widget("label1").set_text(_("Ignored updates"))
+
+    prefs_tree.get_widget("auto_upgrade").set_label(_("Auto Upgrade"))
+    prefs_tree.get_widget("label4").set_text(_("New Upgrade"))
+    prefs_tree.get_widget("label5").set_text(_("Time"))
+    prefs_tree.get_widget("label6").set_text(_("The system will be upgraded automatically with the latest software if it is on and running at the time."))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Saturday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Friday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Thursday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Wednesday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Tuesday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Monday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Sunday"))
+    prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Day"))
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
     prefs_tree.get_widget("checkbutton_hide_window_after_update").set_label(_("Hide the update manager after applying updates"))

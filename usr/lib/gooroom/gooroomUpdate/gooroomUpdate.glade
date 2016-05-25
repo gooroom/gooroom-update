@@ -1548,14 +1548,7 @@ Public License instead of this License.
                     <property name="can_focus">False</property>
                     <property name="focus_on_click">False</property>
                     <property name="entry_text_column">0</property>
-                    <property name="items" translatable="yes">Every Day
-Every Sunday
-Every Monday
-Every Tuesday
-Every Wednesday
-Every Thursday
-Every Friday
-Every Saturday</property>
+                    <property name="items" translatable="yes"></property>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1648,7 +1641,7 @@ PM 11:00
             <child>
               <widget class="GtkLabel" id="label36">
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes" context="yes">Auto-refresh</property>
+                <property name="label" translatable="yes" context="yes">Auto-refresh &amp; Upgrade</property>
               </widget>
               <packing>
                 <property name="position">2</property>
