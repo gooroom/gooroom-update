@@ -1277,7 +1277,6 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['refresh']['timer_days'] = int(prefs_tree.get_widget("timer_days").get_value())
 
     config['auto_upgrade']= {}
-    config['auto_upgrade']['auto_upgrade']= prefs_tree.get_widget("auto_upgrade").get_active()
     config['auto_upgrade']['date']= int(prefs_tree.get_widget("auto_upgrade_date").get_active())
     config['auto_upgrade']['time']= int(prefs_tree.get_widget("auto_upgrade_time").get_active())
 
@@ -1325,14 +1324,34 @@ def pref_cancel(widget, prefs_tree):
     prefs_tree.get_widget("window2").hide()
 
 def set_auto_upgrade(widget, prefs_tree):
-    if prefs_tree.get_widget("auto_upgrade").get_active()== False:
-        os.system("gksudo \"sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
-        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
-        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(False)
-    else:
-        os.system("gksudo \"sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
-        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(True)
+    global auto_up_toggle
+    print(1, auto_up_toggle)
+
+    if auto_up_toggle== 1:
+        auto_up_toggle= 2
+    if prefs_tree.get_widget("auto_upgrade").get_active()== False and auto_up_toggle== 0:
+        auto_up_toggle= 1
+        result=os.system("gksudo \"sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
+    elif prefs_tree.get_widget("auto_upgrade").get_active()== True and auto_up_toggle== 0:
+        auto_up_toggle= 1
+        result=os.system("gksudo \"sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
+    if get_auto_upgrade():
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
+        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(True)
+    else:
+        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(False)
+        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
+    prefs_tree.get_widget("auto_upgrade").set_active(get_auto_upgrade())
+    print(2, auto_up_toggle)
+    if auto_up_toggle== 2 or auto_up_toggle==1:
+        auto_up_toggle=0
+
+def get_auto_upgrade():
+    with open("/etc/sudoers.d/gooroom-update", "r") as f:
+        for line in f:
+            if "%sudo" in line[:5]:
+                return True
+    return False
 
 def read_configuration():
     global icon_busy
@@ -1367,7 +1386,7 @@ def read_configuration():
         prefs["timer_days"] = 0
 
     try:
-        prefs["auto_upgrade"]= (config['auto_upgrade']['auto_upgrade'] == "True")
+        prefs["auto_upgrade"]= get_auto_upgrade()
         prefs["auto_upgrade_date"]= int(config['auto_upgrade']['date'])
         prefs["auto_upgrade_time"] = int(config['auto_upgrade']['time'])
     except:
@@ -2325,6 +2344,9 @@ try:
     global icon_error
     global icon_unknown
     global icon_apply
+    global auto_up_toggle
+
+    auto_up_toggle=0
 
     prefs = read_configuration()
 
