@@ -133,7 +133,10 @@ class ChangelogRetriever(threading.Thread):
 
         changelog_sources = []
         if self.origin == "gooroom":
-            changelog_sources.append("http://packages.gooroom.kr/gooroom/pool/main/%s/%s/%s_%s.changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
+            if (self.source_package.startswith("lib")):
+            	changelog_sources.append("http://packages.gooroom.kr/gooroom/pool/main/%s/%s/%s_%s.changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
+	    else:
+            	changelog_sources.append("http://packages.gooroom.kr/gooroom/pool/main/%s/%s/%s_%s.changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
         elif self.origin == "debian":
             if (self.source_package.startswith("lib")):
                 changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
