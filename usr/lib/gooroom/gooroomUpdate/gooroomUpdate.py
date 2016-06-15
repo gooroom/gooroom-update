@@ -1083,6 +1083,14 @@ class RefreshThread(threading.Thread):
                     log.writelines("++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
+                    try:
+                        urllib2.urlopen('http://packages.gooroom.kr', timeout=2)
+                        print "network connection ok"
+                        net_status = _("OK")
+                    except urllib2.URLError as err:
+                        print "network connection failed"
+                        net_status = _("Failed")
+
                     if (num_safe > 0):
                         message = _("Found a new version in updater.\n Please run the update.")
                         d = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
@@ -1095,17 +1103,23 @@ class RefreshThread(threading.Thread):
                         if (num_safe == 1):
                             if (num_ignored == 0):
                                 self.statusString = _("1 recommended update available (%(size)s)") % {'size':size_to_string(download_size)}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("1 recommended update available (%(size)s), 1 ignored") % {'size':size_to_string(download_size)}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 1):
                                 self.statusString = _("1 recommended update available (%(size)s), %(ignored)d ignored") % {'size':size_to_string(download_size), 'ignored':num_ignored}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                         else:
                             if (num_ignored == 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s)") % {'recommended':num_safe, 'size':size_to_string(download_size)}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), 1 ignored") % {'recommended':num_safe, 'size':size_to_string(download_size)}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), %(ignored)d ignored") % {'recommended':num_safe, 'size':size_to_string(download_size), 'ignored':num_ignored}
+                                self.statusString += " : " + _("Network connection is %s") % net_status
                         self.statusIcon.set_from_file(icon_updates)
                         self.statusIcon.set_tooltip(self.statusString)
                         self.statusIcon.set_visible(True)
@@ -1116,9 +1130,11 @@ class RefreshThread(threading.Thread):
                         if num_visible == 0:
                             self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
                         self.statusIcon.set_from_file(icon_up2date)
-                        self.statusIcon.set_tooltip(_("Your system is up to date"))
+                        self.statusString = _("Your system is up to date")
+                        self.statusString += " : " + _("Network connection is %s") % net_status
+                        self.statusIcon.set_tooltip(self.statusString)
                         self.statusIcon.set_visible(not prefs["hide_systray"])
-                        statusbar.push(context_id, _("Your system is up to date"))
+                        statusbar.push(context_id,self.statusString)
                         log.writelines("++ System is up to date\n")
                         log.flush()
 
