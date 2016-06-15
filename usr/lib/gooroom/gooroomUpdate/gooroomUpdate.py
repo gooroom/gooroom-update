@@ -1084,6 +1084,14 @@ class RefreshThread(threading.Thread):
                     log.flush()
                 else:
                     if (num_safe > 0):
+                        message = _("Found a new version in updater.\n Please run the update.")
+                        d = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
+                        d.set_title(_("warning updater"))
+                        d.run()
+                        d.hide()
+                        d.destroy()
+                        wTree.get_widget("window1").show_all()
+
                         if (num_safe == 1):
                             if (num_ignored == 0):
                                 self.statusString = _("1 recommended update available (%(size)s)") % {'size':size_to_string(download_size)}
