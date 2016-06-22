@@ -792,6 +792,8 @@ class RefreshThread(threading.Thread):
     def run(self):
         global log
         global app_hidden
+        global alert
+        global alertDialog
         gtk.gdk.threads_enter()
         vpaned_position = wTree.get_widget("vpaned1").get_position()
         gtk.gdk.threads_leave()
@@ -1092,12 +1094,40 @@ class RefreshThread(threading.Thread):
                         net_status = _("Failed")
 
                     if (num_safe > 0):
-                        message = _("Found a new version in updater.\n Please run the update.")
-                        d = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
-                        d.set_title(_("warning updater"))
-                        d.run()
-                        d.hide()
-                        d.destroy()
+                        x, y = wTree.get_widget("window1").get_position()
+
+                        ## 1. The alert pop-up is new
+                        if alert == True:
+                            # pop-up for updater
+                            wTree.get_widget("window1").move(x, y)
+                            wTree.get_widget("window1").present()
+                            wTree.get_widget("window1").show_all()
+
+                            message = _("Found a new version in updater.\nPlease run the update.")
+                            alertDialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
+                            alertDialog.set_title(_("warning updater"))
+
+                            # set the center position
+                            wTree.get_widget("window1").set_position(gtk.WIN_POS_CENTER_ALWAYS)
+                            alertDialog.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+
+                            alert = False
+
+                            if alertDialog.run() == gtk.RESPONSE_OK:
+                                alertDialog.hide()
+                                alertDialog.destroy()
+                                alert = True
+
+                        ## 2. The alert pop-up already.
+                        else:
+                            xa, ya = alertDialog.get_position()
+                            alertDialog.move(xa, ya)
+                            alertDialog.present()
+                            alertDialog.show()
+
+                        # pop-up for updater
+                        wTree.get_widget("window1").move(x, y)
+                        wTree.get_widget("window1").present()
                         wTree.get_widget("window1").show_all()
 
                         if (num_safe == 1):
@@ -1337,6 +1367,10 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     prefs_tree.get_widget("window2").hide()
     refresh = RefreshThread(treeview, statusIcon, wTree)
     refresh.start()
+
+    #gooroom
+    global app_hidden
+    app_hidden = True
 
 def kernels_cancel(widget, tree):
     tree.get_widget("window5").hide()
@@ -2338,6 +2372,7 @@ global statusbar
 global context_id
 
 app_hidden = True
+alert = True
 
 gtk.gdk.threads_init()
 
