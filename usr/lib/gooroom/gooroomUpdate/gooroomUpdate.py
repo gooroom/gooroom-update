@@ -1103,9 +1103,12 @@ class RefreshThread(threading.Thread):
                             wTree.get_widget("window1").present()
                             wTree.get_widget("window1").show_all()
 
-                            message = _("Found a new version in updater.\nPlease run the update.")
-                            alertDialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
+                            alertDialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, None)
                             alertDialog.set_title(_("warning updater"))
+
+                            # set font size
+                            message = "<span font_weight='bold' size='large'>%s</span>" % _("Found a new version in updater.\nPlease run the update.")
+                            alertDialog.set_markup(message)
 
                             # set the center position
                             wTree.get_widget("window1").set_position(gtk.WIN_POS_CENTER_ALWAYS)
