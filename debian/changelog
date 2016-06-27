@@ -1,3 +1,15 @@
+gooroom-update (0.9.1+grm2) gooroom; urgency=medium
+
+  [ jongkyung.woo ]
+  * [77382a19] if updates are available, a pop-up guide unconditionally
+  * [a6acd453] Display the network's status in tooltip and status bar
+  * [0f16de61] Alert messageDialog redundancy check and raising the messageDialog in the stacking order with present method
+  * [f81cdcdf] Set the markup to the messageDialog
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 27 Jun 2016 13:17:11 +0900
+
 gooroom-update (0.9.1+grm1) gooroom; urgency=medium
 
   * UNRELEASED
