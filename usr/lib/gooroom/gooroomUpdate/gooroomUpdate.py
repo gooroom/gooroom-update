@@ -404,7 +404,7 @@ class InstallThread(threading.Thread):
 
                 if proceed:
                     gtk.gdk.threads_enter()
-                    self.statusIcon.set_from_file(icon_apply)
+                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_apply))
                     self.statusIcon.set_tooltip(_("Installing updates"))
                     self.statusIcon.set_visible(True)
                     gtk.gdk.threads_leave()
@@ -456,7 +456,7 @@ class InstallThread(threading.Thread):
                     else:
                         # Refresh
                         gtk.gdk.threads_enter()
-                        self.statusIcon.set_from_file(icon_busy)
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
                         self.statusIcon.set_tooltip(_("Checking for updates"))
                         self.statusIcon.set_visible(not prefs["hide_systray"])
                         self.wTree.get_widget("window1").window.set_cursor(None)
@@ -481,7 +481,7 @@ class InstallThread(threading.Thread):
             log.writelines("-- Exception occured in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
-            self.statusIcon.set_from_file(icon_error)
+            self.statusIcon.set_from_pixbuf(pixbuf_taryico(icon_error))
             self.statusIcon.set_tooltip(_("Could not install the security updates"))
             self.statusIcon.set_visible(True)
             log.writelines("-- Could not install security updates\n")
@@ -658,7 +658,7 @@ class AutoInstallThread(threading.Thread):
 
                 if proceed:
                     gtk.gdk.threads_enter()
-                    self.statusIcon.set_from_file(icon_apply)
+                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_apply))
                     self.statusIcon.set_tooltip(_("Installing updates"))
                     self.statusIcon.set_visible(True)
                     gtk.gdk.threads_leave()
@@ -697,7 +697,7 @@ class AutoInstallThread(threading.Thread):
                     else:
                         # Refresh
                         gtk.gdk.threads_enter()
-                        self.statusIcon.set_from_file(icon_busy)
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
                         self.statusIcon.set_tooltip(_("Checking for updates"))
                         self.statusIcon.set_visible(not prefs["hide_systray"])
                         self.wTree.get_widget("window1").window.set_cursor(None)
@@ -723,7 +723,7 @@ class AutoInstallThread(threading.Thread):
             log.writelines("-- Exception occured in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
-            self.statusIcon.set_from_file(icon_error)
+            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
             self.statusIcon.set_tooltip(_("Could not install the security updates"))
             self.statusIcon.set_visible(True)
             log.writelines("-- Could not install security updates\n")
@@ -809,7 +809,7 @@ class RefreshThread(threading.Thread):
             prefs = read_configuration()
 
             # Starts the blinking
-            self.statusIcon.set_from_file(icon_busy)
+            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
             self.statusIcon.set_tooltip(_("Checking for updates"))
             self.statusIcon.set_visible(not prefs["hide_systray"])
             wTree.get_widget("vpaned1").set_position(vpaned_position)
@@ -846,7 +846,7 @@ class RefreshThread(threading.Thread):
                         break
                 if (running == True):
                     gtk.gdk.threads_enter()
-                    self.statusIcon.set_from_file(icon_unknown)
+                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_unknown))
                     self.statusIcon.set_tooltip(_("Another application is using APT"))
                     self.statusIcon.set_visible(not prefs["hide_systray"])
                     statusbar.push(context_id, _("Another application is using APT"))
@@ -895,7 +895,7 @@ class RefreshThread(threading.Thread):
             if (len(updates) == None):
                 gtk.gdk.threads_enter()
                 self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
-                self.statusIcon.set_from_file(icon_up2date)
+                self.statusIcon.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                 self.statusIcon.set_tooltip(_("Your system is up to date"))
                 self.statusIcon.set_visible(not prefs["hide_systray"])
                 statusbar.push(context_id, _("Your system is up to date"))
@@ -910,7 +910,7 @@ class RefreshThread(threading.Thread):
                         except:
                             error_msg = ""
                         gtk.gdk.threads_enter()
-                        self.statusIcon.set_from_file(icon_error)
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
                         self.statusIcon.set_tooltip("%s\n\n%s" % (_("Could not refresh the list of updates"), error_msg))
                         self.statusIcon.set_visible(True)
                         statusbar.push(context_id, _("Could not refresh the list of updates"))
@@ -1078,7 +1078,7 @@ class RefreshThread(threading.Thread):
                 gtk.gdk.threads_enter()
                 if (new_gooroomupdate):
                     self.statusString = _("A new version of the update manager is available")
-                    self.statusIcon.set_from_file(icon_updates)
+                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_updates))
                     self.statusIcon.set_tooltip(self.statusString)
                     self.statusIcon.set_visible(True)
                     statusbar.push(context_id, self.statusString)
@@ -1153,7 +1153,7 @@ class RefreshThread(threading.Thread):
                             elif (num_ignored > 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), %(ignored)d ignored") % {'recommended':num_safe, 'size':size_to_string(download_size), 'ignored':num_ignored}
                                 self.statusString += " : " + _("Network connection is %s") % net_status
-                        self.statusIcon.set_from_file(icon_updates)
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_updates))
                         self.statusIcon.set_tooltip(self.statusString)
                         self.statusIcon.set_visible(True)
                         statusbar.push(context_id, self.statusString)
@@ -1162,7 +1162,7 @@ class RefreshThread(threading.Thread):
                     else:
                         if num_visible == 0:
                             self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
-                        self.statusIcon.set_from_file(icon_up2date)
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                         self.statusString = _("Your system is up to date")
                         self.statusString += " : " + _("Network connection is %s") % net_status
                         self.statusIcon.set_tooltip(self.statusString)
@@ -1191,7 +1191,7 @@ class RefreshThread(threading.Thread):
             log.writelines("-- Exception occured in the refresh thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
-            self.statusIcon.set_from_file(icon_error)
+            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
             self.statusIcon.set_tooltip(_("Could not refresh the list of updates"))
             self.statusIcon.set_visible(True)
             #self.statusIcon.set_blinking(False)
@@ -1260,7 +1260,10 @@ def select_all(widget, treeView, statusbar, context_id):
 def install(widget, treeView, statusIcon, wTree):
     install = InstallThread(treeView, statusIcon, wTree)
     install.start()
-
+def pixbuf_trayicon(filename):
+    size = 16
+    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, size, size)
+    return pixbuf
 def change_icon(widget, button, prefs_tree, treeview, statusIcon, wTree):
     global icon_busy
     global icon_up2date
@@ -2416,7 +2419,7 @@ try:
     prefs = read_configuration()
 
     statusIcon = gtk.StatusIcon()
-    statusIcon.set_from_file(icon_busy)
+    statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
     statusIcon.set_tooltip(_("Checking for updates"))
     statusIcon.set_visible(not prefs["hide_systray"])
 
