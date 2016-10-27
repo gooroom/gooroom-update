@@ -1260,10 +1260,12 @@ def select_all(widget, treeView, statusbar, context_id):
 def install(widget, treeView, statusIcon, wTree):
     install = InstallThread(treeView, statusIcon, wTree)
     install.start()
+
 def pixbuf_trayicon(filename):
-    size = 16
+    size = 22
     pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, size, size)
     return pixbuf
+
 def change_icon(widget, button, prefs_tree, treeview, statusIcon, wTree):
     global icon_busy
     global icon_up2date
