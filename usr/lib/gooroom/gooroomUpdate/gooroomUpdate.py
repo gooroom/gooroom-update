@@ -1062,7 +1062,7 @@ class RefreshThread(threading.Thread):
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias + "\n<small><span foreground='#5C5C5C'>%s</span></small>" % shortdesc)
                         else:
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias)
-                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))
+                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))	
                         model.set_value(iter, UPDATE_OLD_VERSION, package_update.oldVersion)
                         model.set_value(iter, UPDATE_NEW_VERSION, package_update.newVersion)
                         model.set_value(iter, UPDATE_LEVEL_STR, str(package_update.level))
@@ -1482,7 +1482,7 @@ def read_configuration():
         icon_up2date = "/usr/lib/gooroom/gooroomUpdate/icons/base-apply.svg"
         icon_updates = "/usr/lib/gooroom/gooroomUpdate/icons/base-info.svg"
         icon_error = "/usr/lib/gooroom/gooroomUpdate/icons/base-error2.svg"
-        icon_unknown = "/usr/lib/gooroom/gooroomUpdate/icons/base.svg"
+        icon_unknown = "/usr/lib/gooroom/gooroomUpdate/icons/base-unkown.svg"
         icon_apply = "/usr/lib/gooroom/gooroomUpdate/icons/base-exec.svg"
 
     #Read levels config
