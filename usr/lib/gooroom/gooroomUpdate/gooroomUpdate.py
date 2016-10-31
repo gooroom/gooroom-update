@@ -1062,7 +1062,7 @@ class RefreshThread(threading.Thread):
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias + "\n<small><span foreground='#5C5C5C'>%s</span></small>" % shortdesc)
                         else:
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias)
-                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))
+                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))	
                         model.set_value(iter, UPDATE_OLD_VERSION, package_update.oldVersion)
                         model.set_value(iter, UPDATE_NEW_VERSION, package_update.newVersion)
                         model.set_value(iter, UPDATE_LEVEL_STR, str(package_update.level))
@@ -1482,7 +1482,7 @@ def read_configuration():
         icon_up2date = "/usr/lib/gooroom/gooroomUpdate/icons/base-apply.svg"
         icon_updates = "/usr/lib/gooroom/gooroomUpdate/icons/base-info.svg"
         icon_error = "/usr/lib/gooroom/gooroomUpdate/icons/base-error2.svg"
-        icon_unknown = "/usr/lib/gooroom/gooroomUpdate/icons/base.svg"
+        icon_unknown = "/usr/lib/gooroom/gooroomUpdate/icons/base-unkown.svg"
         icon_apply = "/usr/lib/gooroom/gooroomUpdate/icons/base-exec.svg"
 
     #Read levels config
@@ -1560,6 +1560,9 @@ def read_configuration():
         prefs["blacklisted_packages"] = []
 
     return prefs
+
+def open_certificate_manager(widget):
+    os.system("/usr/bin/gooroom-certificate-manager")
 
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
@@ -2558,6 +2561,13 @@ try:
     prefsMenuItem.set_label(_("Preferences"))
     prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     editSubmenu.append(prefsMenuItem)
+    if os.path.exists("/usr/bin/gooroom-certificate-manager"):
+        certMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        #certMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroom-certificate-manager/icons/<icon name>"))
+        certMenuItem.set_label(_("Certification management"))
+        certMenuItem.connect("activate", open_certificate_manager)
+        editSubmenu.append(certMenuItem)
+
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
