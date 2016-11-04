@@ -1561,6 +1561,9 @@ def read_configuration():
 
     return prefs
 
+def open_certificate_manager(widget):
+    os.system("/usr/bin/gooroom-certificate-manager")
+
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
         os.system("/usr/bin/software-sources &")
@@ -2558,6 +2561,13 @@ try:
     prefsMenuItem.set_label(_("Preferences"))
     prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     editSubmenu.append(prefsMenuItem)
+    if os.path.exists("/usr/bin/gooroom-certificate-manager"):
+      certMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+      #certMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroom-certificate-manager/icons/<icon name>"))
+      certMenuItem.set_label(_("Certification management"))
+      certMenuItem.connect("activate", open_certificate_manager)
+      editSubmenu.append(certMenuItem)
+
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
