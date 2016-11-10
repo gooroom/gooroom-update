@@ -2563,7 +2563,7 @@ try:
     editSubmenu.append(prefsMenuItem)
     if os.path.exists("/usr/bin/gooroom-certificate-manager"):
         certMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        #certMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroom-certificate-manager/icons/<icon name>"))
+        certMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/certification-management.png"))
         certMenuItem.set_label(_("Certification management"))
         certMenuItem.connect("activate", open_certificate_manager)
         editSubmenu.append(certMenuItem)
