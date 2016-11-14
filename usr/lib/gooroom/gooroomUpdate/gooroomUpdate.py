@@ -1116,7 +1116,8 @@ class RefreshThread(threading.Thread):
 
                             alert = False
 
-                            if alertDialog.run() == gtk.RESPONSE_OK:
+                            response = alertDialog.run()
+                            if response == gtk.RESPONSE_OK or response == gtk.RESPONSE_DELETE_EVENT:
                                 alertDialog.hide()
                                 alertDialog.destroy()
                                 alert = True
@@ -1732,14 +1733,17 @@ def add_blacklisted_package(widget, treeview_blacklist):
     hbox.pack_end(entry)
     dialog.vbox.pack_end(hbox, True, True, 0)
     dialog.show_all()
-    dialog.run()
-    name = entry.get_text()
-    dialog.destroy()
-    pkg = name.strip()
-    if pkg != '':
-        model = treeview_blacklist.get_model()
-        iter = model.insert_before(None, None)
-        model.set_value(iter, 0, pkg)
+    response = dialog.run()
+    if response == gtk.RESPONSE_OK:
+        name = entry.get_text()
+        dialog.destroy()
+        pkg = name.strip()
+        if pkg != '':
+            model = treeview_blacklist.get_model()
+            iter = model.insert_before(None, None)
+            model.set_value(iter, 0, pkg)
+    else:
+        dialog.destroy()
 
 def remove_blacklisted_package(widget, treeview_blacklist):
     selection = treeview_blacklist.get_selection()
