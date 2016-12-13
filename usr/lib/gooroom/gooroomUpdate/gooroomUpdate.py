@@ -225,7 +225,7 @@ class AutomaticRefreshThread(threading.Thread):
 
         except Exception, detail:
             try:
-                log.writelines("-- Exception occured in the auto-refresh thread.. so it's probably dead now: " + str(detail) + "\n")
+                log.writelines("-- Exception occurred in the auto-refresh thread.. so it's probably dead now: " + str(detail) + "\n")
                 log.flush()
             except:
                 pass # cause it might be closed already
@@ -441,7 +441,7 @@ class InstallThread(threading.Thread):
                 gtk.gdk.threads_leave()
 
         except Exception, detail:
-            log.writelines("-- Exception occured in the install thread: " + str(detail) + "\n")
+            log.writelines("-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_taryico(icon_error))
@@ -683,7 +683,7 @@ class AutoInstallThread(threading.Thread):
 
         except Exception, detail:
             print(detail)
-            log.writelines("-- Exception occured in the install thread: " + str(detail) + "\n")
+            log.writelines("-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
@@ -921,7 +921,7 @@ class RefreshThread(threading.Thread):
                             if update_type == "security":
                                 tooltip = _("Security update")
                             elif update_type == "backport":
-                                tooltip = _("Software backport. Be careful when upgrading. New versions of sofware can introduce regressions.")
+                                tooltip = _("Software backport. Be careful when upgrading. New versions of software can introduce regressions.")
                             elif update_type == "unstable":
                                 tooltip = _("Unstable software. Only apply this update to help developers beta-test new software.")
                             else:
@@ -1151,8 +1151,8 @@ class RefreshThread(threading.Thread):
             gtk.gdk.threads_leave()
 
         except Exception, detail:
-            print "-- Exception occured in the refresh thread: " + str(detail)
-            log.writelines("-- Exception occured in the refresh thread: " + str(detail) + "\n")
+            print "-- Exception occurred in the refresh thread: " + str(detail)
+            log.writelines("-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
@@ -2394,6 +2394,6 @@ try:
 
 except Exception, detail:
     print detail
-    log.writelines("-- Exception occured in main thread: " + str(detail) + "\n")
+    log.writelines("-- Exception occurred in main thread: " + str(detail) + "\n")
     log.flush()
     log.close()
