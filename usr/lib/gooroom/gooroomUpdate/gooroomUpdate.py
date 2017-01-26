@@ -15,6 +15,8 @@ try:
     import gettext
     import fnmatch
     import urllib2
+    import io
+    import tarfile
     import re
     import apt
     from user import home
@@ -125,28 +127,92 @@ class ChangelogRetriever(threading.Thread):
         if ":" in self.version:
             self.version = self.version.split(":")[-1]
 
+    def get_gooroom_source(self):
+        sources = "/etc/apt/sources.list.d/official-package-repositories.list"
+        with open(sources, "r") as f:
+            for line in f.readlines():
+                if "gooroom" in line:
+                    source = line.split()[1]
+                    break
+            else:
+                return
+
+        return source
+
+    def get_gooroom_changelog(self, source):
+        max_size = 1000000
+        if self.source_package.startswith("lib"):
+            abbr = self.source_package[0:4]
+        else:
+            abbr = self.source_package[0]
+
+        common_uri = "%s/pool/main/%s/%s/" % (source, abbr, self.source_package)
+        dsc_uri = common_uri + "%s_%s.dsc" % (self.source_package, self.version)
+        try:
+            dsc = urllib2.urlopen(dsc_uri, None, 10).read().decode("utf-8")
+        except Exception as e:
+            print "Could not open gooroom URL %s - %s" % (dsc_uri, e)
+            return
+
+        filename = None
+        debian_flag = None
+        for line in dsc.split("\n"):
+            if ".tar" in line:
+                tarball_line = line.strip().split(" ", 2)
+                if len(tarball_line) == 3:
+                    checksum, size, filename = tarball_line
+                    debian_flag = False
+                    break
+
+        for line in dsc.split("\n"):
+            if "debian.tar" in line:
+                tarball_line = line.strip().split(" ", 2)
+                if len(tarball_line) == 3:
+                    checksum, size, filename = tarball_line
+                    debian_flag = True
+                    break
+
+        if not filename or not size or not size.isdigit():
+            print "Unsupported debian .dsc file format. Skipping this package."
+            return
+
+        if (int(size) > max_size):
+            print "Skipping download"
+            return
+
+        file_uri = common_uri + filename
+        try:
+            deb_file = urllib2.urlopen(file_uri, None, 10).read()
+        except Exception as e:
+            print "Could not download tarball from : %s - %s" % (file_uri, e)
+            return
+
+        if filename.endswith(".xz"):
+            cmd = ["xz", "--decompress"]
+            try:
+                xz = Popen(cmd, stdin=PIPE, stdout=PIPE)
+                deb_file, deb_err = xz.communicate(deb_file)
+            except EnvironmentError as e:
+                print "Error encountered while decompressing xz file : %s" % e
+                return
+
+        deb_file = io.BytesIO(deb_file)
+        try:
+            with tarfile.open(fileobj = deb_file) as tf:
+                if debian_flag:
+                    deb_changelog = tf.extractfile("debian/changelog").read()
+                else:
+                    deb_changelog = tf.extractfile("%s-%s/debian/changelog" % (self.source_package, self.version)).read()
+        except tarfile.TarError as e:
+            print "Error encountered while reading tarball : %s" % e
+            return
+
+        return deb_changelog
+
     def run(self):
         gtk.gdk.threads_enter()
         self.wTree.get_widget("textview_changes").get_buffer().set_text(_("Downloading changelog..."))
         gtk.gdk.threads_leave()
-
-        changelog_sources = []
-        if self.origin == "gooroom":
-            if (self.source_package.startswith("lib")):
-            	changelog_sources.append("http://packages.gooroom.kr/gooroom/pool/main/%s/%s/%s_%s.changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-	    else:
-            	changelog_sources.append("http://packages.gooroom.kr/gooroom/pool/main/%s/%s/%s_%s.changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
-        elif self.origin == "debian":
-            if (self.source_package.startswith("lib")):
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/contrib/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/non-free/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
-            else:
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/contrib/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
-                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/non-free/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
-
-        changelog = _("No changelog available")
 
         if self.ps == {}:
             # use default urllib2 proxy mechanisms (possibly *_proxy environment vars)
@@ -158,6 +224,25 @@ class ChangelogRetriever(threading.Thread):
         opener = urllib2.build_opener(proxy)
         urllib2.install_opener(opener)
 
+        source = self.get_gooroom_source()
+        changelog = _("No changelog available")
+
+        changelog_sources = []
+        if self.origin == "gooroom":
+            if (self.source_package.startswith("lib")):
+                changelog_sources.append("%s/pool/main/%s/%s/%s_%s.changelog" % (source, self.source_package[0:4], self.source_package, self.source_package, self.version))
+            else:
+                changelog_sources.append("%s/pool/main/%s/%s/%s_%s.changelog" % (source, self.source_package[0], self.source_package, self.source_package, self.version))
+        elif self.origin == "debian":
+            if (self.source_package.startswith("lib")):
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/contrib/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/non-free/%s/%s/%s_%s_changelog" % (self.source_package[0:4], self.source_package, self.source_package, self.version))
+            else:
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/main/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/contrib/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
+                changelog_sources.append("http://metadata.ftp-master.debian.org/changelogs/non-free/%s/%s/%s_%s_changelog" % (self.source_package[0], self.source_package, self.source_package, self.version))
+
         for changelog_source in changelog_sources:
             try:
                 print "Trying to fetch the changelog from: %s" % changelog_source
@@ -166,17 +251,13 @@ class ChangelogRetriever(threading.Thread):
                 url.close()
 
                 changelog = ""
-                if "gooroom.com" in changelog_source:
-                    changes = source.split("\n")
-                    for change in changes:
-                        change = change.strip()
-                        if change.startswith("*"):
-                            changelog = changelog + change + "\n"
-                else:
-                    changelog = source
+                changelog = source
                 break
             except:
-                pass
+                if self.origin == "gooroom":
+                    output = self.get_gooroom_changelog(source)
+                    if output:
+                        changelog = output
 
         gtk.gdk.threads_enter()
         self.wTree.get_widget("textview_changes").get_buffer().set_text(changelog)
@@ -483,7 +564,6 @@ class AutoInstallScheduleThread(threading.Thread):
                 autoinst.start()
             time.sleep(60)
 
-
 class AutoInstallThread(threading.Thread):
     global icon_busy
     global icon_up2date
@@ -501,7 +581,7 @@ class AutoInstallThread(threading.Thread):
     def run(self):
         global log
         try:
-            log.writelines("++ Install requested by user\n")
+            log.writelines("++ Auto Install requested by user\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.wTree.get_widget("window1").window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1025,7 +1105,7 @@ class RefreshThread(threading.Thread):
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias + "\n<small><span foreground='#5C5C5C'>%s</span></small>" % shortdesc)
                         else:
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias)
-                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))	
+                        model.set_value(iter, UPDATE_LEVEL_PIX, gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))
                         model.set_value(iter, UPDATE_OLD_VERSION, package_update.oldVersion)
                         model.set_value(iter, UPDATE_NEW_VERSION, package_update.newVersion)
                         model.set_value(iter, UPDATE_LEVEL_STR, str(package_update.level))
@@ -1354,33 +1434,28 @@ def pref_cancel(widget, prefs_tree):
     prefs_tree.get_widget("window2").hide()
 
 def set_auto_upgrade(widget, prefs_tree):
-    global auto_up_toggle
-    print(1, auto_up_toggle)
+    #FIXME this method has probability that changes other sudoers.d/gooroom-update configuration.
+    global auto_upgrade_handler_id
+    toggle = prefs_tree.get_widget("auto_upgrade").get_active()
+    if toggle == False:
+        result=os.system("pkexec sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && chmod 0440 /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'")
+    elif toggle == True:
+        result=os.system("pkexec sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && chmod 0440 /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'")
 
-    if auto_up_toggle== 1:
-        auto_up_toggle= 2
-    if prefs_tree.get_widget("auto_upgrade").get_active()== False and auto_up_toggle== 0:
-        auto_up_toggle= 1
-        result=os.system("gksudo \"sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
-    elif prefs_tree.get_widget("auto_upgrade").get_active()== True and auto_up_toggle== 0:
-        auto_up_toggle= 1
-        result=os.system("gksudo \"sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'\"")
-    if get_auto_upgrade():
-        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
-        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(True)
+    if result:
+        prefs_tree.get_widget("auto_upgrade").handler_block(auto_upgrade_handler_id)
+        prefs_tree.get_widget("auto_upgrade").set_active(not toggle)
+        prefs_tree.get_widget("auto_upgrade").handler_unblock(auto_upgrade_handler_id)
     else:
-        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(False)
-        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
-    prefs_tree.get_widget("auto_upgrade").set_active(get_auto_upgrade())
-    print(2, auto_up_toggle)
-    if auto_up_toggle== 2 or auto_up_toggle==1:
-        auto_up_toggle=0
+        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(toggle)
+        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(toggle)
 
 def get_auto_upgrade():
-    with open("/etc/sudoers.d/gooroom-update", "r") as f:
-        for line in f:
-            if "%sudo" in line[:5]:
-                return True
+    cmd = ["sudo", "-l"]
+    comnd = Popen(cmd, stdout=PIPE)
+    output = comnd.communicate()
+    if "autoInstall.py" in str(output):
+        return True
     return False
 
 def read_configuration():
@@ -1540,6 +1615,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     global icon_error
     global icon_unknown
     global icon_apply
+    global auto_upgrade_handler_id
 
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window2")
@@ -1636,7 +1712,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("auto_upgrade").set_active(prefs["auto_upgrade"])
     prefs_tree.get_widget("auto_upgrade_date").set_active(prefs["auto_upgrade_date"])
     prefs_tree.get_widget("auto_upgrade_time").set_active(prefs["auto_upgrade_time"])
-    prefs_tree.get_widget("auto_upgrade").connect("clicked", set_auto_upgrade, prefs_tree)
+    auto_upgrade_handler_id = prefs_tree.get_widget("auto_upgrade").connect("toggled", set_auto_upgrade, prefs_tree)
 
     if prefs_tree.get_widget("auto_upgrade").get_active()== False:
         prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
@@ -2133,9 +2209,6 @@ try:
     global icon_error
     global icon_unknown
     global icon_apply
-    global auto_up_toggle
-
-    auto_up_toggle=0
 
     prefs = read_configuration()
 
