@@ -477,14 +477,6 @@ class InstallThread(threading.Thread):
                     log.writelines("++ Install finished\n")
                     log.flush()
 
-                    prefs = read_configuration()
-                    if prefs["hide_window_after_update"]:
-                        gtk.gdk.threads_enter()
-                        global app_hidden
-                        app_hidden = True
-                        self.wTree.get_widget("window1").hide()
-                        gtk.gdk.threads_leave()
-
                     if "gooroom-update" in packages or "gooroom-upgrade-info" in packages:
                         # Restart
                         try:
@@ -502,7 +494,6 @@ class InstallThread(threading.Thread):
                         gtk.gdk.threads_enter()
                         self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
                         self.statusIcon.set_tooltip(_("Checking for updates"))
-                        self.statusIcon.set_visible(not prefs["hide_systray"])
                         self.wTree.get_widget("window1").window.set_cursor(None)
                         self.wTree.get_widget("window1").set_sensitive(True)
                         gtk.gdk.threads_leave()
@@ -717,14 +708,6 @@ class AutoInstallThread(threading.Thread):
                     log.writelines("++ Install finished\n")
                     log.flush()
 
-                    prefs = read_configuration()
-                    if prefs["hide_window_after_update"]:
-                        gtk.gdk.threads_enter()
-                        global app_hidden
-                        app_hidden = True
-                        self.wTree.get_widget("window1").hide()
-                        gtk.gdk.threads_leave()
-
                     if "gooroom-update" in packages or "gooroom-upgrade-info" in packages:
                         # Restart
                         try:
@@ -742,7 +725,6 @@ class AutoInstallThread(threading.Thread):
                         gtk.gdk.threads_enter()
                         self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
                         self.statusIcon.set_tooltip(_("Checking for updates"))
-                        self.statusIcon.set_visible(not prefs["hide_systray"])
                         self.wTree.get_widget("window1").window.set_cursor(None)
                         self.wTree.get_widget("window1").set_sensitive(True)
                         gtk.gdk.threads_leave()
@@ -854,7 +836,6 @@ class RefreshThread(threading.Thread):
             # Starts the blinking
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
             self.statusIcon.set_tooltip(_("Checking for updates"))
-            self.statusIcon.set_visible(not prefs["hide_systray"])
             wTree.get_widget("vpaned1").set_position(vpaned_position)
             #self.statusIcon.set_blinking(True)
             gtk.gdk.threads_leave()
@@ -891,7 +872,6 @@ class RefreshThread(threading.Thread):
                     gtk.gdk.threads_enter()
                     self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_unknown))
                     self.statusIcon.set_tooltip(_("Another application is using APT"))
-                    self.statusIcon.set_visible(not prefs["hide_systray"])
                     statusbar.push(context_id, _("Another application is using APT"))
                     log.writelines("-- Another application is using APT\n")
                     log.flush()
@@ -940,7 +920,6 @@ class RefreshThread(threading.Thread):
                 self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
                 self.statusIcon.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                 self.statusIcon.set_tooltip(_("Your system is up to date"))
-                self.statusIcon.set_visible(not prefs["hide_systray"])
                 statusbar.push(context_id, _("Your system is up to date"))
                 log.writelines("++ System is up to date\n")
                 log.flush()
@@ -1210,7 +1189,6 @@ class RefreshThread(threading.Thread):
                         self.statusString = _("Your system is up to date")
                         self.statusString += " : " + _("Network connection is %s") % net_status
                         self.statusIcon.set_tooltip(self.statusString)
-                        self.statusIcon.set_visible(not prefs["hide_systray"])
                         statusbar.push(context_id,self.statusString)
                         log.writelines("++ System is up to date\n")
                         log.flush()
@@ -1359,11 +1337,6 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
 
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
 
-    #Write general config
-    config['general'] = {}
-    config['general']['hide_window_after_update'] = prefs_tree.get_widget("checkbutton_hide_window_after_update").get_active()
-    config['general']['hide_systray'] = prefs_tree.get_widget("checkbutton_hide_systray").get_active()
-
     #Write level config
     config['levels'] = {}
     config['levels']['level1_visible'] = prefs_tree.get_widget("visible1").get_active()
@@ -1468,17 +1441,6 @@ def read_configuration():
 
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     prefs = {}
-
-    #Read the general config
-    try:
-        prefs["hide_window_after_update"] = (config['general']['hide_window_after_update'] == "True")
-    except:
-        prefs["hide_window_after_update"] = False
-
-    try:
-        prefs["hide_systray"] = (config['general']['hide_systray'] == "True")
-    except:
-        prefs["hide_systray"] = False
 
     #Read refresh config
     try:
@@ -1669,8 +1631,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Day"))
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
-    prefs_tree.get_widget("checkbutton_hide_window_after_update").set_label(_("Hide the update manager after applying updates"))
-    prefs_tree.get_widget("checkbutton_hide_systray").set_label(_("Only show a tray icon when updates are available or in case of errors"))
 
     prefs_tree.get_widget("window2").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     prefs_tree.get_widget("window2").show()
@@ -1722,8 +1682,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_active(prefs["dist_upgrade"])
-    prefs_tree.get_widget("checkbutton_hide_window_after_update").set_active(prefs["hide_window_after_update"])
-    prefs_tree.get_widget("checkbutton_hide_systray").set_active(prefs["hide_systray"])
 
     prefs_tree.get_widget("image_busy").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_busy, 24, 24))
     prefs_tree.get_widget("image_up2date").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_up2date, 24, 24))
@@ -2215,7 +2173,6 @@ try:
     statusIcon = gtk.StatusIcon()
     statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
     statusIcon.set_tooltip(_("Checking for updates"))
-    statusIcon.set_visible(not prefs["hide_systray"])
 
     #Set the Glade file
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"

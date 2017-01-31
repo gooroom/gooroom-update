@@ -882,7 +882,7 @@ Public License instead of this License.
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">12</property>
-                <property name="spacing">3</property>
+                <property name="spacing">15</property>
                 <child>
                   <widget class="GtkCheckButton" id="checkbutton_dist_upgrade">
                     <property name="label" translatable="yes" context="yes">include dist-upgrade packages?</property>
@@ -928,35 +928,7 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkCheckButton" id="checkbutton_hide_window_after_update">
-                    <property name="label" translatable="yes" context="yes">hide window</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
-                    <property name="draw_indicator">True</property>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkCheckButton" id="checkbutton_hide_systray">
-                    <property name="label" translatable="yes">hide systray</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="xalign">0</property>
-                    <property name="draw_indicator">True</property>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">4</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </widget>
             </child>
@@ -1424,7 +1396,7 @@ Public License instead of this License.
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
-                    <property name="yalign">1.1175871339474952e-009</property>
+                    <property name="yalign">1.1175871339474952e-09</property>
                     <property name="label" translatable="yes" context="yes">&lt;i&gt;Note: The list only gets refreshed while the gooroomUpdate window is closed (system tray mode).&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
                   </widget>
@@ -1548,7 +1520,7 @@ Public License instead of this License.
                     <property name="can_focus">False</property>
                     <property name="focus_on_click">False</property>
                     <property name="entry_text_column">0</property>
-                    <property name="items" translatable="yes"></property>
+                    <property name="items" translatable="yes"/>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>
