@@ -908,12 +908,6 @@ class RefreshThread(threading.Thread):
             num_safe = 0
             download_size = 0
             num_ignored = 0
-            ignored_list = []
-            if os.path.exists("%s/gooroom-update.ignored" % CONFIG_DIR):
-                blacklist_file = open("%s/gooroom-update.ignored" % CONFIG_DIR, "r")
-                for blacklist_line in blacklist_file:
-                    ignored_list.append(blacklist_line.strip())
-                blacklist_file.close()
 
             if (len(updates) == None):
                 gtk.gdk.threads_enter()
@@ -965,16 +959,6 @@ class RefreshThread(threading.Thread):
                         package_names.add(package.replace(":i386", "").replace(":amd64", ""))
 
                         if not package_updates.has_key(source_package):
-                            updateIsBlacklisted = False
-                            for blacklist in ignored_list:
-                                if fnmatch.fnmatch(source_package, blacklist):
-                                    num_ignored = num_ignored + 1
-                                    updateIsBlacklisted = True
-                                    break
-
-                            if updateIsBlacklisted:
-                                continue
-
                             security_update = (update_type == "security")
 
                             if update_type == "security":
@@ -1337,17 +1321,6 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['icons']['unknown'] = icon_unknown
     config['icons']['apply'] = icon_apply
 
-    #Write blacklisted updates
-    ignored_list = open("%s/gooroom-update.ignored" % CONFIG_DIR, "w")
-    treeview_blacklist = prefs_tree.get_widget("treeview_blacklist")
-    model = treeview_blacklist.get_model()
-    iter = model.get_iter_first()
-    while iter is not None:
-        pkg = model.get_value(iter, UPDATE_CHECKED)
-        iter = model.iter_next(iter)
-        ignored_list.writelines(pkg + "\n")
-    ignored_list.close()
-
     config.write()
 
     prefs_tree.get_widget("window2").hide()
@@ -1512,12 +1485,6 @@ def read_configuration():
         prefs["dimensions_y"] = 540
         prefs["dimensions_pane_position"] = 278
 
-    #Read package blacklist
-    try:
-        prefs["blacklisted_packages"] = config['blacklisted_packages']
-    except:
-        prefs["blacklisted_packages"] = []
-
     return prefs
 
 def open_certificate_manager(widget):
@@ -1566,7 +1533,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("label82").set_text("<i>" + _("Note: The list only gets refreshed while the update manager window is closed (system tray mode).") + "</i>")
     prefs_tree.get_widget("label82").set_use_markup(True)
     prefs_tree.get_widget("label83").set_text(_("Options"))
-    prefs_tree.get_widget("label1").set_text(_("Ignored updates"))
 
     prefs_tree.get_widget("auto_upgrade").set_label(_("Auto Upgrade"))
     prefs_tree.get_widget("label4").set_text(_("New Upgrade"))
@@ -1626,62 +1592,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_active(prefs["dist_upgrade"])
-
-    # Blacklisted updates
-    treeview_blacklist = prefs_tree.get_widget("treeview_blacklist")
-    column1 = gtk.TreeViewColumn(_("Ignored updates"), gtk.CellRendererText(), text=0)
-    column1.set_sort_column_id(0)
-    column1.set_resizable(True)
-    treeview_blacklist.append_column(column1)
-    treeview_blacklist.set_headers_clickable(True)
-    treeview_blacklist.set_reorderable(False)
-    treeview_blacklist.show()
-
-    model = gtk.TreeStore(str)
-    model.set_sort_column_id( 0, gtk.SORT_ASCENDING )
-    treeview_blacklist.set_model(model)
-
-    if os.path.exists("%s/gooroom-update.ignored" % CONFIG_DIR):
-        ignored_list = open("%s/gooroom-update.ignored" % CONFIG_DIR, "r")
-        for ignored_pkg in ignored_list:
-            iter = model.insert_before(None, None)
-            model.set_value(iter, 0, ignored_pkg.strip())
-        del model
-        ignored_list.close()
-
-    prefs_tree.get_widget("toolbutton_add").connect("clicked", add_blacklisted_package, treeview_blacklist)
-    prefs_tree.get_widget("toolbutton_remove").connect("clicked", remove_blacklisted_package, treeview_blacklist)
-
-def add_blacklisted_package(widget, treeview_blacklist):
-
-    dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK, None)
-    dialog.set_markup("<b>" + _("Please specify the name of the update to ignore:") + "</b>")
-    dialog.set_title(_("Ignore an update"))
-    dialog.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
-    entry = gtk.Entry()
-    hbox = gtk.HBox()
-    hbox.pack_start(gtk.Label(_("Name:")), False, 5, 5)
-    hbox.pack_end(entry)
-    dialog.vbox.pack_end(hbox, True, True, 0)
-    dialog.show_all()
-    response = dialog.run()
-    if response == gtk.RESPONSE_OK:
-        name = entry.get_text()
-        dialog.destroy()
-        pkg = name.strip()
-        if pkg != '':
-            model = treeview_blacklist.get_model()
-            iter = model.insert_before(None, None)
-            model.set_value(iter, 0, pkg)
-    else:
-        dialog.destroy()
-
-def remove_blacklisted_package(widget, treeview_blacklist):
-    selection = treeview_blacklist.get_selection()
-    (model, iter) = selection.get_selected()
-    if (iter != None):
-        pkg = model.get_value(iter, UPDATE_CHECKED)
-        model.remove(iter)
 
 def open_history(widget):
     #Set the Glade file
@@ -2045,23 +1955,6 @@ def setVisibleDescriptions(checkmenuitem, treeView, statusIcon, wTree, prefs):
     refresh = RefreshThread(treeView, statusIcon, wTree)
     refresh.start()
 
-def menuPopup(widget, event, treeview_update, statusIcon, wTree):
-    if event.button == 3:
-        (model, iter) = widget.get_selection().get_selected()
-        if (iter != None):
-            package_update = model.get_value(iter, UPDATE_OBJ)
-            menu = gtk.Menu()
-            menuItem = gtk.MenuItem(_("Ignore updates for this package"))
-            menuItem.connect("activate", add_to_ignore_list, treeview_update, package_update.name, statusIcon, wTree)
-            menu.append(menuItem)
-            menu.show_all()
-            menu.popup( None, None, None, 3, 0)
-
-def add_to_ignore_list(widget, treeview_update, pkg, statusIcon, wTree):
-    os.system("echo \"%s\" >> %s/gooroom-update.ignored" % (pkg, CONFIG_DIR))
-    refresh = RefreshThread(treeview_update, statusIcon, wTree)
-    refresh.start()
-
 global app_hidden
 global log
 global logFile
@@ -2182,8 +2075,6 @@ try:
     treeview_update.set_headers_clickable(True)
     treeview_update.set_reorderable(False)
     treeview_update.show()
-
-    treeview_update.connect( "button-release-event", menuPopup, treeview_update, statusIcon, wTree )
 
     selection = treeview_update.get_selection()
     selection.connect("changed", display_selected_package, wTree)
