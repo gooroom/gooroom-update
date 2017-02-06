@@ -1288,45 +1288,6 @@ def pixbuf_trayicon(filename):
     pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, size, size)
     return pixbuf
 
-def change_icon(widget, button, prefs_tree, treeview, statusIcon, wTree):
-    global icon_busy
-    global icon_up2date
-    global icon_updates
-    global icon_error
-    global icon_unknown
-    global icon_apply
-    dialog = gtk.FileChooserDialog(_("Update Manager"), None, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-    filter1 = gtk.FileFilter()
-    filter1.set_name("*.*")
-    filter1.add_pattern("*")
-    filter2 = gtk.FileFilter()
-    filter2.set_name("*.png")
-    filter2.add_pattern("*.png")
-    dialog.add_filter(filter2)
-    dialog.add_filter(filter1)
-
-    if dialog.run() == gtk.RESPONSE_OK:
-        filename = dialog.get_filename()
-        if (button == "busy"):
-            prefs_tree.get_widget("image_busy").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_busy = filename
-        if (button == "up2date"):
-            prefs_tree.get_widget("image_up2date").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_up2date = filename
-        if (button == "updates"):
-            prefs_tree.get_widget("image_updates").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_updates = filename
-        if (button == "error"):
-            prefs_tree.get_widget("image_error").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_error = filename
-        if (button == "unknown"):
-            prefs_tree.get_widget("image_unknown").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_unknown = filename
-        if (button == "apply"):
-            prefs_tree.get_widget("image_apply").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(filename, 24, 24))
-            icon_apply = filename
-    dialog.destroy()
-
 def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     global icon_busy
     global icon_up2date
@@ -1605,16 +1566,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("label82").set_text("<i>" + _("Note: The list only gets refreshed while the update manager window is closed (system tray mode).") + "</i>")
     prefs_tree.get_widget("label82").set_use_markup(True)
     prefs_tree.get_widget("label83").set_text(_("Options"))
-    prefs_tree.get_widget("label85").set_text(_("Icons"))
-    prefs_tree.get_widget("label86").set_markup("<b>" + _("Icon") + "</b>")
-    prefs_tree.get_widget("label87").set_markup("<b>" + _("Status") + "</b>")
-    prefs_tree.get_widget("label95").set_markup("<b>" + _("New Icon") + "</b>")
-    prefs_tree.get_widget("label88").set_text(_("Busy"))
-    prefs_tree.get_widget("label89").set_text(_("System up-to-date"))
-    prefs_tree.get_widget("label90").set_text(_("Updates available"))
-    prefs_tree.get_widget("label99").set_text(_("Error"))
-    prefs_tree.get_widget("label2").set_text(_("Unknown state"))
-    prefs_tree.get_widget("label3").set_text(_("Applying updates"))
     prefs_tree.get_widget("label1").set_text(_("Ignored updates"))
 
     prefs_tree.get_widget("auto_upgrade").set_label(_("Auto Upgrade"))
@@ -1636,13 +1587,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("window2").show()
     prefs_tree.get_widget("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
     prefs_tree.get_widget("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
-
-    prefs_tree.get_widget("button_icon_busy").connect("clicked", change_icon, "busy", prefs_tree, treeview, statusIcon, wTree)
-    prefs_tree.get_widget("button_icon_up2date").connect("clicked", change_icon, "up2date", prefs_tree, treeview, statusIcon, wTree)
-    prefs_tree.get_widget("button_icon_updates").connect("clicked", change_icon, "updates", prefs_tree, treeview, statusIcon, wTree)
-    prefs_tree.get_widget("button_icon_error").connect("clicked", change_icon, "error", prefs_tree, treeview, statusIcon, wTree)
-    prefs_tree.get_widget("button_icon_unknown").connect("clicked", change_icon, "unknown", prefs_tree, treeview, statusIcon, wTree)
-    prefs_tree.get_widget("button_icon_apply").connect("clicked", change_icon, "apply", prefs_tree, treeview, statusIcon, wTree)
 
     prefs = read_configuration()
 
@@ -1682,13 +1626,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
         prefs_tree.get_widget("auto_upgrade_time").set_sensitive(True)
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_active(prefs["dist_upgrade"])
-
-    prefs_tree.get_widget("image_busy").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_busy, 24, 24))
-    prefs_tree.get_widget("image_up2date").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_up2date, 24, 24))
-    prefs_tree.get_widget("image_updates").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_updates, 24, 24))
-    prefs_tree.get_widget("image_error").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_error, 24, 24))
-    prefs_tree.get_widget("image_unknown").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_unknown, 24, 24))
-    prefs_tree.get_widget("image_apply").set_from_pixbuf(gtk.gdk.pixbuf_new_from_file_at_size(icon_apply, 24, 24))
 
     # Blacklisted updates
     treeview_blacklist = prefs_tree.get_widget("treeview_blacklist")
