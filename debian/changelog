@@ -1,3 +1,28 @@
+gooroom-update (0.9.1+grm3) gooroom; urgency=medium
+
+  [ sungho.kang ]
+  * [53394c0d] Modify tray icon size
+  * [af26b786] Add certification management at edit submenu.
+  * [1400c60d] add submenu icon
+  * [5cafe23e] Bug when message dialog response delete event fixed
+  * [9d570d76] Removed code related in kernels and rel upgrade.
+  * [20be67b9] fixed spelling mistakes.
+  * [a878549f] Fixed auto upgrade using apt library and getting changelog from tar file
+  * [fd332f85] Removed confurations about hide systray and hide window
+  * [305ad598] Remove tray icon image change preference
+  * [1867c8be] Remove blacklist preference
+
+  [ jongkyung.woo ]
+  * [cff8f237] change the trayicon size to 22
+
+  [ Hwanii SeungHwan Jung ]
+  * [786d4ff8] few icons are renewed
+  * [c611dada] few icons are renewed
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 08 Feb 2017 17:18:47 +0900
+
 gooroom-update (0.9.1+grm2) gooroom; urgency=medium
 
   [ jongkyung.woo ]
