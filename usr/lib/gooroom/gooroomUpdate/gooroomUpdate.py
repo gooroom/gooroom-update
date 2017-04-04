@@ -1712,7 +1712,7 @@ def open_about(widget):
     except Exception, detail:
         print detail
 
-    dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>","Gooroom <gooroom@gooroom.com>"])
+    dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>","Gooroom <gooroom@gooroom.kr>"])
     dlg.set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
     dlg.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg"))
     def close(w, res):
