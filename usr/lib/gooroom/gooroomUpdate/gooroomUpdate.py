@@ -1551,6 +1551,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
 
     prefs_tree.get_widget("window2").set_icon_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg")
+    prefs_tree.get_widget("window2").set_keep_above(True)
     prefs_tree.get_widget("window2").show()
     prefs_tree.get_widget("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
     prefs_tree.get_widget("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
