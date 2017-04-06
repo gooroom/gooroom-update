@@ -4,6 +4,7 @@ try:
     import os
     import commands
     import codecs
+    import datetime
     import sys
     import string
     import gtk
@@ -279,7 +280,7 @@ class AutomaticRefreshThread(threading.Thread):
                 timer = (prefs["timer_minutes"] * 60) + (prefs["timer_hours"] * 60 * 60) + (prefs["timer_days"] * 24 * 60 * 60)
 
                 try:
-                    log.writelines("++ Auto-refresh timer is going to sleep for " + str(prefs["timer_minutes"]) + " minutes, " + str(prefs["timer_hours"]) + " hours and " + str(prefs["timer_days"]) + " days\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Auto-refresh timer is going to sleep for " + str(prefs["timer_minutes"]) + " minutes, " + str(prefs["timer_hours"]) + " hours and " + str(prefs["timer_days"]) + " days\n")
                     log.flush()
                 except:
                     pass # cause it might be closed already
@@ -290,7 +291,7 @@ class AutomaticRefreshThread(threading.Thread):
                     time.sleep(timetosleep)
                     if (app_hidden == True):
                         try:
-                            log.writelines("++ GooroomUpdate is in tray mode, performing auto-refresh\n")
+                            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ GooroomUpdate is in tray mode, performing auto-refresh\n")
                             log.flush()
                         except:
                             pass # cause it might be closed already
@@ -299,14 +300,14 @@ class AutomaticRefreshThread(threading.Thread):
                         refresh.start()
                     else:
                         try:
-                            log.writelines("++ The gooroomUpdate window is open, skipping auto-refresh\n")
+                            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ The gooroomUpdate window is open, skipping auto-refresh\n")
                             log.flush()
                         except:
                             pass # cause it might be closed already
 
         except Exception, detail:
             try:
-                log.writelines("-- Exception occurred in the auto-refresh thread.. so it's probably dead now: " + str(detail) + "\n")
+                log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the auto-refresh thread.. so it's probably dead now: " + str(detail) + "\n")
                 log.flush()
             except:
                 pass # cause it might be closed already
@@ -328,7 +329,7 @@ class InstallThread(threading.Thread):
     def run(self):
         global log
         try:
-            log.writelines("++ Install requested by user\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Install requested by user\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.wTree.get_widget("window1").window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -346,7 +347,7 @@ class InstallThread(threading.Thread):
                     package_update = model.get_value(iter, UPDATE_OBJ)
                     for package in package_update.packages:
                         packages.append(package)
-                        log.writelines("++ Will install " + str(package) + "\n")
+                        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Will install " + str(package) + "\n")
                         log.flush()
                 iter = model.iter_next(iter)
 
@@ -452,7 +453,7 @@ class InstallThread(threading.Thread):
                     self.statusIcon.set_tooltip(_("Installing updates"))
                     self.statusIcon.set_visible(True)
                     gtk.gdk.threads_leave()
-                    log.writelines("++ Ready to launch synaptic\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
                     cmd = ["pkexec", "/usr/sbin/synaptic", "--hide-main-window",  \
                             "--non-interactive", "--parent-window-id", "%s" % self.wTree.get_widget("window1").window.xid]
@@ -471,16 +472,16 @@ class InstallThread(threading.Thread):
                     f.flush()
                     comnd = Popen(' '.join(cmd), stdout=log, stderr=log, shell=True)
                     returnCode = comnd.wait()
-                    log.writelines("++ Return code:" + str(returnCode) + "\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Return code:" + str(returnCode) + "\n")
                     #sts = os.waitpid(comnd.pid, 0)
                     f.close()
-                    log.writelines("++ Install finished\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Install finished\n")
                     log.flush()
 
                     if "gooroom-update" in packages or "gooroom-upgrade-info" in packages:
                         # Restart
                         try:
-                            log.writelines("++ Gooroomupdate was updated, restarting it...\n")
+                            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Gooroomupdate was updated, restarting it...\n")
                             log.flush()
                             log.close()
                         except:
@@ -513,13 +514,13 @@ class InstallThread(threading.Thread):
                 gtk.gdk.threads_leave()
 
         except Exception, detail:
-            log.writelines("-- Exception occurred in the install thread: " + str(detail) + "\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_taryico(icon_error))
             self.statusIcon.set_tooltip(_("Could not install the security updates"))
             self.statusIcon.set_visible(True)
-            log.writelines("-- Could not install security updates\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
             #self.statusIcon.set_blinking(False)
             self.wTree.get_widget("window1").window.set_cursor(None)
@@ -572,7 +573,7 @@ class AutoInstallThread(threading.Thread):
     def run(self):
         global log
         try:
-            log.writelines("++ Auto Install requested by user\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Auto Install requested by user\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.wTree.get_widget("window1").window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -590,7 +591,7 @@ class AutoInstallThread(threading.Thread):
                     package_update = model.get_value(iter, UPDATE_OBJ)
                     for package in package_update.packages:
                         packages.append(package)
-                        log.writelines("++ Will install " + str(package) + "\n")
+                        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Will install " + str(package) + "\n")
                         log.flush()
                 iter = model.iter_next(iter)
 
@@ -696,22 +697,22 @@ class AutoInstallThread(threading.Thread):
                     self.statusIcon.set_tooltip(_("Installing updates"))
                     self.statusIcon.set_visible(True)
                     gtk.gdk.threads_leave()
-                    log.writelines("++ Ready to launch synaptic\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
                     cmd = ["sudo", "/usr/lib/gooroom/gooroomUpdate/autoInstall.py"]
                     for pkg in packages:
                         cmd.append(pkg)
                     comnd = Popen(' '.join(cmd), stdout=log, stderr=log, shell=True)
                     returnCode = comnd.wait()
-                    log.writelines("++ Return code:" + str(returnCode) + "\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Return code:" + str(returnCode) + "\n")
                     #sts = os.waitpid(comnd.pid, 0)
-                    log.writelines("++ Install finished\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Install finished\n")
                     log.flush()
 
                     if "gooroom-update" in packages or "gooroom-upgrade-info" in packages:
                         # Restart
                         try:
-                            log.writelines("++ Gooroomupdate was updated, restarting it...\n")
+                            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Gooroomupdate was updated, restarting it...\n")
                             log.flush()
                             log.close()
                         except:
@@ -745,13 +746,13 @@ class AutoInstallThread(threading.Thread):
 
         except Exception, detail:
             print(detail)
-            log.writelines("-- Exception occurred in the install thread: " + str(detail) + "\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
             self.statusIcon.set_tooltip(_("Could not install the security updates"))
             self.statusIcon.set_visible(True)
-            log.writelines("-- Could not install security updates\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
             #self.statusIcon.set_blinking(False)
             self.wTree.get_widget("window1").window.set_cursor(None)
@@ -823,7 +824,7 @@ class RefreshThread(threading.Thread):
         vpaned_position = wTree.get_widget("vpaned1").get_position()
         gtk.gdk.threads_leave()
         try:
-            log.writelines("++ Starting refresh\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Starting refresh\n")
             log.flush()
             gtk.gdk.threads_enter()
             statusbar.push(context_id, _("Starting refresh..."))
@@ -873,7 +874,7 @@ class RefreshThread(threading.Thread):
                     self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_unknown))
                     self.statusIcon.set_tooltip(_("Another application is using APT"))
                     statusbar.push(context_id, _("Another application is using APT"))
-                    log.writelines("-- Another application is using APT\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
                     log.flush()
                     #self.statusIcon.set_blinking(False)
                     self.wTree.get_widget("window1").window.set_cursor(None)
@@ -915,7 +916,7 @@ class RefreshThread(threading.Thread):
                 self.statusIcon.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                 self.statusIcon.set_tooltip(_("Your system is up to date"))
                 statusbar.push(context_id, _("Your system is up to date"))
-                log.writelines("++ System is up to date\n")
+                log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ System is up to date\n")
                 log.flush()
                 gtk.gdk.threads_leave()
             else:
@@ -930,7 +931,7 @@ class RefreshThread(threading.Thread):
                         self.statusIcon.set_tooltip("%s\n\n%s" % (_("Could not refresh the list of updates"), error_msg))
                         self.statusIcon.set_visible(True)
                         statusbar.push(context_id, _("Could not refresh the list of updates"))
-                        log.writelines("-- Error in checkAPT.py, could not refresh the list of updates\n")
+                        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Error in checkAPT.py, could not refresh the list of updates\n")
                         log.flush()
                         self.wTree.get_widget("notebook_status").set_current_page(TAB_ERROR)
                         self.wTree.get_widget("label_error_details").set_markup("<b>%s</b>" % error_msg)
@@ -1088,7 +1089,7 @@ class RefreshThread(threading.Thread):
                     self.statusIcon.set_tooltip(self.statusString)
                     self.statusIcon.set_visible(True)
                     statusbar.push(context_id, self.statusString)
-                    log.writelines("++ Found a new version of gooroom-update\n")
+                    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
                     try:
@@ -1164,7 +1165,7 @@ class RefreshThread(threading.Thread):
                         self.statusIcon.set_tooltip(self.statusString)
                         self.statusIcon.set_visible(True)
                         statusbar.push(context_id, self.statusString)
-                        log.writelines("++ Found " + str(num_safe) + " recommended software updates\n")
+                        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found " + str(num_safe) + " recommended software updates\n")
                         log.flush()
                     else:
                         if num_visible == 0:
@@ -1174,13 +1175,13 @@ class RefreshThread(threading.Thread):
                         self.statusString += " : " + _("Network connection is %s") % net_status
                         self.statusIcon.set_tooltip(self.statusString)
                         statusbar.push(context_id,self.statusString)
-                        log.writelines("++ System is up to date\n")
+                        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ System is up to date\n")
                         log.flush()
 
                 gtk.gdk.threads_leave()
 
             gtk.gdk.threads_enter()
-            log.writelines("++ Refresh finished\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Refresh finished\n")
             log.flush()
             # Stop the blinking
             #self.statusIcon.set_blinking(False)
@@ -1194,7 +1195,7 @@ class RefreshThread(threading.Thread):
 
         except Exception, detail:
             print "-- Exception occurred in the refresh thread: " + str(detail)
-            log.writelines("-- Exception occurred in the refresh thread: " + str(detail) + "\n")
+            log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
@@ -1726,7 +1727,7 @@ def quit_cb(widget, window, vpaned, data = None):
     if data:
         data.set_visible(False)
     try:
-        log.writelines("++ Exiting - requested by user\n")
+        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Exiting - requested by user\n")
         log.flush()
         log.close()
         save_window_size(window, vpaned)
@@ -1982,12 +1983,12 @@ try:
 except Exception, detail:
     print detail
 
-log.writelines("++ Launching gooroomUpdate \n")
+log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Launching gooroomUpdate \n")
 log.flush()
 
 if (not os.path.exists(CONFIG_DIR)):
     os.system("mkdir -p %s" % CONFIG_DIR)
-    log.writelines("++ Creating %s directory\n" % CONFIG_DIR)
+    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Creating %s directory\n" % CONFIG_DIR)
     log.flush()
 
 try:
@@ -2252,6 +2253,6 @@ try:
 
 except Exception, detail:
     print detail
-    log.writelines("-- Exception occurred in main thread: " + str(detail) + "\n")
+    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in main thread: " + str(detail) + "\n")
     log.flush()
     log.close()
