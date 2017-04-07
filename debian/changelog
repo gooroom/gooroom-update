@@ -1,3 +1,14 @@
+gooroom-update (0.9.1+grm4) gooroom; urgency=medium
+
+  [ sungho.kang ]
+  * [c22506a1] modified email address.
+  * [bf0ca6cd] Added log timestamp
+  * [41a69390] Keep preference window always on top
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 07 Apr 2017 14:44:52 +0900
+
 gooroom-update (0.9.1+grm3) gooroom; urgency=medium
 
   [ sungho.kang ]
