@@ -84,12 +84,12 @@ try:
                     if origin.origin == "Debian" and '-Security' in origin.label:
                         update_type = "security"
                         break
-                    if origin.origin == "gooroom":
-                        update_type = "gooroom"                
-                    
+                    if origin.origin == "Gooroom" or origin.origin == 'gooroom':
+                        update_type = "gooroom"
+
                 resultString = u"UPDATE###%s###%s###%s###%s###%s###%s###%s###%s###%s---EOL---" % (package, newVersion, oldVersion, size, sourcePackage, update_type, update_origin, short_description, description)
                 print resultString.encode('ascii', 'xmlcharrefreplace')
-    
+
 except Exception, detail:
     print "CHECK_APT_ERROR---EOL---"
     print detail
