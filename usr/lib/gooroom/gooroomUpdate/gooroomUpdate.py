@@ -39,8 +39,8 @@ except Exception, detail:
 from subprocess import Popen, PIPE
 
 try:
-    numMintUpdate = commands.getoutput("ps -A | grep gooroomUpdate | wc -l")
-    if (numMintUpdate != "0"):
+    numGooroomUpdate = commands.getoutput("ps -A | grep gooroomUpdate | wc -l")
+    if (numGooroomUpdate != "0"):
         os.system("killall gooroomUpdate")
 except Exception, detail:
     print detail
@@ -847,18 +847,6 @@ class RefreshThread(threading.Thread):
 
             model.set_sort_column_id( UPDATE_SORT_STR, gtk.SORT_ASCENDING )
 
-            aliases = {}
-            with open("/usr/lib/gooroom/gooroomUpdate/aliases") as alias_file:
-                for line in alias_file:
-                    if not line.startswith('#'):
-                        splitted = line.split("#####")
-                        if len(splitted) == 4:
-                            (alias_packages, alias_name, alias_short_description, alias_description) = splitted
-                            alias_object = Alias(alias_name, alias_short_description, alias_description)
-                            for alias_package in alias_packages.split(','):
-                                alias_package = alias_package.strip()
-                                aliases[alias_package] = alias_object
-
             # Check to see if no other APT process is running
             if self.root_mode:
                 p1 = Popen(['ps', '-U', 'root', '-o', 'comm'], stdout=PIPE)
@@ -1033,17 +1021,10 @@ class RefreshThread(threading.Thread):
                     if (new_gooroomupdate and package_update.name != "gooroom-update" and package_update.name != "gooroom-upgrade-info"):
                         continue
 
-                    if source_package in aliases.keys():
-                        alias = aliases[source_package]
-                        package_update.alias = alias.name
-                        package_update.short_description = alias.short_description
-                        package_update.description = alias.description
-
-                    else:
-                        # l10n descriptions
-                        l10n_descriptions(package_update)
-                        package_update.short_description = clean_l10n_short_description(package_update.short_description)
-                        package_update.description = clean_l10n_description(package_update.description)
+                    # l10n descriptions
+                    l10n_descriptions(package_update)
+                    package_update.short_description = clean_l10n_short_description(package_update.short_description)
+                    package_update.description = clean_l10n_description(package_update.description)
 
                     security_update = (package_update.type == "security")
 

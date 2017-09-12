@@ -16,7 +16,7 @@
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="program_name">gooroomUpdate</property>
-    <property name="comments" translatable="yes" context="yes">Update Manager for Linux Mint</property>
+    <property name="comments" translatable="yes" context="yes">Update Manager for Linux Gooroom</property>
     <property name="license" translatable="yes" context="yes">		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
 

@@ -28,7 +28,7 @@ import commands
 
 try:
     cache = apt.Cache()
-    
+
     if os.getuid() == 0 :
         use_synaptic = False
         if (len(sys.argv) > 1):
@@ -43,21 +43,12 @@ try:
             #cmd.append("\"" + _("Please wait, this can take some time") + "\"")
             comnd = Popen(' '.join(cmd), shell=True)
             returnCode = comnd.wait()
-            #sts = os.waitpid(comnd.pid, 0)            
+            #sts = os.waitpid(comnd.pid, 0)
         else:
             cache.update()
 
-    sys.path.append('/usr/lib/linuxmint/common')
-    from configobj import ConfigObj
-    config = ConfigObj("/etc/linuxmint/mintUpdate.conf")
-    try:
-        if (config['update']['dist_upgrade'] == "True"):
-            dist_upgrade = True
-        else:
-            dist_upgrade = False
-    except:
-        dist_upgrade = True
-        
+    dist_upgrade = True
+
     # Reopen the cache to reflect any updates
     cache.open(None)
     cache.upgrade(dist_upgrade)
