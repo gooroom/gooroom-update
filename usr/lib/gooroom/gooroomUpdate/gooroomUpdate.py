@@ -1469,8 +1469,8 @@ def read_configuration():
 
     return prefs
 
-def open_certificate_manager(widget):
-    os.system("/usr/bin/gooroom-certificate-manager")
+def open_synaptic_package_manager(widget):
+    os.system("/usr/bin/synaptic-pkexec")
 
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
@@ -2106,6 +2106,16 @@ try:
     fileMenu = gtk.MenuItem(_("_File"))
     fileSubmenu = gtk.Menu()
     fileMenu.set_submenu(fileSubmenu)
+    if os.path.exists("/usr/bin/synaptic-pkexec"):
+        synapticMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        synaptic_icon = "/usr/share/pixmaps/synaptic.png"
+        if os.path.exists(synaptic_icon):
+            synapticMenuItem.set_image(gtk.image_new_from_file(synaptic_icon))
+
+        synapticMenuItem.set_label(_("Synaptic Package Manager"))
+        synapticMenuItem.connect("activate", open_synaptic_package_manager)
+        fileSubmenu.append(synapticMenuItem)
+
     closeMenuItem = gtk.ImageMenuItem(gtk.STOCK_CLOSE)
     closeMenuItem.set_label(_("Close"))
     closeMenuItem.connect("activate", hide_window, wTree.get_widget("window1"))
@@ -2118,12 +2128,6 @@ try:
     prefsMenuItem.set_label(_("Preferences"))
     prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     editSubmenu.append(prefsMenuItem)
-    if os.path.exists("/usr/bin/gooroom-certificate-manager"):
-        certMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        certMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/certification-management.png"))
-        certMenuItem.set_label(_("Certification management"))
-        certMenuItem.connect("activate", open_certificate_manager)
-        editSubmenu.append(certMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
