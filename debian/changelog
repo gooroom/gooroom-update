@@ -1,3 +1,15 @@
+gooroom-update (0.9.2+grm1u1) gooroom; urgency=medium
+
+  [ sungho.kang ]
+  * [d2ca5222] Modified gooroom packages origin
+  * [ec5e63d7] Remove mintupdate related code
+  * [264d8610] update makepot
+  * [4309da91] Added synaptic menu Removeed certificate manager menu
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 14 Nov 2017 09:21:00 +0900
+
 gooroom-update (0.9.1+grm4) gooroom; urgency=medium
 
   [ sungho.kang ]
