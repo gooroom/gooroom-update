@@ -369,7 +369,7 @@ class InstallThread(threading.Thread):
                                 dialog.set_title("")
                                 dialog.set_markup("<b>" + _("This upgrade will trigger additional changes") + "</b>")
                                 #dialog.format_secondary_markup("<i>" + _("All available upgrades for this package will be ignored.") + "</i>")
-                                dialog.set_icon_name("gooroomupdate")
+                                dialog.set_icon_name("gooroomupdater")
                                 dialog.set_default_size(320, 400)
                                 dialog.set_resizable(True)
 
@@ -613,7 +613,7 @@ class AutoInstallThread(threading.Thread):
                                 dialog.set_title("")
                                 dialog.set_markup("<b>" + _("This upgrade will trigger additional changes") + "</b>")
                                 #dialog.format_secondary_markup("<i>" + _("All available upgrades for this package will be ignored.") + "</i>")
-                                dialog.set_icon_name("gooroomupdate")
+                                dialog.set_icon_name("gooroomupdater")
                                 dialog.set_default_size(320, 400)
                                 dialog.set_resizable(True)
 
@@ -1531,7 +1531,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
 
-    prefs_tree.get_widget("window2").set_icon_name("gooroomupdate")
+    prefs_tree.get_widget("window2").set_icon_name("gooroomupdater")
     prefs_tree.get_widget("window2").set_keep_above(True)
     prefs_tree.get_widget("window2").show()
     prefs_tree.get_widget("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
@@ -1581,7 +1581,7 @@ def open_history(widget):
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     wTree = gtk.glade.XML(gladefile, "window4")
     treeview_update = wTree.get_widget("treeview_history")
-    wTree.get_widget("window4").set_icon_name("gooroomupdate")
+    wTree.get_widget("window4").set_icon_name("gooroomupdater")
 
     wTree.get_widget("window4").set_title(_("History of updates") + " - " + _("Update Manager"))
 
@@ -1653,7 +1653,7 @@ def open_information(widget):
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window3")
     prefs_tree.get_widget("window3").set_title(_("Information") + " - " + _("Update Manager"))
-    prefs_tree.get_widget("window3").set_icon_name("gooroomupdate")
+    prefs_tree.get_widget("window3").set_icon_name("gooroomupdater")
     prefs_tree.get_widget("close_button").connect("clicked", info_cancel, prefs_tree)
     prefs_tree.get_widget("label4").set_text(_("Process ID:"))
     prefs_tree.get_widget("label5").set_text(_("Log file:"))
@@ -1672,7 +1672,7 @@ def open_help(widget):
 def open_about(widget):
     dlg = gtk.AboutDialog()
     dlg.set_title(_("About") + " - " + _("Update Manager"))
-    dlg.set_program_name("gooroomUpdate")
+    dlg.set_program_name("gooroomupdater")
     dlg.set_comments(_("Update Manager"))
     try:
         h = open('/usr/share/common-licenses/GPL','r')
@@ -1696,7 +1696,7 @@ def open_about(widget):
         print detail
 
     dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>","Gooroom <gooroom@gooroom.kr>"])
-    dlg.set_icon_name("gooroomupdate")
+    dlg.set_icon_name("gooroomupdater")
     dlg.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/base.svg"))
     def close(w, res):
         if res == gtk.RESPONSE_CANCEL:
@@ -1995,11 +1995,11 @@ try:
     wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
 
     statusbar = wTree.get_widget("statusbar")
-    context_id = statusbar.get_context_id("gooroomUpdate")
+    context_id = statusbar.get_context_id("gooroomupdater")
 
     vbox = wTree.get_widget("vbox_main")
     treeview_update = wTree.get_widget("treeview_update")
-    wTree.get_widget("window1").set_icon_name("gooroomupdate")
+    wTree.get_widget("window1").set_icon_name("gooroomupdater")
 
     accel_group = gtk.AccelGroup()
     wTree.get_widget("window1").add_accel_group(accel_group)
