@@ -1,3 +1,13 @@
+gooroom-update (0.9.3+grm1u1) gooroom; urgency=medium
+
+  [ sungho.kang ]
+  * [07aa61a7] Changed icon file to name
+  * [f43e39db] Changed icon file to name again
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 14 Mar 2018 11:58:39 +0900
+
 gooroom-update (0.9.2+grm1u1) gooroom; urgency=medium
 
   [ sungho.kang ]
