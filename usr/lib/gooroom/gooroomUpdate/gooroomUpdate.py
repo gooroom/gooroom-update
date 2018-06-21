@@ -2130,11 +2130,12 @@ try:
     editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
-        sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
-        sourcesMenuItem.set_label(_("Software sources"))
-        sourcesMenuItem.connect("activate", open_repositories)
-        editSubmenu.append(sourcesMenuItem)
+        if os.system("systemctl status gooroom-agent"):
+            sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+            sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
+            sourcesMenuItem.set_label(_("Software sources"))
+            sourcesMenuItem.connect("activate", open_repositories)
+            editSubmenu.append(sourcesMenuItem)
 
     viewMenu = gtk.MenuItem(_("_View"))
     viewSubmenu = gtk.Menu()
