@@ -2130,7 +2130,23 @@ try:
     editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
-        if os.system("systemctl status gooroom-agent"):
+        def agent_exists():
+            """
+            check if gooroom-agent is running on
+            """
+            import subprocess
+            pp = subprocess.Popen('ps -ef | grep Agent',
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True)
+            sout = pp.communicate()[0].decode('utf8').split('\n')
+            for o in sout:
+                if 'gooroom-agent-service/Agent.py' in o:
+                    return True
+            else:
+                return False
+            
+        if not agent_exists():
             sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
             sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
             sourcesMenuItem.set_label(_("Software sources"))
