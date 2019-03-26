@@ -1076,10 +1076,29 @@ class RefreshThread(threading.Thread):
                     try:
                         urllib2.urlopen('http://packages.gooroom.kr', timeout=2)
                         print "network connection ok"
+
                         net_status = _("OK")
                     except urllib2.URLError as err:
                         print "network connection failed"
                         net_status = _("Failed")
+
+                        error_msg = _("Network connection is %s") % net_status
+
+                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
+                        self.statusIcon.set_visible(True)
+
+                        self.wTree.get_widget("notebook_status").set_current_page(TAB_ERROR)
+                        self.wTree.get_widget("label_error_details").set_markup("<b>%s</b>" % error_msg)
+                        self.wTree.get_widget("window1").window.set_cursor(None)
+                        self.wTree.get_widget("label_error_details").show()
+
+                        self.statusIcon.set_tooltip(error_msg)
+                        statusbar.push(context_id, error_msg)
+
+                        del model
+                        self.wTree.get_widget("window1").set_sensitive(True)
+                        gtk.gdk.threads_leave()
+                        return
 
                     if (num_safe > 0):
                         x, y = wTree.get_widget("window1").get_position()
