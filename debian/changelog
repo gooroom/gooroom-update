@@ -1,3 +1,12 @@
+gooroom-update (0.9.6+grm1u1) gooroom; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [44d690f6] [Bug:493] If not network accessed change icon and board resource
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 29 Mar 2019 09:36:13 +0900
+
 gooroom-update (0.9.5+grm1u1) gooroom; urgency=medium
 
   [ hmkim ]
