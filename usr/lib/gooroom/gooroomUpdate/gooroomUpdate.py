@@ -455,8 +455,8 @@ class InstallThread(threading.Thread):
                     gtk.gdk.threads_leave()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
-                    cmd = ["pkexec", "/usr/sbin/synaptic", "--hide-main-window",  \
-                            "--non-interactive", "--parent-window-id", "%s" % self.wTree.get_widget("window1").window.xid]
+                    cmd = ["pkexec", "/usr/sbin/naptic-script.sh", "--hide-main-window",  \
+                           "--non-interactive", "--parent-window-id", "%s" % self.wTree.get_widget("window1").window.xid]
                     cmd.append("-o")
                     cmd.append("Synaptic::closeZvt=true")
                     cmd.append("--progress-str")
@@ -699,7 +699,7 @@ class AutoInstallThread(threading.Thread):
                     gtk.gdk.threads_leave()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
-                    cmd = ["sudo", "/usr/lib/gooroom/gooroomUpdate/autoInstall.py"]
+                    cmd = ["pkexec", "/usr/lib/gooroom/gooroomUpdate/autoInstall.py"]
                     for pkg in packages:
                         cmd.append(pkg)
                     comnd = Popen(' '.join(cmd), stdout=log, stderr=log, shell=True)
@@ -879,7 +879,7 @@ class RefreshThread(threading.Thread):
             else:
                 refresh_command = "/usr/lib/gooroom/gooroomUpdate/checkAPT.py --use-synaptic %s 2>/dev/null" % self.wTree.get_widget("window1").window.xid
             if self.root_mode:
-                refresh_command = "sudo %s" % refresh_command
+                refresh_command = "pkexec %s" % refresh_command
             updates =  commands.getoutput(refresh_command)
 
             # Look for gooroom-update
@@ -1076,29 +1076,14 @@ class RefreshThread(threading.Thread):
                     try:
                         urllib2.urlopen('http://packages.gooroom.kr', timeout=2)
                         print "network connection ok"
-
                         net_status = _("OK")
                     except urllib2.URLError as err:
-                        print "network connection failed"
-                        net_status = _("Failed")
-
-                        error_msg = _("Network connection is %s") % net_status
-
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
-                        self.statusIcon.set_visible(True)
-
-                        self.wTree.get_widget("notebook_status").set_current_page(TAB_ERROR)
-                        self.wTree.get_widget("label_error_details").set_markup("<b>%s</b>" % error_msg)
-                        self.wTree.get_widget("window1").window.set_cursor(None)
-                        self.wTree.get_widget("label_error_details").show()
-
-                        self.statusIcon.set_tooltip(error_msg)
-                        statusbar.push(context_id, error_msg)
-
-                        del model
-                        self.wTree.get_widget("window1").set_sensitive(True)
-                        gtk.gdk.threads_leave()
-                        return
+                        if err.code == 200 or err.code == 403:
+                            print "network connection ok"
+                            net_status = _("OK")
+                        else:
+                            print "network connection failed"
+                            net_status = _("Failed")
 
                     if (num_safe > 0):
                         x, y = wTree.get_widget("window1").get_position()
@@ -1346,9 +1331,9 @@ def set_auto_upgrade(widget, prefs_tree):
     global auto_upgrade_handler_id
     toggle = prefs_tree.get_widget("auto_upgrade").get_active()
     if toggle == False:
-        result=os.system("pkexec sh -c 'sed s/%sudo/#%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && chmod 0440 /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'")
+        result=os.system("pkexec /usr/sbin/auto-upgrade-script.sh false")
     elif toggle == True:
-        result=os.system("pkexec sh -c 'sed s/#%sudo/%sudo/g /etc/sudoers.d/gooroom-update > /gooroom-update && chmod 0440 /gooroom-update && mv /gooroom-update /etc/sudoers.d/gooroom-update'")
+        result=os.system("pkexec /usr/sbin/auto-upgrade-script.sh true")
 
     if result:
         prefs_tree.get_widget("auto_upgrade").handler_block(auto_upgrade_handler_id)
@@ -1968,6 +1953,7 @@ app_hidden = True
 alert = True
 
 gtk.gdk.threads_init()
+gtk.gdk.set_program_class("gooroomupdate")
 
 # prepare the log
 pid = os.getpid()
@@ -2149,23 +2135,7 @@ try:
     editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
-        def agent_exists():
-            """
-            check if gooroom-agent is running on
-            """
-            import subprocess
-            pp = subprocess.Popen('ps -ef | grep Agent',
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=True)
-            sout = pp.communicate()[0].decode('utf8').split('\n')
-            for o in sout:
-                if 'gooroom-agent-service/Agent.py' in o:
-                    return True
-            else:
-                return False
-            
-        if not agent_exists():
+        if os.system("systemctl status gooroom-agent"):
             sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
             sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
             sourcesMenuItem.set_label(_("Software sources"))
