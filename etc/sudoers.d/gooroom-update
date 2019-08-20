@@ -1,8 +1,0 @@
-# Allow any user to check for new system updates without
-# requiring user authentication.
-
-Cmnd_Alias UPDATE = /usr/lib/gooroom/gooroomUpdate/checkAPT.py
-Cmnd_Alias UPGRADE = /usr/lib/gooroom/gooroomUpdate/autoInstall.py
-
-ALL ALL = NOPASSWD:UPDATE
-#%sudo ALL = NOPASSWD:UPGRADE

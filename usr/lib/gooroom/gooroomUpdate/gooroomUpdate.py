@@ -455,7 +455,7 @@ class InstallThread(threading.Thread):
                     gtk.gdk.threads_leave()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
-                    cmd = ["pkexec", "/usr/sbin/naptic-script.sh", "--hide-main-window",  \
+                    cmd = ["pkexec", "/usr/sbin/synaptic-script.sh", "--hide-main-window",  \
                            "--non-interactive", "--parent-window-id", "%s" % self.wTree.get_widget("window1").window.xid]
                     cmd.append("-o")
                     cmd.append("Synaptic::closeZvt=true")
@@ -1330,10 +1330,11 @@ def set_auto_upgrade(widget, prefs_tree):
     #FIXME this method has probability that changes other sudoers.d/gooroom-update configuration.
     global auto_upgrade_handler_id
     toggle = prefs_tree.get_widget("auto_upgrade").get_active()
+
     if toggle == False:
-        result=os.system("pkexec /usr/sbin/auto-upgrade-script.sh false")
-    elif toggle == True:
-        result=os.system("pkexec /usr/sbin/auto-upgrade-script.sh true")
+        result = os.system("pkexec /usr/sbin/auto-upgrade-script.sh false")
+    else:
+        result = os.system("pkexec /usr/sbin/auto-upgrade-script.sh true")
 
     if result:
         prefs_tree.get_widget("auto_upgrade").handler_block(auto_upgrade_handler_id)
@@ -1344,10 +1345,9 @@ def set_auto_upgrade(widget, prefs_tree):
         prefs_tree.get_widget("auto_upgrade_date").set_sensitive(toggle)
 
 def get_auto_upgrade():
-    cmd = ["sudo", "-l"]
-    comnd = Popen(cmd, stdout=PIPE)
-    output = comnd.communicate()
-    if "autoInstall.py" in str(output):
+    with open("/etc/gooroom/gooroom-update/auto-upgrade", "r") as f:
+        auto_install_flag = f.read().strip("\n")
+    if "1" == auto_install_flag:
         return True
     return False
 
