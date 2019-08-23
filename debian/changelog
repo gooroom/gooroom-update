@@ -1,3 +1,13 @@
+gooroom-update (0.9.7+grm1u1) gooroom; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [cead4164] Change synaptic script call and Icon name
+  * [99a739ee] Change synaptic script call and added icon name
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 23 Aug 2019 16:45:41 +0900
+
 gooroom-update (0.9.6+grm1u1) gooroom; urgency=medium
 
   [ HaeRyong Jeong ]
