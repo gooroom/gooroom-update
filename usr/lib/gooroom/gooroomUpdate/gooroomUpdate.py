@@ -1179,6 +1179,7 @@ class RefreshThread(threading.Thread):
             gtk.gdk.threads_leave()
 
         except Exception, detail:
+            gtk.gdk.threads_leave()
             print "-- Exception occurred in the refresh thread: " + str(detail)
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
