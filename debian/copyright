@@ -4,7 +4,8 @@ Upstream-Contact: gooroom <gooroom@gooroom.kr>
 Source: http://git.gooroom.kr/gitweb/gooroom-update.git
 
 Files: *
-Copyright: 2007-2015 Gooroom <gooroom@gooroom.kr>
+Copyright: 2007-2015 Clement Lefebvre <root@linuxmint.com>
+           2015-2019 Gooroom <gooroom@gooroom.kr>
 License: GPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ License: GPL-3+
 Files: usr/lib/gooroom/gooroomUpdate/proxygsettings.py
 Copyright: 2011-2012 Canonical Ltd.
                 2014 Erik Devriendt
-				2015 Gooroom
+    	   2015-2019 Gooroom <gooroom@gooroom.kr>
 License: GPL-3 with special exception
  This program is free software: you can redistribute it and/or modify it
  under the terms of the GNU General Public License version 3, as published
