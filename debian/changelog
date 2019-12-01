@@ -1,3 +1,21 @@
+gooroom-update (0.9.8+grm2u1) gooroom; urgency=medium
+
+  [ cjheo ]
+  * [a92f67d0] Update tray icons
+
+  [ HaeRyong Jeong ]
+  * [732dbece] [Bug: 1655]Fixed it hangs when network connection not
+  * [b58ba259] Updating source regarding copyright
+  * [d04c2125] Fixed it not show Icon on launcher
+  * [84a86915] [Bug: 1728] Fixed it Install Button
+
+  [ jongkyung.woo ]
+  * [2bce8bbb] Modified copyright
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 01 Dec 2019 19:42:43 +0900
+
 gooroom-update (0.9.7+grm1u1) gooroom; urgency=medium
 
   [ HaeRyong Jeong ]
