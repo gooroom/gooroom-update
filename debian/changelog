@@ -1,3 +1,12 @@
+gooroom-update (0.9.9+grm2u1) unstable; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [4b1986a1] Modified copyright and Changed to install button prev state
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 02 Dec 2019 17:15:08 +0900
+
 gooroom-update (0.9.8+grm2u1) unstable; urgency=medium
 
   * Initial Release
