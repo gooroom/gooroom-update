@@ -2,7 +2,7 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: gooroom-update
 Upstream-Contact: gooroom <gooroom@gooroom.kr>
 Upstream-Source: https://github.com/linuxmint/mintupdate
-Source: http://github.com/gooroom/gooroom-update
+Source: https://github.com/gooroom/gooroom-update
 
 Files: *
 Copyright: 2007-2015 Clement Lefebvre <root@linuxmint.com>

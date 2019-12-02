@@ -340,18 +340,6 @@ class InstallThread(threading.Thread):
             gtk.gdk.threads_leave()
 
             iter = model.get_iter_first()
-            if (iter == None):
-                gtk.gdk.threads_enter()
-                dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, None)
-                dialog.set_title("")
-                dialog.set_markup("Please select update librarys")
-                #dialog.set_icon_name("gooroomupdater")
-
-                dialog.show_all()
-                res = dialog.run()
-                dialog.destroy()
-                gtk.gdk.threads_leave()
-
             while (iter != None):
                 checked = model.get_value(iter, UPDATE_CHECKED)
                 if (checked == "true"):
@@ -946,7 +934,7 @@ class RefreshThread(threading.Thread):
                         return False
 
                     values = string.split(pkg, "###")
-                    #print(pkg)
+                    print(pkg)
                     if len(values) == 10:
                         status = values[0]
                         package = values[1]
@@ -1098,7 +1086,6 @@ class RefreshThread(threading.Thread):
                             net_status = _("Failed")
 
                     if (num_safe > 0):
-                        wTree.get_widget("tool_apply").set_sensitive(True)
                         x, y = wTree.get_widget("window1").get_position()
 
                         ## 1. The alert pop-up is new
@@ -1166,7 +1153,6 @@ class RefreshThread(threading.Thread):
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found " + str(num_safe) + " recommended software updates\n")
                         log.flush()
                     else:
-                        wTree.get_widget("tool_apply").set_sensitive(False)
                         if num_visible == 0:
                             self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
                         self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
@@ -1193,7 +1179,6 @@ class RefreshThread(threading.Thread):
             gtk.gdk.threads_leave()
         except Exception, detail:
             gtk.gdk.threads_leave()
-            print ("-- Exception occurred in the refresh thread: " + str(detail))
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
 
@@ -1240,7 +1225,6 @@ def clear(widget, treeView, statusbar, context_id):
         model.set_value(iter, 0, "false")
         iter = model.iter_next(iter)
     statusbar.push(context_id, _("No updates selected"))
-    wTree.get_widget("tool_apply").set_sensitive(False)
 
 def select_all(widget, treeView, statusbar, context_id):
     model = treeView.get_model()
@@ -1251,12 +1235,6 @@ def select_all(widget, treeView, statusbar, context_id):
     iter = model.get_iter_first()
     download_size = 0
     num_selected = 0
-
-    if (iter != None):
-        wTree.get_widget("tool_apply").set_sensitive(True)
-    else:
-        wTree.get_widget("tool_apply").set_sensitive(False)
-
     while (iter != None):
         checked = model.get_value(iter, UPDATE_CHECKED)
         if (checked == "true"):
@@ -1930,13 +1908,10 @@ def toggled(renderer, path, treeview, statusbar, context_id):
             num_selected = num_selected + 1
         iter = model.iter_next(iter)
     if num_selected == 0:
-        wTree.get_widget("tool_apply").set_sensitive(False)
         statusbar.push(context_id, _("No updates selected"))
     elif num_selected == 1:
-        wTree.get_widget("tool_apply").set_sensitive(True)
         statusbar.push(context_id, _("%(selected)d update selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
     else:
-        wTree.get_widget("tool_apply").set_sensitive(True)
         statusbar.push(context_id, _("%(selected)d updates selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
 
 def size_to_string(size):
@@ -1980,7 +1955,7 @@ app_hidden = True
 alert = True
 
 gtk.gdk.threads_init()
-gtk.gdk.set_program_class("gooroomupdate")
+gtk.gdk.set_program_class("gooroomupdater")
 
 # prepare the log
 pid = os.getpid()
