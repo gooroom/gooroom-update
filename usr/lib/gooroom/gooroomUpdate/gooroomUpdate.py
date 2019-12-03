@@ -1074,7 +1074,24 @@ class RefreshThread(threading.Thread):
                     log.flush()
                 else:
                     try:
-                        urllib2.urlopen('http://packages.gooroom.kr', timeout=2)
+                        pp = Popen(
+                            ['/usr/bin/apt-cache', 'policy'],
+                            stdout=PIPE,
+                            stderr=PIPE)
+                        pp_out, pp_err = pp.communicate()
+                        
+                        package_server_url = ''
+                        for lo in pp_out.split('\n'):
+                            splited_lo = lo.split()
+                            if len(splited_lo) > 1 \
+                                and (splited_lo[1].startswith('http://') \
+                                or splited_lo[1].startswith('https://')):
+
+                                r_splited_lo = splited_lo[1].split('/')
+                                if r_splited_lo[-1] == 'debian':
+                                    package_server_url = '/'.join(r_splited_lo[:-1])
+
+                        urllib2.urlopen(package_server_url, timeout=2)
                         print "network connection ok"
                         net_status = _("OK")
                     except urllib2.URLError as err:
