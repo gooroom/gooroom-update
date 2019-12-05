@@ -1,10 +1,20 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: gooroom-update
-Upstream-Contact: gooroom <gooroom@gooroom.kr>
-Source: http://git.gooroom.kr/gitweb/gooroom-update.git
+Upstream-Name: mintupdate
+Upstream-Contact: Clement Lefebvre <root@linuxmint.com>
+Upstream-Source: https://github.com/linuxmint/mintupdate
+Source: https://github.com/gooroom/gooroom-update
 
 Files: *
-Copyright: 2007-2015 Gooroom <gooroom@gooroom.kr>
+Copyright: 2007-2015 Clement Lefebvre <root@linuxmint.com>
+           2015-2019 Gooroom <gooroom@gooroom.kr>
+License: GPL-3+
+
+Files: usr/lib/gooroom/gooroomUpdate/proxygsettings.py
+Copyright: 2011-2012 Canonical Ltd.
+                2014 Erik Devriendt
+				2015 Gooroom
+License: GPL-3 with special exception
+
 License: GPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,10 +32,11 @@ License: GPL-3+
  On Debian systems, the complete text of the GNU General
  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
 
-Files: usr/lib/gooroom/gooroomUpdate/proxygsettings.py
-Copyright: 2011-2012 Canonical Ltd.
-                2014 Erik Devriendt
-				2015 Gooroom
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
+# Please avoid picking licenses with terms that are more restrictive than the
+# packaged work, as it may make Debian's contributions unacceptable upstream.
+
 License: GPL-3 with special exception
  This program is free software: you can redistribute it and/or modify it
  under the terms of the GNU General Public License version 3, as published
@@ -51,3 +62,8 @@ License: GPL-3 with special exception
  do not wish to do so, delete this exception statement from your
  version.  If you delete this exception statement from all source
  files in the program, then also delete it here.
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
+# Please avoid picking licenses with terms that are more restrictive than the
+# packaged work, as it may make Debian's contributions unacceptable upstream.
