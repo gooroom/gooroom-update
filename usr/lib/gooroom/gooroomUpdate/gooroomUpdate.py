@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+#-*- coding:utf-8 -*-
 
 try:
     import os
@@ -1090,10 +1091,19 @@ class RefreshThread(threading.Thread):
                                 r_splited_lo = splited_lo[1].split('/')
                                 if r_splited_lo[-1] == 'debian':
                                     package_server_url = '/'.join(r_splited_lo[:-1])
+                                # 데비안 업데이트 서버 주소가 명시되지 않은 경우
+                                # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
+                                elif r_splited_lo[-1] == 'gooroom':
+                                    package_server_url = '/'.join(r_splited_lo[:-1])
 
-                        urllib2.urlopen(package_server_url, timeout=2)
-                        print "network connection ok"
-                        net_status = _("OK")
+                        if package_server_url == '':
+                            print "= = = = = = => network connection failed"
+                            net_status = _("Failed")
+                        else:
+                            urllib2.urlopen(package_server_url, timeout=2)
+                            print "network connection ok"
+                            net_status = _("OK")
+
                     except urllib2.URLError as err:
                         if err.code == 200 or err.code == 403:
                             print "network connection ok"
