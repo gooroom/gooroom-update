@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+#-*- coding:utf-8 -*-
 
 try:
     import os
@@ -823,6 +824,7 @@ class RefreshThread(threading.Thread):
         gtk.gdk.threads_enter()
         vpaned_position = wTree.get_widget("vpaned1").get_position()
         gtk.gdk.threads_leave()
+
         try:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Starting refresh\n")
             log.flush()
@@ -920,6 +922,7 @@ class RefreshThread(threading.Thread):
                         self.statusIcon.set_visible(True)
                         statusbar.push(context_id, _("Could not refresh the list of updates"))
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Error in checkAPT.py, could not refresh the list of updates\n")
+
                         log.flush()
                         self.wTree.get_widget("notebook_status").set_current_page(TAB_ERROR)
                         self.wTree.get_widget("label_error_details").set_markup("<b>%s</b>" % error_msg)
@@ -1015,9 +1018,7 @@ class RefreshThread(threading.Thread):
                 self.fetch_l10n_descriptions(package_names)
 
                 for source_package in package_updates.keys():
-
                     package_update = package_updates[source_package]
-
                     if (new_gooroomupdate and package_update.name != "gooroom-update" and package_update.name != "gooroom-upgrade-info"):
                         continue
 
@@ -1090,10 +1091,19 @@ class RefreshThread(threading.Thread):
                                 r_splited_lo = splited_lo[1].split('/')
                                 if r_splited_lo[-1] == 'debian':
                                     package_server_url = '/'.join(r_splited_lo[:-1])
+                                # 데비안 업데이트 서버 주소가 명시되지 않은 경우
+                                # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
+                                elif r_splited_lo[-1] == 'gooroom':
+                                    package_server_url = '/'.join(r_splited_lo[:-1])
 
-                        urllib2.urlopen(package_server_url, timeout=2)
-                        print "network connection ok"
-                        net_status = _("OK")
+                        if package_server_url == '':
+                            print "= = = = = = => network connection failed"
+                            net_status = _("Failed")
+                        else:
+                            urllib2.urlopen(package_server_url, timeout=2)
+                            print "network connection ok"
+                            net_status = _("OK")
+
                     except urllib2.URLError as err:
                         if err.code == 200 or err.code == 403:
                             print "network connection ok"
@@ -1194,11 +1204,11 @@ class RefreshThread(threading.Thread):
             self.wTree.get_widget("window1").set_sensitive(True)
             wTree.get_widget("vpaned1").set_position(vpaned_position)
             gtk.gdk.threads_leave()
-
         except Exception, detail:
-            print "-- Exception occurred in the refresh thread: " + str(detail)
+            gtk.gdk.threads_leave()
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
+
             gtk.gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
             self.statusIcon.set_tooltip(_("Could not refresh the list of updates"))
@@ -1905,12 +1915,14 @@ def celldatafunction_checkbox(column, cell, model, iter):
 def toggled(renderer, path, treeview, statusbar, context_id):
     model = treeview.get_model()
     iter = model.get_iter(path)
+
     if (iter != None):
         checked = model.get_value(iter, UPDATE_CHECKED)
         if (checked == "true"):
             model.set_value(iter, UPDATE_CHECKED, "false")
         else:
             model.set_value(iter, UPDATE_CHECKED, "true")
+        
 
     iter = model.get_iter_first()
     download_size = 0
@@ -1970,7 +1982,7 @@ app_hidden = True
 alert = True
 
 gtk.gdk.threads_init()
-gtk.gdk.set_program_class("gooroomupdate")
+gtk.gdk.set_program_class("gooroomupdater")
 
 # prepare the log
 pid = os.getpid()
