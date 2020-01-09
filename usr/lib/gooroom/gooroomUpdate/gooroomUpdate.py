@@ -1982,7 +1982,7 @@ app_hidden = True
 alert = True
 
 gtk.gdk.threads_init()
-gtk.gdk.set_program_class("gooroomupdater")
+gtk.gdk.set_program_class("gooroomupdate")
 
 # prepare the log
 pid = os.getpid()
