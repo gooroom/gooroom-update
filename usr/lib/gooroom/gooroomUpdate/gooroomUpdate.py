@@ -3,6 +3,7 @@
 
 try:
     import os
+    import stat
     import commands
     import codecs
     import datetime
@@ -1501,7 +1502,21 @@ def read_configuration():
     return prefs
 
 def open_synaptic_package_manager(widget):
-    os.system("/usr/bin/synaptic-pkexec")
+    file_stat = os.stat("/usr/bin/synaptic-pkexec")
+    if file_stat.st_mode & stat.S_IXOTH:
+        os.system("/usr/bin/synaptic-pkexec")
+    else:
+        permissionAlertDialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, None)
+        permissionAlertDialog.set_title(_("Error Launching Program"))
+
+        message = "<span font_weight='bold' size='large'>%s</span>" % _("Can't execute Synpatic Package Manager.\nThis software is prohibited to run.")
+        permissionAlertDialog.set_markup(message)
+        permissionAlertDialog.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+
+        response = permissionAlertDialog.run()
+        if response == gtk.RESPONSE_OK or response == gtk.RESPONSE_DELETE_EVENT:
+            permissionAlertDialog.hide()
+            permissionAlertDialog.destroy()
 
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
