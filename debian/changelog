@@ -1,3 +1,16 @@
+gooroom-update (1.0.1+grm2u1) unstable; urgency=medium
+
+  [ Jeong HaeRyong ]
+  * [138e7615] Fixed to check internet connection to gooroom server url if no debian server url exists.
+  * [7340797d] Change icon name
+
+  [ cjheo ]
+  * [ae83cbf2] 패키지관리자 실행 시 실행권한이 없을 때 예외처리 추가
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 11 Feb 2020 11:34:29 +0900
+
 gooroom-update (1.0.0+grm2u1) unstable; urgency=medium
 
   * Initial Release
