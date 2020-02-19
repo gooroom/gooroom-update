@@ -354,7 +354,6 @@ class InstallThread(threading.Thread):
                 iter = model.iter_next(iter)
 
             if (installNeeded == True):
-
                 proceed = True
                 try:
                     pkgs = ' '.join(str(pkg) for pkg in packages)
@@ -903,6 +902,7 @@ class RefreshThread(threading.Thread):
 
             if (len(updates) == None):
                 gtk.gdk.threads_enter()
+                is_enable_tools = False
                 self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
                 self.statusIcon.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                 self.statusIcon.set_tooltip(_("Your system is up to date"))
@@ -1066,6 +1066,8 @@ class RefreshThread(threading.Thread):
                         num_visible = num_visible + 1
 
                 gtk.gdk.threads_enter()
+
+                is_enable_tools = True
                 if (new_gooroomupdate):
                     self.statusString = _("A new version of the update manager is available")
                     self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_updates))
@@ -1098,7 +1100,6 @@ class RefreshThread(threading.Thread):
                                     package_server_url = '/'.join(r_splited_lo[:-1])
 
                         if package_server_url == '':
-                            print "= = = = = = => network connection failed"
                             net_status = _("Failed")
                         else:
                             urllib2.urlopen(package_server_url, timeout=2)
@@ -1183,6 +1184,7 @@ class RefreshThread(threading.Thread):
                     else:
                         if num_visible == 0:
                             self.wTree.get_widget("notebook_status").set_current_page(TAB_UPTODATE)
+                        is_enable_tools = False
                         self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                         self.statusString = _("Your system is up to date")
                         self.statusString += " : " + _("Network connection is %s") % net_status
@@ -1198,6 +1200,9 @@ class RefreshThread(threading.Thread):
             log.flush()
             # Stop the blinking
             #self.statusIcon.set_blinking(False)
+            self.wTree.get_widget("tool_select_all").set_sensitive(is_enable_tools)
+            self.wTree.get_widget("tool_clear").set_sensitive(is_enable_tools)
+            self.wTree.get_widget("tool_apply").set_sensitive(is_enable_tools)
             self.wTree.get_widget("notebook_details").set_current_page(0)
             self.wTree.get_widget("window1").window.set_cursor(None)
             self.treeview_update.set_model(model)
@@ -1246,15 +1251,16 @@ def force_refresh(widget, treeview, statusIcon, wTree):
     refresh = RefreshThread(treeview, statusIcon, wTree, root_mode=True)
     refresh.start()
 
-def clear(widget, treeView, statusbar, context_id):
+def clear(widget, treeView, statusbar, apply_button, context_id):
     model = treeView.get_model()
     iter = model.get_iter_first()
     while (iter != None):
         model.set_value(iter, 0, "false")
         iter = model.iter_next(iter)
     statusbar.push(context_id, _("No updates selected"))
+    apply_button.set_sensitive(False)
 
-def select_all(widget, treeView, statusbar, context_id):
+def select_all(widget, treeView, statusbar, apply_button, context_id):
     model = treeView.get_model()
     iter = model.get_iter_first()
     while (iter != None):
@@ -1276,6 +1282,8 @@ def select_all(widget, treeView, statusbar, context_id):
         statusbar.push(context_id, _("%(selected)d update selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
     else:
         statusbar.push(context_id, _("%(selected)d updates selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
+
+    apply_button.set_sensitive(True)
 
 def install(widget, treeView, statusIcon, wTree):
     install = InstallThread(treeView, statusIcon, wTree)
@@ -1927,7 +1935,7 @@ def celldatafunction_checkbox(column, cell, model, iter):
     else:
         cell.set_property("active", False)
 
-def toggled(renderer, path, treeview, statusbar, context_id):
+def toggled(renderer, path, treeview, statusbar, apply_button, context_id):
     model = treeview.get_model()
     iter = model.get_iter(path)
 
@@ -1942,6 +1950,7 @@ def toggled(renderer, path, treeview, statusbar, context_id):
     iter = model.get_iter_first()
     download_size = 0
     num_selected = 0
+    is_enable_apply = True
     while (iter != None):
         checked = model.get_value(iter, UPDATE_CHECKED)
         if (checked == "true"):
@@ -1951,10 +1960,14 @@ def toggled(renderer, path, treeview, statusbar, context_id):
         iter = model.iter_next(iter)
     if num_selected == 0:
         statusbar.push(context_id, _("No updates selected"))
+        is_enable_apply = False
     elif num_selected == 1:
         statusbar.push(context_id, _("%(selected)d update selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
     else:
         statusbar.push(context_id, _("%(selected)d updates selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
+
+    apply_button.set_sensitive(is_enable_apply)
+
 
 def size_to_string(size):
     strSize = str(size) + _("B")
@@ -2054,7 +2067,6 @@ try:
     wTree.get_widget("window1").add_accel_group(accel_group)
 
     # Get the window socket (needed for synaptic later on)
-
     if os.getuid() != 0 :
         # If we're not in root mode do that (don't know why it's needed.. very weird)
         socket = gtk.Socket()
@@ -2064,7 +2076,7 @@ try:
 
     # the treeview
     cr = gtk.CellRendererToggle()
-    cr.connect("toggled", toggled, treeview_update, statusbar, context_id)
+    cr.connect("toggled", toggled, treeview_update, statusbar, wTree.get_widget("tool_apply"), context_id)
     column1 = gtk.TreeViewColumn(_("Upgrade"), cr)
     column1.set_cell_data_func(cr, celldatafunction_checkbox)
     column1.set_sort_column_id(UPDATE_CHECKED)
@@ -2113,8 +2125,8 @@ try:
     wTree.get_widget("notebook_details").connect("switch-page", switch_page, wTree, treeview_update)
     wTree.get_widget("window1").connect("delete_event", close_window, wTree.get_widget("vpaned1"))
     wTree.get_widget("tool_apply").connect("clicked", install, treeview_update, statusIcon, wTree)
-    wTree.get_widget("tool_clear").connect("clicked", clear, treeview_update, statusbar, context_id)
-    wTree.get_widget("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, context_id)
+    wTree.get_widget("tool_clear").connect("clicked", clear, treeview_update, statusbar, wTree.get_widget("tool_apply"), context_id)
+    wTree.get_widget("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, wTree.get_widget("tool_apply"), context_id)
     wTree.get_widget("tool_refresh").connect("clicked", force_refresh, treeview_update, statusIcon, wTree)
 
     aist=AutoInstallScheduleThread(treeview_update, statusIcon, wTree)
