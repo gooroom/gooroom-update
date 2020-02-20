@@ -1132,7 +1132,8 @@ class RefreshThread(threading.Thread):
                             alertDialog.set_markup(message)
 
                             # set the center position
-                            wTree.get_widget("window1").set_position(gtk.WIN_POS_CENTER_ALWAYS)
+                            # 윈도우 리사이징 시 해당 플래그 때문에 업데이트 창이 좌측 상단으로 움직임
+                            #wTree.get_widget("window1").set_position(gtk.WIN_POS_CENTER_ALWAYS)
                             alertDialog.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 
                             alert = False
