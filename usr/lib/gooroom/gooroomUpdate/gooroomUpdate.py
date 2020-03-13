@@ -1326,10 +1326,15 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['refresh']['timer_hours'] = int(prefs_tree.get_widget("timer_hours").get_value())
     config['refresh']['timer_days'] = int(prefs_tree.get_widget("timer_days").get_value())
 
+    auto_upgrade = prefs_tree.get_widget('auto_upgrade').get_active()
+    if (auto_upgrade != get_auto_upgrade()):
+        auto_upgrade_script = "pkexec /usr/sbin/auto-upgrade-script.sh {}".format(\
+        ('true' if auto_upgrade else 'false'))
+        os.system(auto_upgrade_script)
+
     config['auto_upgrade']= {}
     config['auto_upgrade']['date']= int(prefs_tree.get_widget("auto_upgrade_date").get_active())
     config['auto_upgrade']['time']= int(prefs_tree.get_widget("auto_upgrade_time").get_active())
-
 
     #Write update config
     config['update'] = {}
@@ -1365,21 +1370,10 @@ def pref_cancel(widget, prefs_tree):
 
 def set_auto_upgrade(widget, prefs_tree):
     #FIXME this method has probability that changes other sudoers.d/gooroom-update configuration.
-    global auto_upgrade_handler_id
     toggle = prefs_tree.get_widget("auto_upgrade").get_active()
 
-    if toggle == False:
-        result = os.system("pkexec /usr/sbin/auto-upgrade-script.sh false")
-    else:
-        result = os.system("pkexec /usr/sbin/auto-upgrade-script.sh true")
-
-    if result:
-        prefs_tree.get_widget("auto_upgrade").handler_block(auto_upgrade_handler_id)
-        prefs_tree.get_widget("auto_upgrade").set_active(not toggle)
-        prefs_tree.get_widget("auto_upgrade").handler_unblock(auto_upgrade_handler_id)
-    else:
-        prefs_tree.get_widget("auto_upgrade_time").set_sensitive(toggle)
-        prefs_tree.get_widget("auto_upgrade_date").set_sensitive(toggle)
+    prefs_tree.get_widget("auto_upgrade_time").set_sensitive(toggle)
+    prefs_tree.get_widget("auto_upgrade_date").set_sensitive(toggle)
 
 def get_auto_upgrade():
     with open("/etc/gooroom/gooroom-update/auto-upgrade", "r") as f:
@@ -1542,7 +1536,6 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     global icon_error
     global icon_unknown
     global icon_apply
-    global auto_upgrade_handler_id
 
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     prefs_tree = gtk.glade.XML(gladefile, "window2")
@@ -1584,6 +1577,31 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Sunday"))
     prefs_tree.get_widget("auto_upgrade_date").insert_text(0, _("Every Day"))
 
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 12:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 1:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 2:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 3:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 4:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 5:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 6:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 7:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 8:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 9:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 10:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("AM 11:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 12:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 1:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 2:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 3:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 4:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 5:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 6:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 7:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 8:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 9:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 10:00"))
+    prefs_tree.get_widget("auto_upgrade_time").insert_text(0, _("PM 11:00"))
+
     prefs_tree.get_widget("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
 
     prefs_tree.get_widget("window2").set_icon_name("gooroomupdater")
@@ -1620,7 +1638,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_widget("auto_upgrade").set_active(prefs["auto_upgrade"])
     prefs_tree.get_widget("auto_upgrade_date").set_active(prefs["auto_upgrade_date"])
     prefs_tree.get_widget("auto_upgrade_time").set_active(prefs["auto_upgrade_time"])
-    auto_upgrade_handler_id = prefs_tree.get_widget("auto_upgrade").connect("toggled", set_auto_upgrade, prefs_tree)
+    prefs_tree.get_widget("auto_upgrade").connect("toggled", set_auto_upgrade, prefs_tree)
 
     if prefs_tree.get_widget("auto_upgrade").get_active()== False:
         prefs_tree.get_widget("auto_upgrade_date").set_sensitive(False)
