@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python2.7 -E
 #-*- coding:utf-8 -*-
 
 try:
