@@ -1,3 +1,16 @@
+gooroom-update (1.0.3+grm2u1) unstable; urgency=medium
+
+  [ JeongHaeRyong ]
+  * [febf9d13] [Bug:2071,2073] Fixed Auto upgrade check button and hours combo box in preference dialog
+
+  [ HaeRyong Jeong ]
+  * [ef3387ed] Disable interactive mode of python
+  * [e83c85d2] [Bug:2093] Modify to appear in the center of the screen after login
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 28 Apr 2020 14:55:58 +0900
+
 gooroom-update (1.0.2+grm2u1) unstable; urgency=medium
 
   [ JeongHaeRyong ]
