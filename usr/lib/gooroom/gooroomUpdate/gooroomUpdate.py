@@ -2306,6 +2306,7 @@ try:
             wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
             app_hidden = False
 
+    wTree.get_widget("window1").show_all()
     wTree.get_widget("notebook_details").set_current_page(0)
 
     refresh = RefreshThread(treeview_update, statusIcon, wTree)
