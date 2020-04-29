@@ -1,3 +1,12 @@
+gooroom-update (1.0.4+grm2u1) unstable; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [ae22405a] Fixed package upgrade error after gooroom-update upgrade.
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 29 Apr 2020 16:45:28 +0900
+
 gooroom-update (1.0.3+grm2u1) unstable; urgency=medium
 
   [ JeongHaeRyong ]
