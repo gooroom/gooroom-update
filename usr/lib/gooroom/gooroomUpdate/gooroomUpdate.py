@@ -719,7 +719,7 @@ class AutoInstallThread(threading.Thread):
                         except:
                             pass #cause we might have closed it already
 
-                        command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show &"
+                        command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py &"
                         os.system(command)
 
                     else:
@@ -2302,9 +2302,14 @@ try:
     if len(sys.argv) > 1:
         showWindow = sys.argv[1]
         if (showWindow == "show"):
-            wTree.get_widget("window1").show_all()
-            wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
-            app_hidden = False
+            # show 파라미터를 더이상 사용하지 않기 때문에
+            # /usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show & 로 실행되는 경우
+            # 업데이트 매니저를 재시작하도록 변경
+            command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py &"
+            os.system(command)
+            #wTree.get_widget("window1").show_all()
+            #wTree.get_widget("vpaned1").set_position(prefs['dimensions_pane_position'])
+            #app_hidden = False
 
     wTree.get_widget("window1").show_all()
     wTree.get_widget("notebook_details").set_current_page(0)
