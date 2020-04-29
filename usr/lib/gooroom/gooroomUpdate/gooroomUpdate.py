@@ -488,7 +488,7 @@ class InstallThread(threading.Thread):
                         except:
                             pass #cause we might have closed it already
 
-                        command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show &"
+                        command = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py &"
                         os.system(command)
 
                     else:
