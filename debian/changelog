@@ -1,3 +1,12 @@
+gooroom-update (1.0.6+grm2u1) unstable; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [0a98f995] Changed synaptic-script.sh file
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 12 May 2020 14:58:59 +0900
+
 gooroom-update (1.0.5+grm2u1) unstable; urgency=medium
 
   [ HaeRyong Jeong ]
