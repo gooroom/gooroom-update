@@ -1,3 +1,12 @@
+gooroom-update (1.0.7+grm2u1) unstable; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [07412068] Fixed to create package list file in synaptic-script.sh
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 20 May 2020 14:58:16 +0900
+
 gooroom-update (1.0.6+grm2u1) unstable; urgency=medium
 
   [ HaeRyong Jeong ]
