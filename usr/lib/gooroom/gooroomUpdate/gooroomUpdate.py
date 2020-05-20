@@ -464,18 +464,17 @@ class InstallThread(threading.Thread):
                     cmd.append("\"" + _("Please wait, this can take some time") + "\"")
                     cmd.append("--finish-str")
                     cmd.append("\"" + _("Update is complete") + "\"")
-                    f = tempfile.NamedTemporaryFile()
 
-                    for pkg in packages:
-                        f.write("%s\tinstall\n" % pkg)
+                    pkg_list = ""
                     cmd.append("--set-selections-file")
-                    cmd.append("%s" % f.name)
-                    f.flush()
+                    for pkg in packages:
+                        pkg_list += "{},".format(pkg)
+                    pkg_list[:-1]
+
+                    cmd.append(pkg_list)
                     comnd = Popen(' '.join(cmd), stdout=log, stderr=log, shell=True)
                     returnCode = comnd.wait()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Return code:" + str(returnCode) + "\n")
-                    #sts = os.waitpid(comnd.pid, 0)
-                    f.close()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Install finished\n")
                     log.flush()
 
