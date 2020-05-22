@@ -369,13 +369,16 @@ class InstallThread(threading.Thread):
                         if len(installations) > 0 or len(removals) > 0:
                             Gdk.threads_enter()
                             try:
-                                dialog = Gtk.MessageDialog(None, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK_CANCEL, None)
-                                dialog.set_title("")
-                                dialog.set_markup("<b>" + _("This upgrade will trigger additional changes") + "</b>")
-                                #dialog.format_secondary_markup("<i>" + _("All available upgrades for this package will be ignored.") + "</i>")
+                                dialog = Gtk.Dialog("", transient_for=None, modal=True, destroy_with_parent=True)
+                                dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
                                 dialog.set_icon_name("gooroomupdater")
                                 dialog.set_default_size(320, 400)
                                 dialog.set_resizable(True)
+
+                                markup = Gtk.Label()
+                                markup.set_markup("<b>" + _("This upgrade will trigger additional changes") + "</b>")
+                                markup.set_margin_top(10)
+                                markup.set_margin_bottom(45)
 
                                 if len(removals) > 0:
                                     # Removals
@@ -384,10 +387,15 @@ class InstallThread(threading.Thread):
                                         label.set_text(_("The following package will be removed:"))
                                     else:
                                         label.set_text(_("The following %d packages will be removed:") % len(removals))
-                                    label.set_alignment(0, 0.5)
+                                    #label.set_alignment(0.1, 0.5)
+                                    label.set_halign(Gtk.Align.START)
+                                    label.set_margin_start(7)
                                     scrolledWindow = Gtk.ScrolledWindow()
                                     scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
                                     scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType._AUTOMATIC)
+                                    scrolledWindow.set_margin_bottom(5)
+                                    scrolledWindow.set_margin_start(5)
+                                    scrolledWindow.set_margin_end(5)
                                     treeview = Gtk.TreeView()
                                     column1 = Gtk.TreeViewColumn("", Gtk.CellRendererText(), text=0)
                                     column1.set_sort_column_id(0)
@@ -396,6 +404,9 @@ class InstallThread(threading.Thread):
                                     treeview.set_headers_clickable(False)
                                     treeview.set_reorderable(False)
                                     treeview.set_headers_visible(False)
+                                    treeview.set_margin_start(1)
+                                    treeview.set_margin_end(1)
+                                    treeview.set_margin_top(1)
                                     model = Gtk.TreeStore(str)
                                     removals.sort()
                                     for pkg in removals:
@@ -404,6 +415,7 @@ class InstallThread(threading.Thread):
                                     treeview.set_model(model)
                                     treeview.show()
                                     scrolledWindow.add(treeview)
+                                    dialog.vbox.pack_start(markup, False, False, 0)
                                     dialog.vbox.pack_start(label, False, False, 0)
                                     dialog.vbox.pack_start(scrolledWindow, True, True, 0)
 
@@ -414,10 +426,15 @@ class InstallThread(threading.Thread):
                                         label.set_text(_("The following package will be installed:"))
                                     else:
                                         label.set_text(_("The following %d packages will be installed:") % len(installations))
-                                    label.set_alignment(0, 0.5)
+                                    #label.set_alignment(0.1, 0.5)
+                                    label.set_halign(Gtk.Align.START)
+                                    label.set_margin_start(7)
                                     scrolledWindow = Gtk.ScrolledWindow()
                                     scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
                                     scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+                                    scrolledWindow.set_margin_bottom(5)
+                                    scrolledWindow.set_margin_start(5)
+                                    scrolledWindow.set_margin_end(5)
                                     treeview = Gtk.TreeView()
                                     column1 = Gtk.TreeViewColumn("", Gtk.CellRendererText(), text=0)
                                     column1.set_sort_column_id(0)
@@ -426,6 +443,10 @@ class InstallThread(threading.Thread):
                                     treeview.set_headers_clickable(False)
                                     treeview.set_reorderable(False)
                                     treeview.set_headers_visible(False)
+                                    treeview.set_margin_start(1)
+                                    treeview.set_margin_end(1)
+                                    treeview.set_margin_top(1)
+                                    treeview.set_margin_bottom(1)
                                     model = Gtk.TreeStore(str)
                                     installations.sort()
                                     for pkg in installations:
@@ -434,6 +455,7 @@ class InstallThread(threading.Thread):
                                     treeview.set_model(model)
                                     treeview.show()
                                     scrolledWindow.add(treeview)
+                                    dialog.vbox.pack_start(markup, False, False, 0)
                                     dialog.vbox.pack_start(label, False, False, 0)
                                     dialog.vbox.pack_start(scrolledWindow, True, True, 0)
 
@@ -509,12 +531,16 @@ class InstallThread(threading.Thread):
                     self.wTree.get_object("window").get_window().set_cursor(None)
                     self.wTree.get_object("window").set_sensitive(True)
                     Gdk.threads_leave()
+                    # FIXME: thread가 끝나면 업데이트가 함께 죽어버림
+                    # 예제에서 참고하여 아래와 같이 수정함.
+                    time.sleep(0.2)
             else:
                 # Stop the blinking but don't refresh
                 Gdk.threads_enter()
                 self.wTree.get_object("window").get_window().set_cursor(None)
                 self.wTree.get_object("window").set_sensitive(True)
                 Gdk.threads_leave()
+                time.sleep(0.2)
 
         except Exception, detail:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
@@ -529,6 +555,7 @@ class InstallThread(threading.Thread):
             self.wTree.get_object("window").get_window().set_cursor(None)
             self.wTree.get_object("window").set_sensitive(True)
             Gdk.threads_leave()
+            time.sleep(0.2)
 
 class AutoInstallScheduleThread(threading.Thread):
     def __init__(self, treeView, statusIcon, wTree):
@@ -599,7 +626,6 @@ class AutoInstallThread(threading.Thread):
                 iter = model.iter_next(iter)
 
             if (installNeeded == True):
-
                 proceed = True
                 try:
                     pkgs = ' '.join(str(pkg) for pkg in packages)
