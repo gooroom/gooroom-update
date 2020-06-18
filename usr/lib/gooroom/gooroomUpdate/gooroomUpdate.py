@@ -1398,6 +1398,11 @@ def info_cancel(widget, prefs_tree):
 def history_cancel(widget, tree):
     tree.get_object("window").hide()
 
+def pref_destroy(widget):
+    global is_pref_opened
+    is_pref_opened = False
+    widget.destroy()
+
 def pref_cancel(widget, prefs_tree):
     prefs_tree.get_object("window").hide()
 
@@ -1573,6 +1578,12 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     global icon_unknown
     global icon_apply
     global auto_upgrade_handler_id
+    global is_pref_opened
+
+    if is_pref_opened:
+        return
+
+    is_pref_opened = True
 
     #gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     gladefile = "/usr/lib/gooroom/gooroomUpdate/preference.glade"
@@ -1645,6 +1656,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
     prefs_tree.get_object("window").set_icon_name("gooroomupdater")
     prefs_tree.get_object("window").set_keep_above(True)
+    prefs_tree.get_object("window").connect("destroy", pref_destroy)
     prefs_tree.get_object("window").show()
     prefs_tree.get_object("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
     prefs_tree.get_object("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
@@ -2195,19 +2207,25 @@ try:
     aist=AutoInstallScheduleThread(treeview_update, statusIcon, wTree)
     aist.start()
 
-    menu = Gtk.Menu()
-    menuItem3 = Gtk.ImageMenuItem(Gtk.STOCK_REFRESH)
-    menuItem3.connect('activate', force_refresh, treeview_update, statusIcon, wTree)
-    menu.append(menuItem3)
-    menuItem2 = Gtk.ImageMenuItem(Gtk.STOCK_DIALOG_INFO)
-    menuItem2.connect('activate', open_information)
-    menu.append(menuItem2)
-    menuItem4 = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
-    menuItem4.connect('activate', open_preferences, treeview_update, statusIcon, wTree)
-    menu.append(menuItem4)
-    menuItem = Gtk.ImageMenuItem(Gtk.STOCK_QUIT)
-    menuItem.connect('activate', quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
-    menu.append(menuItem)
+    global is_pref_opened
+    is_pref_opened = False
+
+    menu = wTree.get_object("popupmenu")
+    menuitem1 = wTree.get_object("refreshmenu")
+    menuitem1.set_label(_("_Refresh"))
+    menuitem1.connect('activate', force_refresh, treeview_update, statusIcon, wTree)
+
+    menuitem2 = wTree.get_object("infomenu")
+    menuitem2.set_label(_("Information"))
+    menuitem2.connect('activate', open_information)
+
+    menuitem3 = wTree.get_object("prefmenu")
+    menuitem3.set_label(_("_Preferences"))
+    menuitem3.connect('activate', open_preferences, treeview_update, statusIcon, wTree)
+
+    menuitem4 = wTree.get_object("quitmenu")
+    menuitem4.set_label(_("_Quit"))
+    menuitem4.connect('activate', quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
 
     statusIcon.connect('activate', activate_icon_cb, None, wTree)
     statusIcon.connect('popup-menu', popup_menu_cb, menu)
