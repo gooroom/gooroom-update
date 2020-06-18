@@ -1398,12 +1398,16 @@ def info_cancel(widget, prefs_tree):
 def history_cancel(widget, tree):
     tree.get_object("window").hide()
 
-def pref_destroy(widget):
+def pref_destroy(widget, prefs_tree):
     global is_pref_opened
     is_pref_opened = False
-    widget.destroy()
+
+    prefs_tree.get_object("window").hide()
 
 def pref_cancel(widget, prefs_tree):
+    global is_pref_opened
+    is_pref_opened = False
+
     prefs_tree.get_object("window").hide()
 
 def set_auto_upgrade(widget, prefs_tree):
@@ -1656,7 +1660,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
     prefs_tree.get_object("window").set_icon_name("gooroomupdater")
     prefs_tree.get_object("window").set_keep_above(True)
-    prefs_tree.get_object("window").connect("destroy", pref_destroy)
+    prefs_tree.get_object("window").connect("destroy", pref_destroy, prefs_tree)
     prefs_tree.get_object("window").show()
     prefs_tree.get_object("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
     prefs_tree.get_object("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
