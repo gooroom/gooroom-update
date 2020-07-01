@@ -1392,6 +1392,10 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     global app_hidden
     app_hidden = True
 
+    global is_pref_opened
+    is_pref_opened = False
+
+
 def info_cancel(widget, prefs_tree):
     prefs_tree.get_object("window").hide()
 
