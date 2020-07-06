@@ -43,13 +43,13 @@ case $arg in
     ;;
 
     --progress-str)
-    args="$args $arg $2"
+    args="$args $arg \"$2\""
     cnt=$(($cnt+1))
     shift;shift
     ;;
 
     --finish-str)
-    args="$args $arg $2"
+    args="$args $arg \"$2\""
     cnt=$(($cnt+1))
     shift;shift
     ;;
@@ -73,7 +73,7 @@ gparent_path="$(ps -q $gparent_pid -o comm=) $(ps -q $gparent_pid -o args=)"
 if [[ "$gparent_path" == "gooroomUpdate /usr/bin/python2.7 -E /usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]] && \
    [[ "$(/bin/cat /proc/$gparent_pid/cmdline)" == "/usr/bin/python2.7-E/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]]
 then
-    /usr/sbin/synaptic $args
+    eval /usr/sbin/synaptic $args
 else
     /usr/bin/zenity --warning --title "Warning" --text "Parent Process isn't GooroomUpdate!!"
 fi
