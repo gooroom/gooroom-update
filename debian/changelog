@@ -1,3 +1,22 @@
+gooroom-update (1.0.8+grm2u1) unstable; urgency=medium
+
+  [ HaeRyong Jeong ]
+  * [4aa68a7c] Porting PyGtk to PyGObject
+  * [ac266869] Fixed control file and Fixed update window closed.
+  * [18b895b5] Removed generate_desktop_files file
+  * [6e8ef00c] [Bug: 1565, 1945] Fixed synaptic install dialog text
+
+  [ HaeRyongJeong ]
+  * [da6b6124] [Bug:2366] Update translations popup menu on tray icon
+  * [46f7317b] [Bug:2363,2371] Fixed information ui file
+
+  [ boyeon.choi ]
+  * [26401ff8] [Bug:2460] Added is_pref_opend to pref_button_apply
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 07 Jul 2020 14:42:05 +0900
+
 gooroom-update (1.0.7+grm2u1) unstable; urgency=medium
 
   [ HaeRyong Jeong ]
