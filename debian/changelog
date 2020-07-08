@@ -1,3 +1,12 @@
+gooroom-update (1.0.9+grm2u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [3cf2c278] fixed preference icon error
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 08 Jul 2020 20:10:05 +0900
+
 gooroom-update (1.0.8+grm2u1) unstable; urgency=medium
 
   [ HaeRyong Jeong ]
