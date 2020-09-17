@@ -803,6 +803,45 @@ class RefreshThread(threading.Thread):
         self.wTree = wTree
         self.root_mode = root_mode
 
+    def check_policy(self):
+        try:
+            pp = Popen(
+                ['/usr/bin/apt-cache', 'policy'],
+                stdout=PIPE,
+                stderr=PIPE)
+            pp_out, pp_err = pp.communicate()
+            
+            package_server_url = ''
+            for lo in pp_out.split('\n'):
+                splited_lo = lo.split()
+                if len(splited_lo) > 1 \
+                    and (splited_lo[1].startswith('http://') \
+                    or splited_lo[1].startswith('https://')):
+
+                    r_splited_lo = splited_lo[1].split('/')
+                    if r_splited_lo[-1] == 'debian':
+                        package_server_url = '/'.join(r_splited_lo[:-1])
+                    # 데비안 업데이트 서버 주소가 명시되지 않은 경우
+                    # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
+                    elif r_splited_lo[-1] == 'gooroom':
+                        package_server_url = '/'.join(r_splited_lo[:-1])
+
+            if package_server_url == '':
+                net_status = _("Failed")
+            else:
+                urllib2.urlopen(package_server_url, timeout=2)
+                print "network connection ok"
+                net_status = _("OK")
+
+        except urllib2.URLError as err:
+            if err.code == 200 or err.code == 403:
+                print "network connection ok"
+                net_status = _("OK")
+            else:
+                print "network connection failed"
+                net_status = _("Failed")
+
+
     def fetch_l10n_descriptions(self, package_names):
         if os.path.exists("/var/lib/apt/lists"):
             try:
@@ -1106,82 +1145,46 @@ class RefreshThread(threading.Thread):
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
-                    try:
-                        pp = Popen(
-                            ['/usr/bin/apt-cache', 'policy'],
-                            stdout=PIPE,
-                            stderr=PIPE)
-                        pp_out, pp_err = pp.communicate()
-                        
-                        package_server_url = ''
-                        for lo in pp_out.split('\n'):
-                            splited_lo = lo.split()
-                            if len(splited_lo) > 1 \
-                                and (splited_lo[1].startswith('http://') \
-                                or splited_lo[1].startswith('https://')):
-
-                                r_splited_lo = splited_lo[1].split('/')
-                                if r_splited_lo[-1] == 'debian':
-                                    package_server_url = '/'.join(r_splited_lo[:-1])
-                                # 데비안 업데이트 서버 주소가 명시되지 않은 경우
-                                # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
-                                elif r_splited_lo[-1] == 'gooroom':
-                                    package_server_url = '/'.join(r_splited_lo[:-1])
-
-                        if package_server_url == '':
-                            net_status = _("Failed")
-                        else:
-                            urllib2.urlopen(package_server_url, timeout=2)
-                            print "network connection ok"
-                            net_status = _("OK")
-
-                    except urllib2.URLError as err:
-                        if err.code == 200 or err.code == 403:
-                            print "network connection ok"
-                            net_status = _("OK")
-                        else:
-                            print "network connection failed"
-                            net_status = _("Failed")
-
+                    net_status = self.check_policy()
                     if (num_safe > 0):
                         x, y = wTree.get_object("window").get_position()
 
-                        ## 1. The alert pop-up is new
-                        if alert == True:
-                            # pop-up for updater
-                            wTree.get_object("window").move(x, y)
-                            wTree.get_object("window").present()
-                            wTree.get_object("window").show_all()
+                        ### 1. The alert pop-up is new
+                        #if alert == True:
+                        #    # pop-up for updater
+                        #    wTree.get_object("window").move(x, y)
+                        #    wTree.get_object("window").present()
+                        #    wTree.get_object("window").show_all()
 
-                            image = Gtk.Image()
-                            image.set_from_stock(Gtk.STOCK_DIALOG_INFO, Gtk.IconSize.DIALOG)
-                            image.show()
-                            alertDialog = Gtk.MessageDialog(None, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, None)
-                            alertDialog.set_title(_("warning updater"))
-                            alertDialog.set_image(image)
+                        #    image = Gtk.Image()
+                        #    image.set_from_stock(Gtk.STOCK_DIALOG_INFO, Gtk.IconSize.DIALOG)
+                        #    image.show()
+                        #    alertDialog = Gtk.MessageDialog(None, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, None)
+                        #    alertDialog.set_title(_("warning updater"))
+                        #    alertDialog.set_image(image)
 
-                            # set font size
-                            message = "<span font_weight='bold' size='large'>%s</span>" % _("Found a new version in updater.\nPlease run the update.")
-                            alertDialog.set_markup(message)
+                        #    # set font size
+                        #    message = "<span font_weight='bold' size='large'>%s</span>" % _("Found a new version in updater.\nPlease run the update.")
+                        #    alertDialog.set_markup(message)
 
-                            # set the center position
-                            #wTree.get_object("window").set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-                            alertDialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+                        #    # set the center position
+                        #    #wTree.get_object("window").set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+                        #    alertDialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
 
-                            alert = False
+                        #    alert = False
 
-                            response = alertDialog.run()
-                            if response == Gtk.ResponseType.OK or response == Gtk.ResponseType.DELETE_EVENT:
-                                alertDialog.hide()
-                                alertDialog.destroy()
-                                alert = True
+                        #    response = alertDialog.run()
+                        #    if response == Gtk.ResponseType.OK or response == Gtk.ResponseType.DELETE_EVENT:
+                        #        alertDialog.hide()
+                        #        alertDialog.destroy()
+                        #        alert = True
 
-                        ## 2. The alert pop-up already.
-                        else:
-                            xa, ya = alertDialog.get_position()
-                            alertDialog.move(xa, ya)
-                            alertDialog.present()
-                            alertDialog.show()
+                        ### 2. The alert pop-up already.
+                        #else:
+                        #    xa, ya = alertDialog.get_position()
+                        #    alertDialog.move(xa, ya)
+                        #    alertDialog.present()
+                        #    alertDialog.show()
 
                         # pop-up for updater
                         wTree.get_object("window").move(x, y)

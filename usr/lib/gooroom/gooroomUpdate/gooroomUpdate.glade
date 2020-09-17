@@ -6,32 +6,32 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <child>
-        <object class="GtkMenuItem" id="refreshmenu">
-          <property name="visible">True</property>
-          <property name="can_focus">False</property>
-          <property name="use_underline">True</property>
-        </object>
+      <object class="GtkMenuItem" id="refreshmenu">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+      </object>
     </child>
     <child>
-        <object class="GtkMenuItem" id="infomenu">
-          <property name="visible">True</property>
-          <property name="can_focus">False</property>
-          <property name="use_underline">True</property>
-        </object>
+      <object class="GtkMenuItem" id="infomenu">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+      </object>
     </child>
     <child>
-        <object class="GtkMenuItem" id="prefmenu">
-          <property name="visible">True</property>
-          <property name="can_focus">False</property>
-          <property name="use_underline">True</property>
-        </object>
+      <object class="GtkMenuItem" id="prefmenu">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+      </object>
     </child>
     <child>
-        <object class="GtkMenuItem" id="quitmenu">
-          <property name="visible">True</property>
-          <property name="can_focus">False</property>
-          <property name="use_underline">True</property>
-        </object>
+      <object class="GtkMenuItem" id="quitmenu">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+      </object>
     </child>
   </object>
   <object class="GtkWindow" id="window">
@@ -186,11 +186,13 @@
                     <property name="position_set">True</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow2">
+                        <property name="height_request">250</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
                         <child>
                           <object class="GtkTreeView" id="treeview_update">
+                            <property name="height_request">250</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="reorderable">True</property>
