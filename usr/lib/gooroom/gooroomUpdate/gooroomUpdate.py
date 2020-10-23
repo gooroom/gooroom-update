@@ -1,10 +1,10 @@
-#!/usr/bin/python2.7 -E
+#!/usr/bin/python3 -E
 #-*- coding:utf-8 -*-
 
 try:
     import os
     import stat
-    import commands
+    import subprocess
     import codecs
     import datetime
     import sys
@@ -14,18 +14,17 @@ try:
     import time
     import gettext
     import fnmatch
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     import io
     import tarfile
     import re
     import apt
-    from user import home
-    from sets import Set
+    from os.path import expanduser
     import proxygsettings
     sys.path.append('/usr/lib/gooroom/common')
     from configobj import ConfigObj
-except Exception, detail:
-    print detail
+except Exception as detail:
+    print (detail)
     pass
 
 try:
@@ -37,24 +36,24 @@ try:
     from gi.repository import Gdk
     from gi.repository import GObject
     from gi.repository import GdkPixbuf
-except Exception, detail:
-    print detail
+except Exception as detail:
+    print (detail)
     pass
 
 from subprocess import Popen, PIPE
 
 try:
-    numGooroomUpdate = commands.getoutput("ps -A | grep gooroomUpdate | wc -l")
+    numGooroomUpdate = subprocess.getoutput("ps -A | grep gooroomUpdate | wc -l")
     if (numGooroomUpdate != "0"):
         os.system("killall gooroomUpdate")
-except Exception, detail:
-    print detail
+except Exception as detail:
+    print (detail)
 
-architecture = commands.getoutput("uname -a")
+architecture = subprocess.getoutput("uname -a")
 if (architecture.find("x86_64") >= 0):
     import ctypes
     libc = ctypes.CDLL('libc.so.6')
-    libc.prctl(15, 'gooroomUpdate', 0, 0, 0)
+    libc.prctl(15, 'gooroomUpdate'.encode('utf-8'), 0, 0, 0)
 else:
     import dl
     if os.path.exists('/lib/libc.so.6'):
@@ -67,14 +66,14 @@ else:
 # i18n
 gettext.install("gooroom-update", "/usr/share/gooroom/locale")
 
-CONFIG_DIR = "%s/.config/gooroom" % home
+CONFIG_DIR = "%s/.config/gooroom" %expanduser("~")
 
-(TAB_UPDATES, TAB_UPTODATE, TAB_ERROR) = range(3)
+(TAB_UPDATES, TAB_UPTODATE, TAB_ERROR) = list(range(3))
 
 package_short_descriptions = {}
 package_descriptions = {}
 
-(UPDATE_CHECKED, UPDATE_ALIAS, UPDATE_LEVEL_PIX, UPDATE_OLD_VERSION, UPDATE_NEW_VERSION, UPDATE_LEVEL_STR, UPDATE_SIZE, UPDATE_SIZE_STR, UPDATE_TYPE_PIX, UPDATE_TYPE, UPDATE_TOOLTIP, UPDATE_SORT_STR, UPDATE_OBJ) = range(13)
+(UPDATE_CHECKED, UPDATE_ALIAS, UPDATE_LEVEL_PIX, UPDATE_OLD_VERSION, UPDATE_NEW_VERSION, UPDATE_LEVEL_STR, UPDATE_SIZE, UPDATE_SIZE_STR, UPDATE_TYPE_PIX, UPDATE_TYPE, UPDATE_TOOLTIP, UPDATE_SORT_STR, UPDATE_OBJ) = list(range(13))
 
 class Alias():
     def __init__(self, name, short_description, description):
@@ -155,9 +154,9 @@ class ChangelogRetriever(threading.Thread):
         common_uri = "%s/pool/main/%s/%s/" % (source, abbr, self.source_package)
         dsc_uri = common_uri + "%s_%s.dsc" % (self.source_package, self.version)
         try:
-            dsc = urllib2.urlopen(dsc_uri, None, 10).read().decode("utf-8")
+            dsc = urllib.request.urlopen(dsc_uri, None, 10).read().decode("utf-8")
         except Exception as e:
-            print "Could not open gooroom URL %s - %s" % (dsc_uri, e)
+            print ("Could not open gooroom URL %s - %s" % (dsc_uri, e))
             return
 
         filename = None
@@ -179,18 +178,18 @@ class ChangelogRetriever(threading.Thread):
                     break
 
         if not filename or not size or not size.isdigit():
-            print "Unsupported debian .dsc file format. Skipping this package."
+            print ("Unsupported debian .dsc file format. Skipping this package.")
             return
 
         if (int(size) > max_size):
-            print "Skipping download"
+            print ("Skipping download")
             return
 
         file_uri = common_uri + filename
         try:
-            deb_file = urllib2.urlopen(file_uri, None, 10).read()
+            deb_file = urllib.request.urlopen(file_uri, None, 10).read()
         except Exception as e:
-            print "Could not download tarball from : %s - %s" % (file_uri, e)
+            print ("Could not download tarball from : %s - %s" % (file_uri, e))
             return
 
         if filename.endswith(".xz"):
@@ -199,7 +198,7 @@ class ChangelogRetriever(threading.Thread):
                 xz = Popen(cmd, stdin=PIPE, stdout=PIPE)
                 deb_file, deb_err = xz.communicate(deb_file)
             except EnvironmentError as e:
-                print "Error encountered while decompressing xz file : %s" % e
+                print ("Error encountered while decompressing xz file : %s" % e)
                 return
 
         deb_file = io.BytesIO(deb_file)
@@ -210,7 +209,7 @@ class ChangelogRetriever(threading.Thread):
                 else:
                     deb_changelog = tf.extractfile("%s-%s/debian/changelog" % (self.source_package, self.version)).read()
         except tarfile.TarError as e:
-            print "Error encountered while reading tarball : %s" % e
+            print ("Error encountered while reading tarball : %s" % e)
             return
 
         return deb_changelog
@@ -221,14 +220,14 @@ class ChangelogRetriever(threading.Thread):
         Gdk.threads_leave()
 
         if self.ps == {}:
-            # use default urllib2 proxy mechanisms (possibly *_proxy environment vars)
-            proxy = urllib2.ProxyHandler()
+            # use default urllib.request proxy mechanisms (possibly *_proxy environment vars)
+            proxy = urllib.request.ProxyHandler()
         else:
             # use proxy settings retrieved from gsettings
-            proxy = urllib2.ProxyHandler(self.ps)
+            proxy = urllib.request.ProxyHandler(self.ps)
 
-        opener = urllib2.build_opener(proxy)
-        urllib2.install_opener(opener)
+        opener = urllib.request.build_opener(proxy)
+        urllib.request.install_opener(opener)
 
         source = self.get_gooroom_source()
         changelog = _("No changelog available")
@@ -251,8 +250,8 @@ class ChangelogRetriever(threading.Thread):
 
         for changelog_source in changelog_sources:
             try:
-                print "Trying to fetch the changelog from: %s" % changelog_source
-                url = urllib2.urlopen(changelog_source, None, 10)
+                print ("Trying to fetch the changelog from: %s" % changelog_source)
+                url = urllib.request.urlopen(changelog_source, None, 10)
                 source = url.read()
                 url.close()
 
@@ -310,7 +309,7 @@ class AutomaticRefreshThread(threading.Thread):
                         except:
                             pass # cause it might be closed already
 
-        except Exception, detail:
+        except Exception as detail:
             try:
                 log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the auto-refresh thread.. so it's probably dead now: " + str(detail) + "\n")
                 log.flush()
@@ -360,7 +359,7 @@ class InstallThread(threading.Thread):
                 proceed = True
                 try:
                     pkgs = ' '.join(str(pkg) for pkg in packages)
-                    warnings = commands.getoutput("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
+                    warnings = subprocess.getoutput("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
                     #print ("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
                     warnings = warnings.split("###")
                     if len(warnings) == 2:
@@ -465,13 +464,13 @@ class InstallThread(threading.Thread):
                                 else:
                                     proceed = False
                                 dialog.destroy()
-                            except Exception, detail:
-                                print detail
+                            except Exception as detail:
+                                print (detail)
                             Gdk.threads_leave()
                         else:
                             proceed = True
-                except Exception, details:
-                    print details
+                except Exception as detail:
+                    print (detail)
 
                 if proceed:
                     Gdk.threads_enter()
@@ -542,7 +541,7 @@ class InstallThread(threading.Thread):
                 Gdk.threads_leave()
                 time.sleep(0.2)
 
-        except Exception, detail:
+        except Exception as detail:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             Gdk.threads_enter()
@@ -551,7 +550,6 @@ class InstallThread(threading.Thread):
             self.statusIcon.set_visible(True)
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
-            #self.statusIcon.set_blinking(False)
             self.wTree.get_object("window").get_window().set_cursor(None)
             self.wTree.get_object("window").set_sensitive(True)
             Gdk.threads_leave()
@@ -629,7 +627,7 @@ class AutoInstallThread(threading.Thread):
                 proceed = True
                 try:
                     pkgs = ' '.join(str(pkg) for pkg in packages)
-                    warnings = commands.getoutput("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
+                    warnings = subprocess.getoutput("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
                     #print ("/usr/lib/gooroom/gooroomUpdate/checkWarnings.py %s" % pkgs)
                     warnings = warnings.split("###")
                     if len(warnings) == 2:
@@ -712,13 +710,13 @@ class AutoInstallThread(threading.Thread):
                                 else:
                                     proceed = False
                                 dialog.destroy()
-                            except Exception, detail:
-                                print detail
+                            except Exception as detail:
+                                print (detail)
                             Gdk.threads_leave()
                         else:
                             proceed = True
-                except Exception, details:
-                    print details
+                except Exception as details:
+                    print (details)
 
                 if proceed:
                     Gdk.threads_enter()
@@ -773,7 +771,7 @@ class AutoInstallThread(threading.Thread):
                 self.wTree.get_object("window").set_sensitive(True)
                 Gdk.threads_leave()
 
-        except Exception, detail:
+        except Exception as detail:
             print(detail)
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
@@ -783,7 +781,6 @@ class AutoInstallThread(threading.Thread):
             self.statusIcon.set_visible(True)
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
-            #self.statusIcon.set_blinking(False)
             self.wTree.get_object("window").get_window().set_cursor(None)
             self.wTree.get_object("window").set_sensitive(True)
             Gdk.threads_leave()
@@ -802,45 +799,6 @@ class RefreshThread(threading.Thread):
         self.statusIcon = statusIcon
         self.wTree = wTree
         self.root_mode = root_mode
-
-    def check_policy(self):
-        try:
-            pp = Popen(
-                ['/usr/bin/apt-cache', 'policy'],
-                stdout=PIPE,
-                stderr=PIPE)
-            pp_out, pp_err = pp.communicate()
-            
-            package_server_url = ''
-            for lo in pp_out.split('\n'):
-                splited_lo = lo.split()
-                if len(splited_lo) > 1 \
-                    and (splited_lo[1].startswith('http://') \
-                    or splited_lo[1].startswith('https://')):
-
-                    r_splited_lo = splited_lo[1].split('/')
-                    if r_splited_lo[-1] == 'debian':
-                        package_server_url = '/'.join(r_splited_lo[:-1])
-                    # 데비안 업데이트 서버 주소가 명시되지 않은 경우
-                    # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
-                    elif r_splited_lo[-1] == 'gooroom':
-                        package_server_url = '/'.join(r_splited_lo[:-1])
-
-            if package_server_url == '':
-                net_status = _("Failed")
-            else:
-                urllib2.urlopen(package_server_url, timeout=2)
-                print "network connection ok"
-                net_status = _("OK")
-
-        except urllib2.URLError as err:
-            if err.code == 200 or err.code == 403:
-                print "network connection ok"
-                net_status = _("OK")
-            else:
-                print "network connection failed"
-                net_status = _("Failed")
-
 
     def fetch_l10n_descriptions(self, package_names):
         if os.path.exists("/var/lib/apt/lists"):
@@ -872,16 +830,16 @@ class RefreshThread(threading.Thread):
                                     description += "\n" + line
                                 j += 1
                             if pkgname in package_names:
-                                if not package_descriptions.has_key(pkgname):
+                                if pkgname not in package_descriptions:
                                     package_short_descriptions[pkgname] = short_description
                                     package_descriptions[pkgname] = description
-                        except Exception, detail:
-                            print "a %s" % detail
+                        except Exception as detail:
+                            print ("a %s" % detail)
                     i += 1
                 del super_buffer
-            except Exception, detail:
-                print "Could not fetch l10n descriptions.."
-                print detail
+            except Exception as detail:
+                print ("Could not fetch l10n descriptions..")
+                print (detail)
 
     def run(self):
         global log
@@ -903,11 +861,9 @@ class RefreshThread(threading.Thread):
 
             prefs = read_configuration()
 
-            # Starts the blinking
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
             self.statusIcon.set_tooltip_text(_("Checking for updates"))
             wTree.get_object("vpaned1").set_position(vpaned_position)
-            #self.statusIcon.set_blinking(True)
             Gdk.threads_leave()
 
             model = Gtk.TreeStore(str, str, GdkPixbuf.Pixbuf, str, str, str, int, str, GdkPixbuf.Pixbuf, str, str, str, object)
@@ -921,7 +877,7 @@ class RefreshThread(threading.Thread):
                 p1 = Popen(['ps', '-U', 'root', '-o', 'comm'], stdout=PIPE)
                 p = p1.communicate()[0]
                 running = False
-                pslist = p.split('\n')
+                pslist = p.decode().split('\n')
                 for process in pslist:
                     if process.strip() in ["dpkg", "apt-get","synaptic","update-manager", "adept", "adept-notifier"]:
                         running = True
@@ -934,7 +890,6 @@ class RefreshThread(threading.Thread):
                     statusbar.push(context_id, _("Another application is using APT"))
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
                     log.flush()
-                    #self.statusIcon.set_blinking(False)
                     self.wTree.get_object("window").get_window().set_cursor(None)
                     self.wTree.get_object("window").set_sensitive(True)
                     Gdk.threads_leave()
@@ -950,7 +905,7 @@ class RefreshThread(threading.Thread):
                 refresh_command = "/usr/lib/gooroom/gooroomUpdate/checkAPT.py --use-synaptic %s 2>/dev/null" % self.wTree.get_object("window").get_window().get_xid()
             if self.root_mode:
                 refresh_command = "pkexec %s" % refresh_command
-            updates =  commands.getoutput(refresh_command)
+            updates =  subprocess.getoutput(refresh_command)
 
             # Look for gooroom-update
             if ("UPDATE###gooroom-update###" in updates or "UPDATE###gooroom-upgrade-info###" in updates):
@@ -958,11 +913,11 @@ class RefreshThread(threading.Thread):
             else:
                 new_gooroomupdate = False
 
-            updates = string.split(updates, "---EOL---")
+            updates = str.split(updates, "---EOL---")
 
             # Look at the updates one by one
             package_updates = {}
-            package_names = Set()
+            package_names = set()
             num_visible = 0
             num_safe = 0
             download_size = 0
@@ -996,14 +951,12 @@ class RefreshThread(threading.Thread):
                         self.wTree.get_object("notebook_status").set_current_page(TAB_ERROR)
                         self.wTree.get_object("label_error_details").set_markup("<b>%s</b>" % error_msg)
                         self.wTree.get_object("label_error_details").show()
-                        #self.statusIcon.set_blinking(False)
                         self.wTree.get_object("window").get_window().set_cursor(None)
                         self.wTree.get_object("window").set_sensitive(True)
-                        #statusbar.push(context_id, _(""))
                         Gdk.threads_leave()
                         return False
 
-                    values = string.split(pkg, "###")
+                    values = str.split(pkg, "###")
                     print(pkg)
                     if len(values) == 10:
                         status = values[0]
@@ -1019,7 +972,7 @@ class RefreshThread(threading.Thread):
 
                         package_names.add(package.replace(":i386", "").replace(":amd64", ""))
 
-                        if not package_updates.has_key(source_package):
+                        if source_package not in package_updates:
                             security_update = (update_type == "security")
 
                             if update_type == "security":
@@ -1086,7 +1039,7 @@ class RefreshThread(threading.Thread):
 
                 self.fetch_l10n_descriptions(package_names)
 
-                for source_package in package_updates.keys():
+                for source_package in list(package_updates.keys()):
                     package_update = package_updates[source_package]
                     if (new_gooroomupdate and package_update.name != "gooroom-update" and package_update.name != "gooroom-upgrade-info"):
                         continue
@@ -1145,46 +1098,45 @@ class RefreshThread(threading.Thread):
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
-                    net_status = self.check_policy()
+                    try:
+                        pp = Popen(
+                             ['/usr/bin/apt-cache','policy'],
+                            stdout=PIPE,
+                            stderr=PIPE)
+                        pp_out, pp_err = pp.communicate()
+
+                        package_server_url = ''
+                        for lo in pp_out.decode().split('\n'):
+                            splited_lo = lo.split()
+                            if len(splited_lo) > 1 \
+                                and (splited_lo[1].startswith('http://') \
+                                or splited_lo[1].startswith('https://')):
+
+                                r_splited_lo = splited_lo[1].split('/')
+                                if r_splited_lo[-1] == 'debian':
+                                    package_server_url = '/'.join(r_splited_lo[:-1])
+                                # 데비안 업데이트 서버 주소가 명시되지 않은 경우
+                                # 구름 업데이트 서버 주소를 이용하여 연결 유무 확인
+                                elif r_splited_lo[-1] == 'gooroom':
+                                    package_server_url = '/'.join(r_splited_lo[:-1])
+
+                        if package_server_url == '':
+                            net_status = _("Failed")
+                        else:
+                            urllib.request.urlopen(package_server_url, timeout=2)
+                            print ("network connection ok")
+                            net_status = _("OK")
+
+                    except urllib.error.URLError as err:
+                        if err.code == 200 or err.code == 403:
+                            print ("network connection ok")
+                            net_status = _("OK")
+                        else:
+                            print ("network connection failed")
+                            net_status = _("Failed")
+                    
                     if (num_safe > 0):
                         x, y = wTree.get_object("window").get_position()
-
-                        ### 1. The alert pop-up is new
-                        #if alert == True:
-                        #    # pop-up for updater
-                        #    wTree.get_object("window").move(x, y)
-                        #    wTree.get_object("window").present()
-                        #    wTree.get_object("window").show_all()
-
-                        #    image = Gtk.Image()
-                        #    image.set_from_stock(Gtk.STOCK_DIALOG_INFO, Gtk.IconSize.DIALOG)
-                        #    image.show()
-                        #    alertDialog = Gtk.MessageDialog(None, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, None)
-                        #    alertDialog.set_title(_("warning updater"))
-                        #    alertDialog.set_image(image)
-
-                        #    # set font size
-                        #    message = "<span font_weight='bold' size='large'>%s</span>" % _("Found a new version in updater.\nPlease run the update.")
-                        #    alertDialog.set_markup(message)
-
-                        #    # set the center position
-                        #    #wTree.get_object("window").set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-                        #    alertDialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-
-                        #    alert = False
-
-                        #    response = alertDialog.run()
-                        #    if response == Gtk.ResponseType.OK or response == Gtk.ResponseType.DELETE_EVENT:
-                        #        alertDialog.hide()
-                        #        alertDialog.destroy()
-                        #        alert = True
-
-                        ### 2. The alert pop-up already.
-                        #else:
-                        #    xa, ya = alertDialog.get_position()
-                        #    alertDialog.move(xa, ya)
-                        #    alertDialog.present()
-                        #    alertDialog.show()
 
                         # pop-up for updater
                         wTree.get_object("window").move(x, y)
@@ -1234,8 +1186,6 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Refresh finished\n")
             log.flush()
-            # Stop the blinking
-            #self.statusIcon.set_blinking(False)
             self.wTree.get_object("tool_select_all").set_sensitive(is_enable_tools)
             self.wTree.get_object("tool_clear").set_sensitive(is_enable_tools)
             self.wTree.get_object("tool_apply").set_sensitive(is_enable_tools)
@@ -1246,7 +1196,7 @@ class RefreshThread(threading.Thread):
             self.wTree.get_object("window").set_sensitive(True)
             wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
-        except Exception, detail:
+        except Exception as detail:
             Gdk.threads_leave()
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the refresh thread: " + str(detail) + "\n")
             log.flush()
@@ -1254,12 +1204,11 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
             self.statusIcon.set_tooltip_text(_("Could not refresh the list of updates"))
-            self.statusIcon.set_visible(True)
-            #self.statusIcon.set_blinking(False)
-            self.wTree.get_object("window").get_window().set_cursor(None)
-            self.wTree.get_object("window").set_sensitive(True)
-            statusbar.push(context_id, _("Could not refresh the list of updates"))
-            wTree.get_object("vpaned1").set_position(vpaned_position)
+#            self.statusIcon.set_visible(True)
+#            self.wTree.get_object("window").get_window().set_cursor(None)
+#            self.wTree.get_object("window").set_sensitive(True)
+#            statusbar.push(context_id, _("Could not refresh the list of updates"))
+#            wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
 
     def checkDependencies(self, changes, cache):
@@ -1277,7 +1226,7 @@ class RefreshThread(threading.Thread):
                                 newPkg = cache[o.name]
                                 changes.append(newPkg)
                                 foundSomething = True
-                    except Exception, detail:
+                    except Exception as detail:
                         pass # don't know why we get these..
         if (foundSomething):
             changes = self.checkDependencies(changes, cache)
@@ -1345,13 +1294,9 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config['levels']['level1_visible'] = prefs_tree.get_object("visible1").get_active()
     config['levels']['level2_visible'] = prefs_tree.get_object("visible2").get_active()
     config['levels']['level3_visible'] = prefs_tree.get_object("visible3").get_active()
-    #config['levels']['level4_visible'] = prefs_tree.get_object("visible4").get_active()
-    #config['levels']['level5_visible'] = prefs_tree.get_object("visible5").get_active()
     config['levels']['level1_safe'] = prefs_tree.get_object("safe1").get_active()
     config['levels']['level2_safe'] = prefs_tree.get_object("safe2").get_active()
     config['levels']['level3_safe'] = prefs_tree.get_object("safe3").get_active()
-    #config['levels']['level4_safe'] = prefs_tree.get_object("safe4").get_active()
-    #config['levels']['level5_safe'] = prefs_tree.get_object("safe5").get_active()
     config['levels']['security_visible'] = prefs_tree.get_object("checkbutton_security_visible").get_active()
     config['levels']['security_safe'] = prefs_tree.get_object("checkbutton_security_safe").get_active()
 
@@ -1489,26 +1434,18 @@ def read_configuration():
         prefs["level1_visible"] = (config['levels']['level1_visible'] == "True")
         prefs["level2_visible"] = (config['levels']['level2_visible'] == "True")
         prefs["level3_visible"] = (config['levels']['level3_visible'] == "True")
-        #prefs["level4_visible"] = (config['levels']['level4_visible'] == "True")
-        #prefs["level5_visible"] = (config['levels']['level5_visible'] == "True")
         prefs["level1_safe"] = (config['levels']['level1_safe'] == "True")
         prefs["level2_safe"] = (config['levels']['level2_safe'] == "True")
         prefs["level3_safe"] = (config['levels']['level3_safe'] == "True")
-        #prefs["level4_safe"] = (config['levels']['level4_safe'] == "True")
-        #prefs["level5_safe"] = (config['levels']['level5_safe'] == "True")
         prefs["security_visible"] = (config['levels']['security_visible'] == "True")
         prefs["security_safe"] = (config['levels']['security_safe'] == "True")
     except:
         prefs["level1_visible"] = True
         prefs["level2_visible"] = True
         prefs["level3_visible"] = True
-        #prefs["level4_visible"] = False
-        #prefs["level5_visible"] = False
         prefs["level1_safe"] = True
         prefs["level2_safe"] = True
         prefs["level3_safe"] = True
-        #prefs["level4_safe"] = False
-        #prefs["level5_safe"] = False
         prefs["security_visible"] = False
         prefs["security_safe"] = False
 
@@ -1596,9 +1533,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
     is_pref_opened = True
 
-    #gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     gladefile = "/usr/lib/gooroom/gooroomUpdate/preference.glade"
-    #prefs_tree = gtk.glade.XML(gladefile, "window2")
     prefs_tree = Gtk.Builder().new_from_file(gladefile)
     prefs_tree.get_object("window").set_title(_("Preferences") + " - " + _("Update Manager"))
 
@@ -1613,13 +1548,9 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_object("label43").set_text(_("Packages provided by Gooroom"))
     prefs_tree.get_object("label44").set_text(_("Packages provided by Debian"))
     prefs_tree.get_object("label45").set_text(_("Packages provided by 3rd-party"))
-    #prefs_tree.get_object("label46").set_text(_("Unsafe updates. Could potentially affect the stability of the system."))
-    #prefs_tree.get_object("label47").set_text(_("Dangerous updates. Known to affect the stability of the systems depending on certain specs or hardware."))
     prefs_tree.get_object("label55").set_text(_("Gooroom"))
     prefs_tree.get_object("label56").set_text(_("Debian"))
     prefs_tree.get_object("label57").set_text(_("3rd-party"))
-    #prefs_tree.get_object("label58").set_text(_("Upstream"))
-    #prefs_tree.get_object("label59").set_text(_("Upstream"))
     prefs_tree.get_object("label81").set_text(_("Refresh the list of updates every:"))
     prefs_tree.get_object("label82").set_text("<i>" + _("Note: The list only gets refreshed while the update manager window is closed (system tray mode).") + "</i>")
     prefs_tree.get_object("label82").set_use_markup(True)
@@ -1677,13 +1608,9 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_object("visible1").set_active(prefs["level1_visible"])
     prefs_tree.get_object("visible2").set_active(prefs["level2_visible"])
     prefs_tree.get_object("visible3").set_active(prefs["level3_visible"])
-    #prefs_tree.get_object("visible4").set_active(prefs["level4_visible"])
-    #prefs_tree.get_object("visible5").set_active(prefs["level5_visible"])
     prefs_tree.get_object("safe1").set_active(prefs["level1_safe"])
     prefs_tree.get_object("safe2").set_active(prefs["level2_safe"])
     prefs_tree.get_object("safe3").set_active(prefs["level3_safe"])
-    #prefs_tree.get_object("safe4").set_active(prefs["level4_safe"])
-    #prefs_tree.get_object("safe5").set_active(prefs["level5_safe"])
     prefs_tree.get_object("checkbutton_security_visible").set_active(prefs["security_visible"])
     prefs_tree.get_object("checkbutton_security_safe").set_active(prefs["security_safe"])
 
@@ -1713,9 +1640,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
 
 def open_history(widget):
     #Set the Glade file
-    #gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     gladefile = "/usr/lib/gooroom/gooroomUpdate/history.glade"
-    #wTree = gtk.glade.XML(gladefile, "window4")
     wTree = Gtk.Builder().new_from_file(gladefile)
     treeview_update = wTree.get_object("treeview_history")
     wTree.get_object("window").set_icon_name("gooroomupdater")
@@ -1749,10 +1674,10 @@ def open_history(widget):
     model = Gtk.TreeStore(str, str, str, str) # (packageName, date, oldVersion, newVersion)
 
     if (os.path.exists("/var/log/dpkg.log")):
-        updates = commands.getoutput("cat /var/log/dpkg.log /var/log/dpkg.log.? 2>/dev/null | egrep \"upgrade\"")
-        updates = string.split(updates, "\n")
+        updates = subprocess.getoutput("cat /var/log/dpkg.log /var/log/dpkg.log.? 2>/dev/null | egrep \"upgrade\"")
+        updates = str.split(updates, "\n")
         for pkg in updates:
-            values = string.split(pkg, " ")
+            values = str.split(pkg, " ")
             if len(values) == 6:
                 date = values[0]
                 time = values[1]
@@ -1786,7 +1711,6 @@ def open_information(widget):
     global logFile
     global pid
 
-    #gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     gladefile = "/usr/lib/gooroom/gooroomUpdate/information.glade"
     prefs_tree = Gtk.Builder().new_from_file(gladefile)
     prefs_tree.get_object("window").set_title(_("Information") + " - " + _("Update Manager"))
@@ -1797,7 +1721,7 @@ def open_information(widget):
     prefs_tree.get_object("processid_label").set_text(str(pid))
     prefs_tree.get_object("log_filename").set_text(str(logFile))
     txtbuffer = Gtk.TextBuffer()
-    txtbuffer.set_text(commands.getoutput("cat " + logFile))
+    txtbuffer.set_text(subprocess.getoutput("cat " + logFile))
     prefs_tree.get_object("log_textview").set_buffer(txtbuffer)
 
 def label_size_allocate(widget, rect):
@@ -1819,8 +1743,8 @@ def open_about(widget):
             gpl += line
         h.close()
         dlg.set_license(gpl)
-    except Exception, detail:
-        print detail
+    except Exception as detail:
+        print (detail)
     try:
         cache = apt.Cache()
         pkg = cache["gooroom-update"]
@@ -1829,8 +1753,8 @@ def open_about(widget):
         else:
             version = ""
         dlg.set_version(version)
-    except Exception, detail:
-        print detail
+    except Exception as detail:
+        print (detail)
 
     dlg.set_authors(["Clement Lefebvre <root@linuxmint.com>", "Chris Hodapp <clhodapp@live.com>","Gooroom <gooroom@gooroom.kr>"])
     dlg.set_icon_name("gooroomupdater")
@@ -1862,7 +1786,6 @@ def popup_menu_cb(widget, button, time, data = None):
     if button == 3:
         if data:
             data.show_all()
-            #data.popup(None, None, Gtk.StatusIcon.position_menu, 3, time, widget)
             data.popup(None, None, Gtk.StatusIcon.position_menu, widget, 3, time)
     pass
 
@@ -1912,8 +1835,8 @@ def clean_l10n_short_description(description):
             value = value.replace('&', '&amp;')
 
             return value
-        except Exception, detail:
-            print detail
+        except Exception as detail:
+            print (detail)
             return description
 
 def clean_l10n_description(description):
@@ -1942,13 +1865,13 @@ def clean_l10n_description(description):
             if len(value) > 0 and value[-1] not in [".", "!", "?"]:
                 value = "%s." % value
             return value
-        except Exception, detail:
-            print detail
+        except Exception as detail:
+            print (detail)
             return description
 
 def l10n_descriptions(package_update):
         package_name = package_update.name.replace(":i386", "").replace(":amd64", "")
-        if package_descriptions.has_key(package_name):
+        if package_name in package_descriptions:
             package_update.short_description = package_short_descriptions[package_name]
             package_update.description = package_descriptions[package_name]
 
@@ -1981,8 +1904,8 @@ def display_selected_package(selection, wTree):
                 retriever = ChangelogRetriever(package_update, wTree)
                 retriever.start()
 
-    except Exception, detail:
-        print detail
+    except Exception as detail:
+        print (detail)
 
 def switch_page(notebook, page, page_num, Wtree, treeView):
     selection = treeView.get_selection()
@@ -2064,7 +1987,7 @@ def size_to_string(size):
 
 def setVisibleColumn(checkmenuitem, column, configName):
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
-    if (config.has_key('visible_columns')):
+    if ('visible_columns' in config):
         config['visible_columns'][configName] = checkmenuitem.get_active()
     else:
         config['visible_columns'] = {}
@@ -2074,7 +1997,7 @@ def setVisibleColumn(checkmenuitem, column, configName):
 
 def setVisibleDescriptions(checkmenuitem, treeView, statusIcon, wTree, prefs):
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
-    if (not config.has_key('visible_columns')):
+    if ('visible_columns' not in config):
         config['visible_columns'] = {}
     config['visible_columns']['description'] = checkmenuitem.get_active()
     config.write()
@@ -2103,12 +2026,12 @@ if not os.path.exists(logdir):
     os.system("mkdir -p " + logdir)
     os.system("chmod a+rwx " + logdir)
 
-log = tempfile.NamedTemporaryFile(prefix = logdir, delete=False)
+log = tempfile.NamedTemporaryFile(prefix = logdir, delete=False, mode='w+t')
 logFile = log.name
 try:
     os.system("chmod a+rw %s" % log.name)
-except Exception, detail:
-    print detail
+except Exception as detail:
+    print (detail)
 
 log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Launching gooroomUpdate \n")
 log.flush()
@@ -2125,6 +2048,8 @@ try:
     global icon_error
     global icon_unknown
     global icon_apply
+    global statusbar
+    global context_id
 
     prefs = read_configuration()
 
@@ -2134,7 +2059,6 @@ try:
 
     #Set the Glade file
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
-    #wTree = gtk.glade.XML(gladefile, "window1")
     wTree = Gtk.Builder()
     wTree.add_from_file(gladefile)
     wTree.get_object("window").set_title(_("Update Manager"))
@@ -2152,13 +2076,12 @@ try:
     wTree.get_object("window").add_accel_group(accel_group)
 
     # Get the window socket (needed for synaptic later on)
-
-    if os.getuid() != 0 :
-        # If we're not in root mode do that (don't know why it's needed.. very weird)
-        socket = Gtk.Socket()
-        vbox.pack_start(socket, False, False, 0)
-        socket.show()
-        window_id = repr(socket.get_id())
+#    if os.getuid() != 0 :
+#        # If we're not in root mode do that (don't know why it's needed.. very weird)
+#        socket = Gtk.Socket()
+#        vbox.pack_start(socket, False, False, 0)
+#        socket.show()
+#        window_id = repr(socket.get_id())
 
     # the treeview
     cr = Gtk.CellRendererToggle()
@@ -2224,22 +2147,22 @@ try:
     menu = wTree.get_object("popupmenu")
     menuitem1 = wTree.get_object("refreshmenu")
     menuitem1.set_label(_("_Refresh"))
-    menuitem1.connect('activate', force_refresh, treeview_update, statusIcon, wTree)
+    menuitem1.connect("activate", force_refresh, treeview_update, statusIcon, wTree)
 
     menuitem2 = wTree.get_object("infomenu")
     menuitem2.set_label(_("Information"))
-    menuitem2.connect('activate', open_information)
+    menuitem2.connect("activate", open_information)
 
     menuitem3 = wTree.get_object("prefmenu")
     menuitem3.set_label(_("_Preferences"))
-    menuitem3.connect('activate', open_preferences, treeview_update, statusIcon, wTree)
+    menuitem3.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
 
     menuitem4 = wTree.get_object("quitmenu")
     menuitem4.set_label(_("_Quit"))
-    menuitem4.connect('activate', quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
+    menuitem4.connect("activate", quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
 
-    statusIcon.connect('activate', activate_icon_cb, None, wTree)
-    statusIcon.connect('popup-menu', popup_menu_cb, menu)
+    statusIcon.connect("activate", activate_icon_cb, None, wTree)
+    statusIcon.connect("popup-menu", popup_menu_cb, menu)
 
     # Set text for all visible widgets (because of i18n)
     wTree.get_object("tool_apply").set_label(_("Install Updates"))
@@ -2261,7 +2184,7 @@ try:
     fileSubmenu = Gtk.Menu()
     fileMenu.set_submenu(fileSubmenu)
     if os.path.exists("/usr/bin/synaptic-pkexec"):
-        synapticMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
+        synapticMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
         synaptic_icon = "/usr/share/pixmaps/synaptic.png"
         if os.path.exists(synaptic_icon):
             synapticMenuItem.set_image(Gtk.Image.new_from_file(synaptic_icon))
@@ -2270,7 +2193,7 @@ try:
         synapticMenuItem.connect("activate", open_synaptic_package_manager)
         fileSubmenu.append(synapticMenuItem)
 
-    closeMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_CLOSE)
+    closeMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_CLOSE)
     closeMenuItem.set_label(_("Close"))
     closeMenuItem.connect("activate", hide_window, wTree.get_object("window"))
     fileSubmenu.append(closeMenuItem)
@@ -2279,14 +2202,14 @@ try:
     editMenu.set_label(_("_Edit"))
     editSubmenu = Gtk.Menu()
     editMenu.set_submenu(editSubmenu)
-    prefsMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
+    prefsMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
     prefsMenuItem.set_label(_("Preferences"))
     prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         if os.system("systemctl status gooroom-agent"):
-            sourcesMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
+            sourcesMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
             sourcesMenuItem.set_image(Gtk.Image.new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
             sourcesMenuItem.set_label(_("Software sources"))
             sourcesMenuItem.connect("activate", open_repositories)
@@ -2296,48 +2219,48 @@ try:
     viewMenu.set_label(_("_View"))
     viewSubmenu = Gtk.Menu()
     viewMenu.set_submenu(viewSubmenu)
-    historyMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_INDEX)
+    historyMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_INDEX)
     historyMenuItem.set_label(_("History of updates"))
     historyMenuItem.connect("activate", open_history)
-    infoMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_DIALOG_INFO)
+    infoMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_DIALOG_INFO)
     infoMenuItem.set_label(_("Information"))
     infoMenuItem.connect("activate", open_information)
-    visibleColumnsMenuItem = Gtk.MenuItem(Gtk.STOCK_DIALOG_INFO)
+    visibleColumnsMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_DIALOG_INFO)
     visibleColumnsMenuItem.set_label(_("Visible columns"))
     visibleColumnsMenu = Gtk.Menu()
     visibleColumnsMenuItem.set_submenu(visibleColumnsMenu)
 
-    typeColumnMenuItem = Gtk.CheckMenuItem(_("Type"))
+    typeColumnMenuItem = Gtk.CheckMenuItem(label=_("Type"))
     typeColumnMenuItem.set_active(prefs["type_column_visible"])
     column7.set_visible(prefs["type_column_visible"])
     typeColumnMenuItem.connect("toggled", setVisibleColumn, column7, "type")
     visibleColumnsMenu.append(typeColumnMenuItem)
 
-    levelColumnMenuItem = Gtk.CheckMenuItem(_("Level"))
+    levelColumnMenuItem = Gtk.CheckMenuItem(label=_("Level"))
     levelColumnMenuItem.set_active(prefs["level_column_visible"])
     column3.set_visible(prefs["level_column_visible"])
     levelColumnMenuItem.connect("toggled", setVisibleColumn, column3, "level")
     visibleColumnsMenu.append(levelColumnMenuItem)
 
-    packageColumnMenuItem = Gtk.CheckMenuItem(_("Package"))
+    packageColumnMenuItem = Gtk.CheckMenuItem(label=_("Package"))
     packageColumnMenuItem.set_active(prefs["package_column_visible"])
     column2.set_visible(prefs["package_column_visible"])
     packageColumnMenuItem.connect("toggled", setVisibleColumn, column2, "package")
     visibleColumnsMenu.append(packageColumnMenuItem)
 
-    oldVersionColumnMenuItem = Gtk.CheckMenuItem(_("Old version"))
+    oldVersionColumnMenuItem = Gtk.CheckMenuItem(label=_("Old version"))
     oldVersionColumnMenuItem.set_active(prefs["old_version_column_visible"])
     column4.set_visible(prefs["old_version_column_visible"])
     oldVersionColumnMenuItem.connect("toggled", setVisibleColumn, column4, "old_version")
     visibleColumnsMenu.append(oldVersionColumnMenuItem)
 
-    newVersionColumnMenuItem = Gtk.CheckMenuItem(_("New version"))
+    newVersionColumnMenuItem = Gtk.CheckMenuItem(label=_("New version"))
     newVersionColumnMenuItem.set_active(prefs["new_version_column_visible"])
     column5.set_visible(prefs["new_version_column_visible"])
     newVersionColumnMenuItem.connect("toggled", setVisibleColumn, column5, "new_version")
     visibleColumnsMenu.append(newVersionColumnMenuItem)
 
-    sizeColumnMenuItem = Gtk.CheckMenuItem(_("Size"))
+    sizeColumnMenuItem = Gtk.CheckMenuItem(label=_("Size"))
     sizeColumnMenuItem.set_active(prefs["size_column_visible"])
     column6.set_visible(prefs["size_column_visible"])
     sizeColumnMenuItem.connect("toggled", setVisibleColumn, column6, "size")
@@ -2345,7 +2268,7 @@ try:
 
     viewSubmenu.append(visibleColumnsMenuItem)
 
-    descriptionsMenuItem = Gtk.CheckMenuItem(_("Show descriptions"))
+    descriptionsMenuItem = Gtk.CheckMenuItem(label=_("Show descriptions"))
     descriptionsMenuItem.set_active(prefs["descriptions_visible"])
     descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, statusIcon, wTree, prefs)
     viewSubmenu.append(descriptionsMenuItem)
@@ -2358,19 +2281,16 @@ try:
     helpSubmenu = Gtk.Menu()
     helpMenu.set_submenu(helpSubmenu)
     if os.path.exists("/usr/share/help/C/gooroom"):
-        helpMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_HELP)
+        helpMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_HELP)
         helpMenuItem.set_label(_("Contents"))
         helpMenuItem.connect("activate", open_help)
         key, mod = Gtk.accelerator_parse("F1")
         helpMenuItem.add_accelerator("activate", accel_group, key, mod, Gtk.AccelFlags.VISIBLE)
         helpSubmenu.append(helpMenuItem)
-    aboutMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_ABOUT)
+    aboutMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_ABOUT)
     aboutMenuItem.set_label(_("About"))
     aboutMenuItem.connect("activate", open_about)
     helpSubmenu.append(aboutMenuItem)
-
-    #browser.connect("activate", browser_callback)
-    #browser.show()
 
     if len(sys.argv) > 1:
         showWindow = sys.argv[1]
@@ -2397,8 +2317,8 @@ try:
     Gtk.main()
     Gdk.threads_leave()
 
-except Exception, detail:
-    print detail
+except Exception as detail:
+    print (detail)
     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in main thread: " + str(detail) + "\n")
     log.flush()
     log.close()

@@ -1,9 +1,9 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import os
 import sys
 import apt
-import commands
+import subprocess
 
 #def checkDependencies(changes, cache):
 #    foundSomething = False
@@ -20,7 +20,7 @@ import commands
 #                            newPkg = cache[o.name]
 #                            changes.append(newPkg)
 #                            foundSomething = True
-#                except Exception, detail:
+#                except Exception as detail:
 #                    pass # don't know why we get these..
 #    if (foundSomething):
 #        changes = checkDependencies(changes, cache)
@@ -78,10 +78,10 @@ try:
                     if origin.origin == "Gooroom" or origin.origin == 'gooroom':
                         update_type = "gooroom"
 
-                resultString = u"UPDATE###%s###%s###%s###%s###%s###%s###%s###%s###%s---EOL---" % (package, newVersion, oldVersion, size, sourcePackage, update_type, update_origin, short_description, description)
-                print resultString.encode('ascii', 'xmlcharrefreplace')
+                resultString = "UPDATE###%s###%s###%s###%s###%s###%s###%s###%s###%s---EOL---" % (package, newVersion, oldVersion, size, sourcePackage, update_type, update_origin, short_description, description)
+                print (resultString.encode('ascii', 'xmlcharrefreplace'))
 
-except Exception, detail:
-    print "CHECK_APT_ERROR---EOL---"
-    print detail
+except Exception as detail:
+    print ("CHECK_APT_ERROR---EOL---")
+    print (detail)
     sys.exit(1)

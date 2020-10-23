@@ -3,20 +3,20 @@ Section: admin
 Priority: optional
 Maintainer: Gooroom <gooroom@gooroom.kr>
 Build-Depends: debhelper (>= 9),
-               python (>= 2.7~),
+               python3 (>= 3.0~),
                dh-python
 Standards-Version: 3.9.5
 
 Package: gooroom-update
 Architecture: all
 Depends:
- ${python:Depends},
+ ${python3:Depends},
  ${misc:Depends},
  gir1.2-gtk-3.0,
  gir1.2-gdkpixbuf-2.0,
  gir1.2-gladeui-2.0,
- python-configobj,
- python-apt,
+ python3-configobj,
+ python3-apt,
  synaptic,
  gooroom-translations
 Description: The Gooroom Update Manager

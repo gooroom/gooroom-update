@@ -70,8 +70,8 @@ gparent_pid="${gparent_pid// /}"
 gparent_path="$(ps -q $gparent_pid -o comm=) $(ps -q $gparent_pid -o args=)"
 
 # Check Absolute File Path of Parent Process (Caller) and arguments via cmdline of /proc/
-if [[ "$gparent_path" == "gooroomUpdate /usr/bin/python2.7 -E /usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]] && \
-   [[ "$(/bin/cat /proc/$gparent_pid/cmdline)" == "/usr/bin/python2.7-E/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]]
+if [[ "$gparent_path" == "gooroomUpdate /usr/bin/python3 -E /usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]] && \
+   [[ "$(/bin/cat /proc/$gparent_pid/cmdline)" == "/usr/bin/python3-E/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py" ]]
 then
     eval /usr/sbin/synaptic $args
 else

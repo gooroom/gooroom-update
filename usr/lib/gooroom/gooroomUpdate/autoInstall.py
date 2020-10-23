@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 import sys
 import apt
 """Update packages passed by gooroom-update."""
@@ -15,8 +15,8 @@ try:
 
     upgrade_result = cache.commit()
     if upgrade_result:
-        print "++ Auto Install finished\n"
+        print("++ Auto Install finished\n")
     else:
-        print "-- Auto Install failed\n"
+        print ("-- Auto Install failed\n")
 except Exception as e:
-    print "-- Exception occured in the auto install thread: " + e + "\n"
+    print ("-- Exception occured in the auto install thread: " + e +"\n")

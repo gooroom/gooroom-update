@@ -1,7 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os
-import commands
 
 command="/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py show &"
 os.system(command)
