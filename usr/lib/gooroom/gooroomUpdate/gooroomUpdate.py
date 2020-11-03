@@ -841,6 +841,8 @@ class RefreshThread(threading.Thread):
                 print "network connection failed"
                 net_status = _("Failed")
 
+        return net_status
+
 
     def fetch_l10n_descriptions(self, package_names):
         if os.path.exists("/var/lib/apt/lists"):
