@@ -9,7 +9,7 @@
     <property name="border_width">10</property>
     <property name="title" translatable="yes" context="yes">gooroomUpdate</property>
     <property name="window_position">center</property>
-    <property name="icon">usr/lib/gooroom/gooroomUpdate/icons/icon.png</property>
+    <!--property name="icon">usr/lib/gooroom/gooroomUpdate/icons/icon.png</property-->
     <child>
       <placeholder/>
     </child>
