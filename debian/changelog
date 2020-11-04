@@ -1,3 +1,13 @@
+gooroom-update (1.1.1+grm2u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [5a4a2601] returned net status
+  * [e583b671] do not exist icon name icon.png
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 04 Nov 2020 11:50:58 +0900
+
 gooroom-update (1.1.0+grm2u1) unstable; urgency=medium
 
   [ HaeRyong Jeong ]
