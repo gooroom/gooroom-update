@@ -1818,7 +1818,7 @@ def open_about(widget):
         s = h.readlines()
         gpl = ""
         for line in s:
-            gpl += line
+            gpl += "\t"*3 + line
         h.close()
         dlg.set_license(gpl)
     except Exception, detail:
