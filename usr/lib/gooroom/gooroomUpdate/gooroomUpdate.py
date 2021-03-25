@@ -1149,8 +1149,6 @@ class RefreshThread(threading.Thread):
                 else:
                     net_status = self.check_policy()
                     if (num_safe > 0):
-                        x, y = wTree.get_object("window").get_position()
-
                         ### 1. The alert pop-up is new
                         #if alert == True:
                         #    # pop-up for updater
@@ -1189,7 +1187,6 @@ class RefreshThread(threading.Thread):
                         #    alertDialog.show()
 
                         # pop-up for updater
-                        wTree.get_object("window").move(x, y)
                         wTree.get_object("window").present()
                         wTree.get_object("window").show_all()
 
@@ -1284,6 +1281,21 @@ class RefreshThread(threading.Thread):
         if (foundSomething):
             changes = self.checkDependencies(changes, cache)
         return changes
+
+def move_update_window (self, window):
+    display = Gdk.Display.get_default()
+    monitor = display.get_primary_monitor()
+
+    alloc = window.get_allocation()
+    workarea = monitor.get_workarea()
+
+    geo = monitor.get_geometry()
+    req = window.get_preferred_size ()
+
+    x = workarea.x + (workarea.width/2)-(alloc.width/2)
+    y = workarea.y + (workarea.height/2)-(alloc.height/2)
+
+    window.get_window().move(x, y)
 
 def force_refresh(widget, treeview, statusIcon, wTree):
     refresh = RefreshThread(treeview, statusIcon, wTree, root_mode=True)
@@ -1868,6 +1880,9 @@ def popup_menu_cb(widget, button, time, data = None):
             data.popup(None, None, Gtk.StatusIcon.position_menu, widget, 3, time)
     pass
 
+def realize_window_cb(window, wTree):
+    move_update_window(wTree, window)
+
 def close_window(window, event, vpaned):
     global app_hidden
     window.hide()
@@ -2212,6 +2227,7 @@ try:
     selection.connect("changed", display_selected_package, wTree)
     wTree.get_object("notebook_details").connect("switch-page", switch_page, wTree, treeview_update)
     wTree.get_object("window").connect("delete_event", close_window, wTree.get_object("vpaned1"))
+    wTree.get_object("window").connect("show", realize_window_cb, wTree)
     wTree.get_object("tool_apply").connect("clicked", install, treeview_update, statusIcon, wTree)
     wTree.get_object("tool_clear").connect("clicked", clear, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
     wTree.get_object("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
