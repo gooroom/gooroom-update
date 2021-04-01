@@ -1,3 +1,15 @@
+gooroom-update (1.1.2+grm2u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [9c5ecba3] [Bug:2623] centralized the license texts
+
+  [ boyeon.choi ]
+  * [c296e04a] Set gooroomUpdate to open frome the center of the primary monitor
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Thu, 01 Apr 2021 10:07:41 +0900
+
 gooroom-update (1.1.1+grm2u1) unstable; urgency=medium
 
   [ subin.kim ]
