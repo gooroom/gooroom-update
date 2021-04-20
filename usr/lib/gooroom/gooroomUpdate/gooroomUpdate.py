@@ -1818,7 +1818,7 @@ def label_size_allocate(widget, rect):
     widget.set_size_request(rect.width, -1)
 
 def open_help(widget):
-    os.system("yelp help:gooroom/software-updates &")
+    os.system("yelp help:gooroom-help-gooroom-update")
 
 def open_about(widget):
     dlg = Gtk.AboutDialog()
@@ -2375,7 +2375,7 @@ try:
     helpMenu.set_label(_("_Help"))
     helpSubmenu = Gtk.Menu()
     helpMenu.set_submenu(helpSubmenu)
-    if os.path.exists("/usr/share/help/C/gooroom"):
+    if os.path.exists("/usr/share/gooroom-yelp-adjustments/"):
         helpMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_HELP)
         helpMenuItem.set_label(_("Contents"))
         helpMenuItem.connect("activate", open_help)
