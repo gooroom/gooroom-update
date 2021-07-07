@@ -1,7 +1,0 @@
-#!/usr/bin/python3
-
-import os,subprocess
-
-cmdline = subprocess.getoutput("cat /proc/cmdline")
-if ((not "boot=casper" in cmdline) and (not "boot=live" in cmdline)):
-        os.system("/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py")

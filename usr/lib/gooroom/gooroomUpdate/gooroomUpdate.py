@@ -2,6 +2,8 @@
 #-*- coding:utf-8 -*-
 
 try:
+    import dbus
+    import dbus.service
     import os
     import stat
     import subprocess
@@ -23,6 +25,7 @@ try:
     import proxygsettings
     sys.path.append('/usr/lib/gooroom/common')
     from configobj import ConfigObj
+    from dbus.mainloop.glib import DBusGMainLoop
 except Exception as detail:
     print (detail)
     pass
@@ -31,10 +34,13 @@ try:
     import gi
     gi.require_version('Gtk', '3.0')
     gi.require_version('Gdk', '3.0')
+    gi.require_version('Notify', '0.7')
 
     from gi.repository import Gtk
     from gi.repository import Gdk
+    from gi.repository import GLib
     from gi.repository import GObject
+    from gi.repository import Notify
     from gi.repository import GdkPixbuf
 except Exception as detail:
     print (detail)
@@ -74,6 +80,13 @@ package_short_descriptions = {}
 package_descriptions = {}
 
 (UPDATE_CHECKED, UPDATE_ALIAS, UPDATE_LEVEL_PIX, UPDATE_OLD_VERSION, UPDATE_NEW_VERSION, UPDATE_LEVEL_STR, UPDATE_SIZE, UPDATE_SIZE_STR, UPDATE_TYPE_PIX, UPDATE_TYPE, UPDATE_TOOLTIP, UPDATE_SORT_STR, UPDATE_OBJ) = list(range(13))
+
+#for DBus decorator parameter
+DBUS_NAME = 'kr.gooroom.Update'
+DBUS_OBJ = '/kr/gooroom/Update'
+DBUS_IFACE = 'kr.gooroom.Update'
+
+Notify.init("gooroom-update")
 
 class Alias():
     def __init__(self, name, short_description, description):
@@ -269,10 +282,9 @@ class ChangelogRetriever(threading.Thread):
         Gdk.threads_leave()
 
 class AutomaticRefreshThread(threading.Thread):
-    def __init__(self, treeView, statusIcon, wTree):
+    def __init__(self, treeView, wTree):
         threading.Thread.__init__(self)
         self.treeView = treeView
-        self.statusIcon = statusIcon
         self.wTree = wTree
 
     def run(self):
@@ -300,7 +312,7 @@ class AutomaticRefreshThread(threading.Thread):
                         except:
                             pass # cause it might be closed already
                         # Refresh
-                        refresh = RefreshThread(self.treeView, self.statusIcon, self.wTree, root_mode=True)
+                        refresh = RefreshThread(self.treeView, self.wTree, root_mode=True)
                         refresh.start()
                     else:
                         try:
@@ -324,14 +336,16 @@ class InstallThread(threading.Thread):
     global icon_unknown
     global icon_apply
 
-    def __init__(self, treeView, statusIcon, wTree):
+    def __init__(self, treeView, wTree):
         threading.Thread.__init__(self)
         self.treeView = treeView
-        self.statusIcon = statusIcon
         self.wTree = wTree
 
     def run(self):
         global log
+        global update_dbus
+        global current_icon
+
         try:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Install requested by user\n")
             log.flush()
@@ -474,9 +488,8 @@ class InstallThread(threading.Thread):
 
                 if proceed:
                     Gdk.threads_enter()
-                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_apply))
-                    self.statusIcon.set_tooltip_text(_("Installing updates"))
-                    self.statusIcon.set_visible(True)
+                    update_dbus.onIconChanged (icon_apply)
+                    current_icon = icon_apply
                     Gdk.threads_leave()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
@@ -517,12 +530,12 @@ class InstallThread(threading.Thread):
                     else:
                         # Refresh
                         Gdk.threads_enter()
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
-                        self.statusIcon.set_tooltip_text(_("Checking for updates"))
+                        update_dbus.onIconChanged (icon_busy)
+                        current_icon = icon_busy
                         self.wTree.get_object("window").get_window().set_cursor(None)
                         self.wTree.get_object("window").set_sensitive(True)
                         Gdk.threads_leave()
-                        refresh = RefreshThread(self.treeView, self.statusIcon, self.wTree)
+                        refresh = RefreshThread(self.treeView, self.wTree)
                         refresh.start()
                 else:
                     # Stop the blinking but don't refresh
@@ -545,9 +558,8 @@ class InstallThread(threading.Thread):
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             Gdk.threads_enter()
-            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
-            self.statusIcon.set_tooltip_text(_("Could not install the security updates"))
-            self.statusIcon.set_visible(True)
+            update_dbus.onIconChanged (icon_error)
+            current_icon = icon_error
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
             self.wTree.get_object("window").get_window().set_cursor(None)
@@ -556,10 +568,9 @@ class InstallThread(threading.Thread):
             time.sleep(0.2)
 
 class AutoInstallScheduleThread(threading.Thread):
-    def __init__(self, treeView, statusIcon, wTree):
+    def __init__(self, treeView, wTree):
         threading.Thread.__init__(self)
         self.treeView = treeView
-        self.statusIcon = statusIcon
         self.wTree = wTree
 
     def run(self):
@@ -580,7 +591,7 @@ class AutoInstallScheduleThread(threading.Thread):
                 hit_time= True
 
             if hit_date and hit_time and prefs['auto_upgrade']:
-                autoinst= AutoInstallThread(self.treeView, self.statusIcon, self.wTree)
+                autoinst= AutoInstallThread(self.treeView, self.wTree)
                 autoinst.start()
             time.sleep(60)
 
@@ -592,14 +603,16 @@ class AutoInstallThread(threading.Thread):
     global icon_unknown
     global icon_apply
 
-    def __init__(self, treeView, statusIcon, wTree):
+    def __init__(self, treeView, wTree):
         threading.Thread.__init__(self)
         self.treeView = treeView
-        self.statusIcon = statusIcon
         self.wTree = wTree
 
     def run(self):
         global log
+        global update_dbus
+        global current_icon
+
         try:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Auto Install requested by user\n")
             log.flush()
@@ -720,9 +733,8 @@ class AutoInstallThread(threading.Thread):
 
                 if proceed:
                     Gdk.threads_enter()
-                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_apply))
-                    self.statusIcon.set_tooltip_text(_("Installing updates"))
-                    self.statusIcon.set_visible(True)
+                    update_dbus.onIconChanged (icon_apply)
+                    current_icon = icon_apply
                     Gdk.threads_leave()
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Ready to launch synaptic\n")
                     log.flush()
@@ -751,12 +763,12 @@ class AutoInstallThread(threading.Thread):
                     else:
                         # Refresh
                         Gdk.threads_enter()
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
-                        self.statusIcon.set_tooltip_text(_("Checking for updates"))
+                        update_dbus.onIconChanged (icon_busy)
+                        current_icon = icon_busy
                         self.wTree.get_object("window").get_window().set_cursor(None)
                         self.wTree.get_object("window").set_sensitive(True)
                         Gdk.threads_leave()
-                        refresh = RefreshThread(self.treeView, self.statusIcon, self.wTree)
+                        refresh = RefreshThread(self.treeView, self.wTree)
                         refresh.start()
                 else:
                     # Stop the blinking but don't refresh
@@ -776,9 +788,8 @@ class AutoInstallThread(threading.Thread):
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Exception occurred in the install thread: " + str(detail) + "\n")
             log.flush()
             Gdk.threads_enter()
-            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
-            self.statusIcon.set_tooltip_text(_("Could not install the security updates"))
-            self.statusIcon.set_visible(True)
+            update_dbus.onIconChanged (icon_error)
+            current_icon = icon_error
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Could not install security updates\n")
             log.flush()
             self.wTree.get_object("window").get_window().set_cursor(None)
@@ -793,10 +804,9 @@ class RefreshThread(threading.Thread):
     global statusbar
     global context_id
 
-    def __init__(self, treeview_update, statusIcon, wTree, root_mode=False):
+    def __init__(self, treeview_update, wTree, root_mode=False):
         threading.Thread.__init__(self)
         self.treeview_update = treeview_update
-        self.statusIcon = statusIcon
         self.wTree = wTree
         self.root_mode = root_mode
 
@@ -845,7 +855,15 @@ class RefreshThread(threading.Thread):
         global log
         global app_hidden
         global alert
-        global alertDialog
+        global noti
+        global refreshed
+        global title
+        global message
+
+        global update_dbus
+        global current_icon
+        global status_str
+
         Gdk.threads_enter()
         vpaned_position = wTree.get_object("vpaned1").get_position()
         Gdk.threads_leave()
@@ -856,13 +874,13 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             statusbar.push(context_id, _("Starting refresh..."))
             self.wTree.get_object("notebook_status").set_current_page(TAB_UPDATES)
-            self.wTree.get_object("window").get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.WATCH))
+#           self.wTree.get_object("window").get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.WATCH))
             self.wTree.get_object("window").set_sensitive(False)
 
             prefs = read_configuration()
 
-            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
-            self.statusIcon.set_tooltip_text(_("Checking for updates"))
+            update_dbus.onIconChanged (icon_busy)
+            current_icon = icon_busy
             wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
 
@@ -885,8 +903,8 @@ class RefreshThread(threading.Thread):
 
                 if (running == True):
                     Gdk.threads_enter()
-                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_unknown))
-                    self.statusIcon.set_tooltip_text(_("Another application is using APT"))
+                    update_dbus.onIconChanged (icon_unknown)
+                    current_icon = icon_unknown
                     statusbar.push(context_id, _("Another application is using APT"))
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
                     log.flush()
@@ -897,6 +915,8 @@ class RefreshThread(threading.Thread):
 
             Gdk.threads_enter()
             statusbar.push(context_id, _("Finding the list of updates..."))
+            update_dbus.onStatusStringChanged(_("Finding the list of updates..."))
+            status_str = _("Finding the list of updates...")
             wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
             if app_hidden:
@@ -922,14 +942,16 @@ class RefreshThread(threading.Thread):
             num_safe = 0
             download_size = 0
             num_ignored = 0
+            title = _("warning updater")
 
             if (len(updates) == None):
                 Gdk.threads_enter()
                 is_enable_tools = False
                 self.wTree.get_object("notebook_status").set_current_page(TAB_UPTODATE)
-                self.statusIcon.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
-                self.statusIcon.set_tooltip_text(_("Your system is up to date"))
+                update_dbus.onIconChanged (icon_up2date)
+                current_icon = icon_up2date
                 statusbar.push(context_id, _("Your system is up to date"))
+                show_noti(None, title, _("Your system is up to date"), wTree)
                 log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ System is up to date\n")
                 log.flush()
                 Gdk.threads_leave()
@@ -941,10 +963,12 @@ class RefreshThread(threading.Thread):
                         except:
                             error_msg = ""
                         Gdk.threads_enter()
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
-                        self.statusIcon.set_tooltip_text("%s\n\n%s" % (_("Could not refresh the list of updates"), error_msg))
-                        self.statusIcon.set_visible(True)
-                        statusbar.push(context_id, _("Could not refresh the list of updates"))
+                        update_dbus.onIconChanged (icon_error)
+                        current_icon = icon_error
+                        status_str =  _("Could not refresh the list of updates")
+                        statusbar.push(context_id, status_str)
+                        show_noti(None, title, status_str, wTree)
+                        update_dbus.onStatusStringChanged(status_str)
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Error in checkAPT.py, could not refresh the list of updates\n")
 
                         log.flush()
@@ -1091,16 +1115,21 @@ class RefreshThread(threading.Thread):
                 is_enable_tools = True
                 if (new_gooroomupdate):
                     self.statusString = _("A new version of the update manager is available")
-                    self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_updates))
-                    self.statusIcon.set_tooltip_text(self.statusString)
-                    self.statusIcon.set_visible(True)
                     statusbar.push(context_id, self.statusString)
+
+                    status_str = self.statusString
+                    update_dbus.onStatusStringChanged(status_str)
+                    show_noti(None, title, self.statusString, wTree)
+
+                    current_icon = icon_updates
+                    update_dbus.onIconChanged (icon_updates)
+
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found a new version of gooroom-update\n")
                     log.flush()
                 else:
                     try:
                         pp = Popen(
-                             ['/usr/bin/apt-cache','policy'],
+                            ['/usr/bin/apt-cache', 'policy'],
                             stdout=PIPE,
                             stderr=PIPE)
                         pp_out, pp_err = pp.communicate()
@@ -1134,50 +1163,88 @@ class RefreshThread(threading.Thread):
                         else:
                             print ("network connection failed")
                             net_status = _("Failed")
-                    
+
                     if (num_safe > 0):
                         x, y = wTree.get_object("window").get_position()
 
+                        ## 1. The alert pop-up is new
+                        if alert == True:
+                            # pop-up for updater
+                            wTree.get_object("window").move(x, y)
+                            wTree.get_object("window").hide()
+
+                            app_hidden = True
+                            alert = False
+                            refreshed = False
+
+                        ## 2. The alert pop-up already.
+                        else:
+                            refreshed = True
+                            if (app_hidden == True):
+                                wTree.get_object("window").hide()
+                                app_hidden = True
+                            else:
+                                wTree.get_object("window").show_all()
+                                app_hidden = False 
+
                         # pop-up for updater
-                        wTree.get_object("window").move(x, y)
-                        wTree.get_object("window").present()
-                        wTree.get_object("window").show_all()
+#                        wTree.get_object("window").move(x, y)
+#                        wTree.get_object("window").present()
+#                        wTree.get_object("window").show_all()
 
                         if (num_safe == 1):
                             if (num_ignored == 0):
                                 self.statusString = _("1 recommended update available (%(size)s)") % {'size':size_to_string(download_size)}
+                                status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("1 recommended update available (%(size)s), 1 ignored") % {'size':size_to_string(download_size)}
+                                status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 1):
                                 self.statusString = _("1 recommended update available (%(size)s), %(ignored)d ignored") % {'size':size_to_string(download_size), 'ignored':num_ignored}
+                                status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += " : " + _("Network connection is %s") % net_status
                         else:
                             if (num_ignored == 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s)") % {'recommended':num_safe, 'size':size_to_string(download_size)}
+                                status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), 1 ignored") % {'recommended':num_safe, 'size':size_to_string(download_size)}
+                                status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += " : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), %(ignored)d ignored") % {'recommended':num_safe, 'size':size_to_string(download_size), 'ignored':num_ignored}
+                                update_dbus.onStatusStringChanged(status_str)
+                                status_str = self.statusString
                                 self.statusString += " : " + _("Network connection is %s") % net_status
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_updates))
-                        self.statusIcon.set_tooltip_text(self.statusString)
-                        self.statusIcon.set_visible(True)
+                        update_dbus.onIconChanged (icon_updates)
+                        current_icon = icon_updates
                         statusbar.push(context_id, self.statusString)
+                        update_dbus.onStatusStringChanged(status_str)
+                        status_str = self.statusString
+                        show_noti(None, title, status_str, wTree)
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found " + str(num_safe) + " recommended software updates\n")
                         log.flush()
                     else:
                         if num_visible == 0:
                             self.wTree.get_object("notebook_status").set_current_page(TAB_UPTODATE)
                         is_enable_tools = False
-                        self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_up2date))
                         self.statusString = _("Your system is up to date")
+                        status_str = self.statusString
+                        update_dbus.onStatusStringChanged(status_str)
                         self.statusString += " : " + _("Network connection is %s") % net_status
-                        self.statusIcon.set_tooltip_text(self.statusString)
-                        statusbar.push(context_id,self.statusString)
+                        update_dbus.onIconChanged (icon_up2date)
+                        current_icon = icon_up2date
+                        statusbar.push(context_id, self.statusString)
+                        show_noti(None, title, status_str, wTree)
+
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ System is up to date\n")
                         log.flush()
 
@@ -1190,7 +1257,7 @@ class RefreshThread(threading.Thread):
             self.wTree.get_object("tool_clear").set_sensitive(is_enable_tools)
             self.wTree.get_object("tool_apply").set_sensitive(is_enable_tools)
             self.wTree.get_object("notebook_details").set_current_page(0)
-            self.wTree.get_object("window").get_window().set_cursor(None)
+#           self.wTree.get_object("window").get_window().set_cursor(None)
             self.treeview_update.set_model(model)
             del model
             self.wTree.get_object("window").set_sensitive(True)
@@ -1202,13 +1269,15 @@ class RefreshThread(threading.Thread):
             log.flush()
 
             Gdk.threads_enter()
-            self.statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_error))
-            self.statusIcon.set_tooltip_text(_("Could not refresh the list of updates"))
-#            self.statusIcon.set_visible(True)
-#            self.wTree.get_object("window").get_window().set_cursor(None)
-#            self.wTree.get_object("window").set_sensitive(True)
-#            statusbar.push(context_id, _("Could not refresh the list of updates"))
-#            wTree.get_object("vpaned1").set_position(vpaned_position)
+            update_dbus.onIconChanged (icon_error)
+            current_icon = icon_error
+            self.wTree.get_object("window").get_window().set_cursor(None)
+            self.wTree.get_object("window").set_sensitive(True)
+            status_str =  _("Could not refresh the list of updates")
+            statusbar.push(context_id, status_str)
+            show_noti(None, title, status_str, wTree)
+            update_dbus.onStatusStringChanged(status_str)
+            wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
 
     def checkDependencies(self, changes, cache):
@@ -1232,8 +1301,20 @@ class RefreshThread(threading.Thread):
             changes = self.checkDependencies(changes, cache)
         return changes
 
-def force_refresh(widget, treeview, statusIcon, wTree):
-    refresh = RefreshThread(treeview, statusIcon, wTree, root_mode=True)
+def show_noti(window, title, message, wTree):
+    global noti
+
+    image = "/usr/lib/gooroom/gooroomUpdate/icons/warning.png"
+
+    try:
+        noti = Notify.Notification.new(title, message, image)
+        noti.add_action("details-action", _("Details"), show_window, wTree)
+        noti.show()
+    except Exception as e:
+        print (e) 
+
+def force_refresh(widget, treeview, wTree):
+    refresh = RefreshThread(treeview, wTree, root_mode=True)
     refresh.start()
 
 def clear(widget, treeView, statusbar, apply_button, context_id):
@@ -1270,16 +1351,11 @@ def select_all(widget, treeView, statusbar, apply_button, context_id):
 
     apply_button.set_sensitive(True)
 
-def install(widget, treeView, statusIcon, wTree):
-    install = InstallThread(treeView, statusIcon, wTree)
+def install(widget, treeView, wTree):
+    install = InstallThread(treeView, wTree)
     install.start()
 
-def pixbuf_trayicon(filename):
-    size = 22
-    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, size, size)
-    return pixbuf
-
-def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
+def pref_apply(widget, prefs_tree, treeview, wTree):
     global icon_busy
     global icon_up2date
     global icon_updates
@@ -1333,12 +1409,13 @@ def pref_apply(widget, prefs_tree, treeview, statusIcon, wTree):
     config.write()
 
     prefs_tree.get_object("window").hide()
-    refresh = RefreshThread(treeview, statusIcon, wTree)
+    refresh = RefreshThread(treeview, wTree)
     refresh.start()
 
     #gooroom
-    global app_hidden
-    app_hidden = True
+#    global app_hidden
+#    app_hidden = True
+#    app_hidden = False
 
     global is_pref_opened
     is_pref_opened = False
@@ -1518,7 +1595,7 @@ def open_repositories(widget):
     elif os.path.exists("/usr/bin/software-properties-kde"):
         os.system("/usr/bin/software-properties-kde &")
 
-def open_preferences(widget, treeview, statusIcon, wTree):
+def open_preferences(widget, treeview, wTree):
     global icon_busy
     global icon_up2date
     global icon_updates
@@ -1601,7 +1678,7 @@ def open_preferences(widget, treeview, statusIcon, wTree):
     prefs_tree.get_object("window").connect("destroy", pref_destroy, prefs_tree)
     prefs_tree.get_object("window").show()
     prefs_tree.get_object("pref_button_cancel").connect("clicked", pref_cancel, prefs_tree)
-    prefs_tree.get_object("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, statusIcon, wTree)
+    prefs_tree.get_object("pref_button_apply").connect("clicked", pref_apply, prefs_tree, treeview, wTree)
 
     prefs = read_configuration()
 
@@ -1782,13 +1859,6 @@ def quit_cb(widget, window, vpaned, data = None):
     #gtk.main_quit()
     #sys.exit(0)
 
-def popup_menu_cb(widget, button, time, data = None):
-    if button == 3:
-        if data:
-            data.show_all()
-            data.popup(None, None, Gtk.StatusIcon.position_menu, widget, 3, time)
-    pass
-
 def close_window(window, event, vpaned):
     global app_hidden
     window.hide()
@@ -1800,6 +1870,12 @@ def hide_window(widget, window):
     global app_hidden
     window.hide()
     app_hidden = True
+
+def show_window(window, data, wTree):
+    global app_hidden
+#    wTree.get_object("window").present_with_time(Gtk.get_current_event_time())
+    wTree.get_object("window").show_all()
+    app_hidden = False
 
 def activate_icon_cb(widget, data, wTree):
     global app_hidden
@@ -1995,17 +2071,70 @@ def setVisibleColumn(checkmenuitem, column, configName):
     config.write()
     column.set_visible(checkmenuitem.get_active())
 
-def setVisibleDescriptions(checkmenuitem, treeView, statusIcon, wTree, prefs):
+def setVisibleDescriptions(checkmenuitem, treeView, wTree, prefs):
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     if ('visible_columns' not in config):
         config['visible_columns'] = {}
     config['visible_columns']['description'] = checkmenuitem.get_active()
     config.write()
     prefs["descriptions_visible"] = checkmenuitem.get_active()
-    refresh = RefreshThread(treeView, statusIcon, wTree)
+    refresh = RefreshThread(treeView, wTree)
     refresh.start()
 
+class UpdateDBus(dbus.service.Object):
+    def __init__(self, wTree):
+        try:
+            DBusGMainLoop(set_as_default=True) # for async calls
+            BUS = dbus.SessionBus()
+
+            self._loop = None
+            self._loop = GLib.MainLoop()
+
+            bus_name = dbus.service.BusName(DBUS_NAME, BUS)
+            dbus.service.Object.__init__(self, bus_name, DBUS_OBJ)
+        except Exception as detail: 
+            print (detail)
+
+    def run(self):
+        """
+        Updater's main loop
+        """
+        self._loop.run()
+
+        #LOOPING ON
+
+    @dbus.service.method(dbus_interface = DBUS_IFACE, in_signature="", out_signature="")
+    def Reload(self):
+        treeview = wTree.get_object("treeview_update")
+        force_refresh(None, treeview, wTree)
+
+    @dbus.service.method(dbus_interface = DBUS_IFACE, in_signature="", out_signature="")
+    def Show(self):
+        show_window(None, None, wTree)
+
+    @dbus.service.method(dbus_interface = DBUS_IFACE, in_signature="", out_signature="")
+    def Pref(self):
+        treeview = wTree.get_object("treeview_update")
+        open_preferences(None, treeview, wTree)
+
+    @dbus.service.method(dbus_interface = DBUS_IFACE, in_signature="", out_signature="s")
+    def GetCurrentIcon(self):
+        return current_icon
+
+    @dbus.service.method(dbus_interface = DBUS_IFACE, in_signature="", out_signature="s")
+    def GetCurrentStatusString(self):
+        return status_str
+
+    @dbus.service.signal(dbus_interface = DBUS_IFACE, signature='s')
+    def onIconChanged(self, icon_path):
+        pass
+
+    @dbus.service.signal(dbus_interface = DBUS_IFACE, signature='s')
+    def onStatusStringChanged(self, status_string):
+        pass
+
 global app_hidden
+global alert
 global log
 global logFile
 global pid
@@ -2013,6 +2142,10 @@ global statusbar
 global context_id
 
 app_hidden = True
+global update_dbus
+global current_icon
+global status_str
+
 alert = True
 
 Gdk.threads_init()
@@ -2048,19 +2181,24 @@ try:
     global icon_error
     global icon_unknown
     global icon_apply
-    global statusbar
-    global context_id
+
+    global update_dbus
+    global current_icon
+    global status_str
 
     prefs = read_configuration()
-
-    statusIcon = Gtk.StatusIcon()
-    statusIcon.set_from_pixbuf(pixbuf_trayicon(icon_busy))
-    statusIcon.set_tooltip_text(_("Checking for updates"))
 
     #Set the Glade file
     gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
     wTree = Gtk.Builder()
     wTree.add_from_file(gladefile)
+
+    update_dbus = UpdateDBus(wTree)
+    update_dbus.onStatusStringChanged(_("Launching gooroomUpdate"))
+    update_dbus.onIconChanged (icon_busy)
+    status_str = _("Launching gooroomUpdate")
+    current_icon = icon_busy
+
     wTree.get_object("window").set_title(_("Update Manager"))
     wTree.get_object("window").set_default_size(prefs['dimensions_x'], prefs['dimensions_y'])
     wTree.get_object("vpaned1").set_position(prefs['dimensions_pane_position'])
@@ -2076,6 +2214,7 @@ try:
     wTree.get_object("window").add_accel_group(accel_group)
 
     # Get the window socket (needed for synaptic later on)
+
 #    if os.getuid() != 0 :
 #        # If we're not in root mode do that (don't know why it's needed.. very weird)
 #        socket = Gtk.Socket()
@@ -2133,36 +2272,39 @@ try:
     selection.connect("changed", display_selected_package, wTree)
     wTree.get_object("notebook_details").connect("switch-page", switch_page, wTree, treeview_update)
     wTree.get_object("window").connect("delete_event", close_window, wTree.get_object("vpaned1"))
-    wTree.get_object("tool_apply").connect("clicked", install, treeview_update, statusIcon, wTree)
+    wTree.get_object("tool_apply").connect("clicked", install, treeview_update, wTree)
     wTree.get_object("tool_clear").connect("clicked", clear, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
     wTree.get_object("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
-    wTree.get_object("tool_refresh").connect("clicked", force_refresh, treeview_update, statusIcon, wTree)
+    wTree.get_object("tool_refresh").connect("clicked", force_refresh, treeview_update, wTree)
 
-    aist=AutoInstallScheduleThread(treeview_update, statusIcon, wTree)
+    aist=AutoInstallScheduleThread(treeview_update, wTree)
     aist.start()
 
     global is_pref_opened
     is_pref_opened = False
 
-    menu = wTree.get_object("popupmenu")
-    menuitem1 = wTree.get_object("refreshmenu")
-    menuitem1.set_label(_("_Refresh"))
-    menuitem1.connect("activate", force_refresh, treeview_update, statusIcon, wTree)
 
-    menuitem2 = wTree.get_object("infomenu")
-    menuitem2.set_label(_("Information"))
-    menuitem2.connect("activate", open_information)
-
-    menuitem3 = wTree.get_object("prefmenu")
-    menuitem3.set_label(_("_Preferences"))
-    menuitem3.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
-
-    menuitem4 = wTree.get_object("quitmenu")
-    menuitem4.set_label(_("_Quit"))
-    menuitem4.connect("activate", quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
-
-    statusIcon.connect("activate", activate_icon_cb, None, wTree)
-    statusIcon.connect("popup-menu", popup_menu_cb, menu)
+#    print(1)
+#    menu = wTree.get_object("popupmenu")
+#    menuitem1 = wTree.get_object("refreshmenu")
+#    menuitem1.set_label(_("_Refresh"))
+#    menuitem1.connect("activate", force_refresh, treeview_update, statusIcon, wTree)
+#    print(2)
+#
+#    menuitem2 = wTree.get_object("infomenu")
+#    menuitem2.set_label(_("Information"))
+#    menuitem2.connect("activate", open_information)
+#
+#    menuitem3 = wTree.get_object("prefmenu")
+#    menuitem3.set_label(_("_Preferences"))
+#    menuitem3.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
+#
+#    menuitem4 = wTree.get_object("quitmenu")
+#    menuitem4.set_label(_("_Quit"))
+#    menuitem4.connect("activate", quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
+#
+#    statusIcon.connect("activate", activate_icon_cb, None, wTree)
+#    statusIcon.connect("popup-menu", popup_menu_cb, menu)
 
     # Set text for all visible widgets (because of i18n)
     wTree.get_object("tool_apply").set_label(_("Install Updates"))
@@ -2204,7 +2346,8 @@ try:
     editMenu.set_submenu(editSubmenu)
     prefsMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
     prefsMenuItem.set_label(_("Preferences"))
-    prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
+    #prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
+    prefsMenuItem.connect("activate", open_preferences, treeview_update, wTree)
     editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
@@ -2270,7 +2413,8 @@ try:
 
     descriptionsMenuItem = Gtk.CheckMenuItem(label=_("Show descriptions"))
     descriptionsMenuItem.set_active(prefs["descriptions_visible"])
-    descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, statusIcon, wTree, prefs)
+#    descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, statusIcon, wTree, prefs)
+    descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, wTree, prefs)
     viewSubmenu.append(descriptionsMenuItem)
 
     viewSubmenu.append(historyMenuItem)
@@ -2304,13 +2448,13 @@ try:
             #wTree.get_object("vpaned1").set_position(prefs['dimensions_pane_position'])
             #app_hidden = False
 
-    wTree.get_object("window").show_all()
     wTree.get_object("notebook_details").set_current_page(0)
+    app_hidden = True
 
-    refresh = RefreshThread(treeview_update, statusIcon, wTree)
+    refresh = RefreshThread(treeview_update, wTree)
     refresh.start()
 
-    auto_refresh = AutomaticRefreshThread(treeview_update, statusIcon, wTree)
+    auto_refresh = AutomaticRefreshThread(treeview_update, wTree)
     auto_refresh.start()
 
     Gdk.threads_enter()
