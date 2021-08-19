@@ -1185,7 +1185,7 @@ class RefreshThread(threading.Thread):
                                 app_hidden = True
                             else:
                                 wTree.get_object("window").show_all()
-                                app_hidden = False 
+                                app_hidden = False
 
                         # pop-up for updater
 #                        wTree.get_object("window").move(x, y)
@@ -1311,7 +1311,22 @@ def show_noti(window, title, message, wTree):
         noti.add_action("details-action", _("Details"), show_window, wTree)
         noti.show()
     except Exception as e:
-        print (e) 
+        print (e)
+
+def move_update_window (self, window):
+    display = Gdk.Display.get_default()
+    monitor = display.get_primary_monitor()
+
+    alloc = window.get_allocation()
+    workarea = monitor.get_workarea()
+
+    geo = monitor.get_geometry()
+    req = window.get_preferred_size ()
+
+    x = workarea.x + (workarea.width/2)-(alloc.width/2)
+    y = workarea.y + (workarea.height/2)-(alloc.height/2)
+
+    window.get_window().move(x, y)
 
 def force_refresh(widget, treeview, wTree):
     refresh = RefreshThread(treeview, wTree, root_mode=True)
@@ -1805,7 +1820,7 @@ def label_size_allocate(widget, rect):
     widget.set_size_request(rect.width, -1)
 
 def open_help(widget):
-    os.system("yelp help:gooroom/software-updates &")
+    os.system("yelp help:gooroom-help-gooroom-update")
 
 def open_about(widget):
     dlg = Gtk.AboutDialog()
@@ -1817,7 +1832,7 @@ def open_about(widget):
         s = h.readlines()
         gpl = ""
         for line in s:
-            gpl += line
+            gpl += "\t"*3 + line
         h.close()
         dlg.set_license(gpl)
     except Exception as detail:
@@ -1858,6 +1873,17 @@ def quit_cb(widget, window, vpaned, data = None):
     os.system("kill -9 %s &" % pid)
     #gtk.main_quit()
     #sys.exit(0)
+
+def popup_menu_cb(widget, button, time, data = None):
+    if button == 3:
+        if data:
+            data.show_all()
+            #data.popup(None, None, Gtk.StatusIcon.position_menu, 3, time, widget)
+            data.popup(None, None, Gtk.StatusIcon.position_menu, widget, 3, time)
+    pass
+
+def realize_window_cb(window, wTree):
+    move_update_window(wTree, window)
 
 def close_window(window, event, vpaned):
     global app_hidden
@@ -2028,7 +2054,6 @@ def toggled(renderer, path, treeview, statusbar, apply_button, context_id):
             model.set_value(iter, UPDATE_CHECKED, "false")
         else:
             model.set_value(iter, UPDATE_CHECKED, "true")
-        
 
     iter = model.get_iter_first()
     download_size = 0
@@ -2092,7 +2117,7 @@ class UpdateDBus(dbus.service.Object):
 
             bus_name = dbus.service.BusName(DBUS_NAME, BUS)
             dbus.service.Object.__init__(self, bus_name, DBUS_OBJ)
-        except Exception as detail: 
+        except Exception as detail:
             print (detail)
 
     def run(self):
@@ -2272,6 +2297,7 @@ try:
     selection.connect("changed", display_selected_package, wTree)
     wTree.get_object("notebook_details").connect("switch-page", switch_page, wTree, treeview_update)
     wTree.get_object("window").connect("delete_event", close_window, wTree.get_object("vpaned1"))
+    wTree.get_object("window").connect("show", realize_window_cb, wTree)
     wTree.get_object("tool_apply").connect("clicked", install, treeview_update, wTree)
     wTree.get_object("tool_clear").connect("clicked", clear, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
     wTree.get_object("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
@@ -2424,8 +2450,8 @@ try:
     helpMenu.set_label(_("_Help"))
     helpSubmenu = Gtk.Menu()
     helpMenu.set_submenu(helpSubmenu)
-    if os.path.exists("/usr/share/help/C/gooroom"):
-        helpMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_HELP)
+    if os.path.exists("/usr/share/gooroom-yelp-adjustments/"):
+        helpMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_HELP)
         helpMenuItem.set_label(_("Contents"))
         helpMenuItem.connect("activate", open_help)
         key, mod = Gtk.accelerator_parse("F1")
