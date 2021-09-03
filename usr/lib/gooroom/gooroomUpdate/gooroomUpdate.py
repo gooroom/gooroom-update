@@ -2278,7 +2278,9 @@ try:
     fileMenu.set_label(_("_File"))
     fileSubmenu = Gtk.Menu()
     fileMenu.set_submenu(fileSubmenu)
-    if os.path.exists("/usr/bin/synaptic-pkexec"):
+    synaptic_exec = "/usr/bin/synaptic-pkexec"
+    synaptic_desktop = "/usr/share/applications/synaptic.desktop"
+    if (os.path.exists(synaptic_exec) and os.path.exists(synaptic_desktop)):
         synapticMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
         synaptic_icon = "/usr/share/pixmaps/synaptic.png"
         if os.path.exists(synaptic_icon):
