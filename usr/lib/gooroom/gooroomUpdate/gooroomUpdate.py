@@ -1827,12 +1827,14 @@ def open_about(widget):
     dlg.set_title(_("About") + " - " + _("Update Manager"))
     dlg.set_program_name("gooroomupdater")
     dlg.set_comments(_("Update Manager"))
+    dlg.set_default_size(600,300)
     try:
         h = open('/usr/share/common-licenses/GPL','r')
         s = h.readlines()
         gpl = ""
         for line in s:
-            gpl += "\t"*3 + line
+#            gpl += "\t"*3 + line
+            gpl += line
         h.close()
         dlg.set_license(gpl)
     except Exception as detail:
