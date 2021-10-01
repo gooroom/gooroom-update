@@ -1,3 +1,13 @@
+gooroom-update (1.1.5+grm2u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [27558f36] removed icon path in information.glade
+
+  [ boyeon.choi ]
+  * [1dbd7c34] Hide menus when synaptic.desktop is not present
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 01 Oct 2021 20:16:52 +0900
+
 gooroom-update (1.1.4+grm2u1) unstable; urgency=medium
 
   [ subin.kim ]
