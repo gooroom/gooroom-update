@@ -88,25 +88,25 @@ def get_proxy_settings():
     gsettings = {}
     base_len = len("org.gnome.system.proxy.")
     # pylint: disable=E1103
-    for line in output.split("\n"):
+    for line in output.split(b"\n"):
         try:
-            path, key, value = line.split(" ", 2)
+            path, key, value = line.split(b" ", 2)
         except ValueError:
             continue
-        if value.startswith("'"):
+        if value.startswith(b"'"):
             parsed_value = value[1:-1]
-        elif value.startswith(('[', '@')):
+        elif value.startswith((b'[', b'@')):
             parsed_value = value
-        elif value in ('true', 'false'):
+        elif value in (b'true', b'false'):
             parsed_value = (value == 'true')
         elif value.isdigit():
             parsed_value = int(value)
         else:
             print (CANNOT_PARSE_WARNING % value)
             parsed_value = value
-        relative_key = (path + "." + key)[base_len:]
+        relative_key = (path + b"." + key)[base_len:]
         gsettings[relative_key] = parsed_value
-    mode = gsettings["mode"]
+    mode = gsettings[b"mode"]
     if mode == "none":
         settings = {}
     elif mode == "manual":

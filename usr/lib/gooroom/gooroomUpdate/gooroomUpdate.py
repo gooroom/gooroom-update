@@ -38,6 +38,7 @@ try:
 
     from gi.repository import Gtk
     from gi.repository import Gdk
+    from gi.repository import Gio
     from gi.repository import GLib
     from gi.repository import GObject
     from gi.repository import Notify
@@ -275,7 +276,7 @@ class ChangelogRetriever(threading.Thread):
                 if self.origin == "gooroom":
                     output = self.get_gooroom_changelog(source)
                     if output:
-                        changelog = output
+                        changelog = str(output)
 
         Gdk.threads_enter()
         self.wTree.get_object("textview_changes").get_buffer().set_text(changelog)
@@ -1097,7 +1098,7 @@ class RefreshThread(threading.Thread):
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias + "\n<small><span foreground='#5C5C5C'>%s</span></small>" % shortdesc)
                         else:
                             model.set_value(iter, UPDATE_ALIAS, package_update.alias)
-                        model.set_value(iter, UPDATE_LEVEL_PIX, GdkPixbuf.Pixbuf.new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".png"))
+                        model.set_value(iter, UPDATE_LEVEL_PIX, GdkPixbuf.Pixbuf.new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level" + str(package_update.level) + ".svg"))
                         model.set_value(iter, UPDATE_OLD_VERSION, package_update.oldVersion)
                         model.set_value(iter, UPDATE_NEW_VERSION, package_update.newVersion)
                         model.set_value(iter, UPDATE_LEVEL_STR, str(package_update.level))
@@ -1114,6 +1115,8 @@ class RefreshThread(threading.Thread):
 
                 is_enable_tools = True
                 if (new_gooroomupdate):
+                    if num_safe==0 or num_visible==0:
+                        is_enable_tools = False
                     self.statusString = _("A new version of the update manager is available")
                     statusbar.push(context_id, self.statusString)
 
@@ -1197,39 +1200,40 @@ class RefreshThread(threading.Thread):
                                 self.statusString = _("1 recommended update available (%(size)s)") % {'size':size_to_string(download_size)}
                                 status_str = self.statusString
                                 update_dbus.onStatusStringChanged(status_str)
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("1 recommended update available (%(size)s), 1 ignored") % {'size':size_to_string(download_size)}
                                 status_str = self.statusString
                                 update_dbus.onStatusStringChanged(status_str)
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 1):
                                 self.statusString = _("1 recommended update available (%(size)s), %(ignored)d ignored") % {'size':size_to_string(download_size), 'ignored':num_ignored}
                                 status_str = self.statusString
                                 update_dbus.onStatusStringChanged(status_str)
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                         else:
                             if (num_ignored == 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s)") % {'recommended':num_safe, 'size':size_to_string(download_size)}
                                 status_str = self.statusString
                                 update_dbus.onStatusStringChanged(status_str)
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                             elif (num_ignored == 1):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), 1 ignored") % {'recommended':num_safe, 'size':size_to_string(download_size)}
                                 status_str = self.statusString
                                 update_dbus.onStatusStringChanged(status_str)
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), %(ignored)d ignored") % {'recommended':num_safe, 'size':size_to_string(download_size), 'ignored':num_ignored}
                                 update_dbus.onStatusStringChanged(status_str)
                                 status_str = self.statusString
-                                self.statusString += " : " + _("Network connection is %s") % net_status
+                                self.statusString += "\n : " + _("Network connection is %s") % net_status
                         update_dbus.onIconChanged (icon_updates)
                         current_icon = icon_updates
                         statusbar.push(context_id, self.statusString)
                         update_dbus.onStatusStringChanged(status_str)
                         status_str = self.statusString
                         show_noti(None, title, status_str, wTree)
+#                        wTree.get_object("label_num").set_label(str(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found " + str(num_safe) + " recommended software updates\n"))
                         log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Found " + str(num_safe) + " recommended software updates\n")
                         log.flush()
                     else:
@@ -1239,7 +1243,7 @@ class RefreshThread(threading.Thread):
                         self.statusString = _("Your system is up to date")
                         status_str = self.statusString
                         update_dbus.onStatusStringChanged(status_str)
-                        self.statusString += " : " + _("Network connection is %s") % net_status
+                        self.statusString += "\n : " + _("Network connection is %s") % net_status
                         update_dbus.onIconChanged (icon_up2date)
                         current_icon = icon_up2date
                         statusbar.push(context_id, self.statusString)
@@ -1253,8 +1257,6 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Refresh finished\n")
             log.flush()
-            self.wTree.get_object("tool_select_all").set_sensitive(is_enable_tools)
-            self.wTree.get_object("tool_clear").set_sensitive(is_enable_tools)
             self.wTree.get_object("tool_apply").set_sensitive(is_enable_tools)
             self.wTree.get_object("notebook_details").set_current_page(0)
 #           self.wTree.get_object("window").get_window().set_cursor(None)
@@ -1271,7 +1273,7 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             update_dbus.onIconChanged (icon_error)
             current_icon = icon_error
-            self.wTree.get_object("window").get_window().set_cursor(None)
+#            self.wTree.get_object("window").get_window().set_cursor(None)
             self.wTree.get_object("window").set_sensitive(True)
             status_str =  _("Could not refresh the list of updates")
             statusbar.push(context_id, status_str)
@@ -1304,7 +1306,7 @@ class RefreshThread(threading.Thread):
 def show_noti(window, title, message, wTree):
     global noti
 
-    image = "/usr/lib/gooroom/gooroomUpdate/icons/warning.png"
+    image = "/usr/lib/gooroom/gooroomUpdate/icons/level1.svg"
 
     try:
         noti = Notify.Notification.new(title, message, image)
@@ -1344,27 +1346,50 @@ def clear(widget, treeView, statusbar, apply_button, context_id):
 def select_all(widget, treeView, statusbar, apply_button, context_id):
     model = treeView.get_model()
     iter = model.get_iter_first()
-    while (iter != None):
-        model.set_value(iter, UPDATE_CHECKED, "true")
-        iter = model.iter_next(iter)
-    iter = model.get_iter_first()
-    download_size = 0
     num_selected = 0
+
+    ##체크된 개수 카운트
     while (iter != None):
         checked = model.get_value(iter, UPDATE_CHECKED)
         if (checked == "true"):
-            size = model.get_value(iter, UPDATE_SIZE)
-            download_size = download_size + size
             num_selected = num_selected + 1
         iter = model.iter_next(iter)
-    if num_selected == 0:
-        statusbar.push(context_id, _("No updates selected"))
-    elif num_selected == 1:
-        statusbar.push(context_id, _("%(selected)d update selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
-    else:
-        statusbar.push(context_id, _("%(selected)d updates selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
 
-    apply_button.set_sensitive(True)
+    ##체크된 것 없으면 select all
+    if num_selected == 0:
+        iter = model.get_iter_first()
+        while (iter != None):
+            model.set_value(iter, UPDATE_CHECKED, "true")
+            iter = model.iter_next(iter)
+
+        iter = model.get_iter_first()
+        download_size = 0
+        while (iter != None):
+            checked = model.get_value(iter, UPDATE_CHECKED)
+            if (checked == "true"):
+                size = model.get_value(iter, UPDATE_SIZE)
+                num_selected = num_selected + 1
+                download_size = download_size + size
+            iter = model.iter_next(iter)
+
+        if num_selected == 0:
+            statusbar.push(context_id, _("No updates selected"))
+        if num_selected == 1:
+            statusbar.push(context_id, _("%(selected)d update selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
+        else:
+            statusbar.push(context_id, _("%(selected)d updates selected (%(size)s)") % {'selected':num_selected, 'size':size_to_string(download_size)})
+
+        apply_button.set_sensitive(True)
+
+    ##체크된 것 있으면 clear
+    else:
+        iter = model.get_iter_first()
+        while (iter != None):
+            model.set_value(iter, 0, "false")
+            iter = model.iter_next(iter)
+        statusbar.push(context_id, _("No updates selected"))
+        apply_button.set_sensitive(False)
+        num_selected = 0
 
 def install(widget, treeView, wTree):
     install = InstallThread(treeView, wTree)
@@ -1625,31 +1650,36 @@ def open_preferences(widget, treeview, wTree):
 
     is_pref_opened = True
 
-    gladefile = "/usr/lib/gooroom/gooroomUpdate/preference.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/ui/preference.glade"
     prefs_tree = Gtk.Builder().new_from_file(gladefile)
     prefs_tree.get_object("window").set_title(_("Preferences") + " - " + _("Update Manager"))
 
     prefs_tree.get_object("label37").set_text(_("Levels"))
-    prefs_tree.get_object("label36").set_text(_("Auto-Refresh & Upgrade"))
-    prefs_tree.get_object("label39").set_markup("<b>" + _("Level") + "</b>")
-    prefs_tree.get_object("label40").set_markup("<b>" + _("Description") + "</b>")
+    prefs_tree.get_object("label36").set_text(_("Auto-Refresh"))
     prefs_tree.get_object("label48").set_markup("<b>" + _("Tested?") + "</b>")
+    prefs_tree.get_object("image3").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/tick.png")
+    prefs_tree.get_object("image4").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/tick.png")
+    prefs_tree.get_object("image1").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/no.png")
     prefs_tree.get_object("label54").set_markup("<b>" + _("Origin") + "</b>")
+    prefs_tree.get_object("image10").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level1.svg")
+    prefs_tree.get_object("image11").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level2.svg")
+    prefs_tree.get_object("image12").set_from_file("/usr/lib/gooroom/gooroomUpdate/icons/level3.svg")
+    prefs_tree.get_object("image10").set_tooltip_text(_("Packages provided by Gooroom"))
+    prefs_tree.get_object("image11").set_tooltip_text(_("Packages provided by Debian"))
+    prefs_tree.get_object("image12").set_tooltip_text(_("Packages provided by 3rd-party"))
     prefs_tree.get_object("label41").set_markup("<b>" + _("Safe?") + "</b>")
     prefs_tree.get_object("label42").set_markup("<b>" + _("Visible?") + "</b>")
-    prefs_tree.get_object("label43").set_text(_("Packages provided by Gooroom"))
-    prefs_tree.get_object("label44").set_text(_("Packages provided by Debian"))
-    prefs_tree.get_object("label45").set_text(_("Packages provided by 3rd-party"))
     prefs_tree.get_object("label55").set_text(_("Gooroom"))
+    prefs_tree.get_object("label55").set_tooltip_text(_("Packages provided by Gooroom"))
     prefs_tree.get_object("label56").set_text(_("Debian"))
+    prefs_tree.get_object("label56").set_tooltip_text(_("Packages provided by Debian"))
     prefs_tree.get_object("label57").set_text(_("3rd-party"))
-    prefs_tree.get_object("label81").set_text(_("Refresh the list of updates every:"))
-    prefs_tree.get_object("label82").set_text("<i>" + _("Note: The list only gets refreshed while the update manager window is closed (system tray mode).") + "</i>")
-    prefs_tree.get_object("label82").set_use_markup(True)
-    prefs_tree.get_object("label83").set_text(_("Options"))
+    prefs_tree.get_object("label57").set_tooltip_text(_("Packages provided by 3rd-party"))
+    prefs_tree.get_object("label81").set_text(_("The list gets refreshed while the update manager window is closed (system tray mode)."))
+    prefs_tree.get_object("label83").set_text(_("General"))
 
     prefs_tree.get_object("auto_upgrade").set_label(_("Auto Upgrade"))
-    prefs_tree.get_object("label4").set_text(_("New Upgrade"))
+    prefs_tree.get_object("label4").set_text(_("Update Frequency"))
     prefs_tree.get_object("label5").set_text(_("Time"))
     prefs_tree.get_object("label6").set_text(_("The system will be upgraded automatically with the latest software if it is on and running at the time."))
     prefs_tree.get_object("auto_upgrade_date").insert_text(0, _("Every Saturday"))
@@ -1732,11 +1762,13 @@ def open_preferences(widget, treeview, wTree):
 
 def open_history(widget):
     #Set the Glade file
-    gladefile = "/usr/lib/gooroom/gooroomUpdate/history.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/ui/history.glade"
     wTree = Gtk.Builder().new_from_file(gladefile)
     treeview_update = wTree.get_object("treeview_history")
     wTree.get_object("window").set_icon_name("gooroomupdater")
     wTree.get_object("window").set_title(_("History of updates") + " - " + _("Update Manager"))
+
+    wTree.get_object("hlabel").set_markup("<b>" + _("Update History") + "</b>")
 
     # the treeview
     column1 = Gtk.TreeViewColumn(_("Date"), Gtk.CellRendererText(), text=1)
@@ -1803,21 +1835,18 @@ def open_information(widget):
     global logFile
     global pid
 
-    gladefile = "/usr/lib/gooroom/gooroomUpdate/information.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/ui/information.glade"
     prefs_tree = Gtk.Builder().new_from_file(gladefile)
     prefs_tree.get_object("window").set_title(_("Information") + " - " + _("Update Manager"))
     prefs_tree.get_object("window").set_icon_name("gooroomupdater")
     prefs_tree.get_object("close_button3").connect("clicked", info_cancel, prefs_tree)
-    prefs_tree.get_object("label4").set_text(_("Process ID:"))
-    prefs_tree.get_object("label5").set_text(_("Log file:"))
+    prefs_tree.get_object("label4").set_text(_("Process ID"))
+    prefs_tree.get_object("label5").set_text(_("Log file"))
     prefs_tree.get_object("processid_label").set_text(str(pid))
     prefs_tree.get_object("log_filename").set_text(str(logFile))
     txtbuffer = Gtk.TextBuffer()
     txtbuffer.set_text(subprocess.getoutput("cat " + logFile))
     prefs_tree.get_object("log_textview").set_buffer(txtbuffer)
-
-def label_size_allocate(widget, rect):
-    widget.set_size_request(rect.width, -1)
 
 def open_help(widget):
     os.system("yelp help:gooroom-help-gooroom-update")
@@ -1859,30 +1888,22 @@ def open_about(widget):
     dlg.connect("response", close)
     dlg.show()
 
-def quit_cb(widget, window, vpaned, data = None):
-    global log
-    if data:
-        data.set_visible(False)
-    try:
-        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Exiting - requested by user\n")
-        log.flush()
-        log.close()
-        save_window_size(window, vpaned)
-    except:
-        pass # cause log might already been closed
-    # Whatever works best heh :)
-    pid = os.getpid()
-    os.system("kill -9 %s &" % pid)
-    #gtk.main_quit()
-    #sys.exit(0)
-
-def popup_menu_cb(widget, button, time, data = None):
-    if button == 3:
-        if data:
-            data.show_all()
-            #data.popup(None, None, Gtk.StatusIcon.position_menu, 3, time, widget)
-            data.popup(None, None, Gtk.StatusIcon.position_menu, widget, 3, time)
-    pass
+#def quit_cb(widget, window, vpaned, data = None):
+#    global log
+#    if data:
+#        data.set_visible(False)
+#    try:
+#        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Exiting - requested by user\n")
+#        log.flush()
+#        log.close()
+#        save_window_size(window, vpaned)
+#    except:
+#        pass # cause log might already been closed
+#    # Whatever works best heh :)
+#    pid = os.getpid()
+#    os.system("kill -9 %s &" % pid)
+#    #gtk.main_quit()
+#    #sys.exit(0)
 
 def realize_window_cb(window, wTree):
     move_update_window(wTree, window)
@@ -1902,21 +1923,12 @@ def hide_window(widget, window):
 def show_window(window, data, wTree):
     global app_hidden
 #    wTree.get_object("window").present_with_time(Gtk.get_current_event_time())
+    wTree.get_object("window").grab_focus()
+    wTree.get_object("window").present()
     wTree.get_object("window").show_all()
     app_hidden = False
 
-def activate_icon_cb(widget, data, wTree):
-    global app_hidden
-    if (app_hidden == True):
-        wTree.get_object("window").show_all()
-        app_hidden = False
-    else:
-        wTree.get_object("window").hide()
-        app_hidden = True
-        save_window_size(wTree.get_object("window"), wTree.get_object("vpaned1"))
-
 def save_window_size(window, vpaned):
-
     config = ConfigObj("%s/gooroomUpdate.conf" % CONFIG_DIR)
     config['dimensions'] = {}
     config['dimensions']['x'] = window.get_size()[0]
@@ -2081,11 +2093,11 @@ def toggled(renderer, path, treeview, statusbar, apply_button, context_id):
 def size_to_string(size):
     strSize = str(size) + _("B")
     if (size >= 1024):
-        strSize = str(size / 1024) + _("KB")
+        strSize = str("{:.2f}".format(size / 1024)) + _("KB")
     if (size >= (1024 * 1024)):
-        strSize = str(size / (1024 * 1024)) + _("MB")
+        strSize = str("{:.2f}".format(size / (1024 * 1024))) + _("MB")
     if (size >= (1024 * 1024 * 1024)):
-        strSize = str(size / (1024 * 1024 * 1024)) + _("GB")
+        strSize = str("{:.2f}".format(size / (1024 * 1024 * 1024))) + _("GB")
     return strSize
 
 def setVisibleColumn(checkmenuitem, column, configName):
@@ -2111,7 +2123,8 @@ def setVisibleDescriptions(checkmenuitem, treeView, wTree, prefs):
 class UpdateDBus(dbus.service.Object):
     def __init__(self, wTree):
         try:
-            DBusGMainLoop(set_as_default=True) # for async calls
+            # for async calls
+            DBusGMainLoop(set_as_default=True)
             BUS = dbus.SessionBus()
 
             self._loop = None
@@ -2215,8 +2228,14 @@ try:
 
     prefs = read_configuration()
 
+    cssProvider = Gtk.CssProvider()
+    cssProvider.load_from_path('/usr/lib/gooroom/gooroomUpdate/ui/style.css')
+    screen = Gdk.Screen.get_default()
+    styleContext = Gtk.StyleContext()
+    styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
     #Set the Glade file
-    gladefile = "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.glade"
+    gladefile = "/usr/lib/gooroom/gooroomUpdate/ui/gooroomUpdate.glade"
     wTree = Gtk.Builder()
     wTree.add_from_file(gladefile)
 
@@ -2226,7 +2245,13 @@ try:
     status_str = _("Launching gooroomUpdate")
     current_icon = icon_busy
 
-    wTree.get_object("window").set_title(_("Update Manager"))
+    window = wTree.get_object("window")
+
+    headerbar = Gtk.HeaderBar()
+    headerbar.props.title = (_("Update Manager"))
+    headerbar.set_show_close_button(True)
+    window.set_titlebar(headerbar)
+
     wTree.get_object("window").set_default_size(prefs['dimensions_x'], prefs['dimensions_y'])
     wTree.get_object("vpaned1").set_position(prefs['dimensions_pane_position'])
 
@@ -2252,9 +2277,8 @@ try:
     # the treeview
     cr = Gtk.CellRendererToggle()
     cr.connect("toggled", toggled, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
-    column1 = Gtk.TreeViewColumn(_("Upgrade"), cr)
+    column1 = Gtk.TreeViewColumn (_("Upgrade"), cr)
     column1.set_cell_data_func(cr, celldatafunction_checkbox)
-    column1.set_sort_column_id(UPDATE_CHECKED)
     column1.set_resizable(True)
 
     column2 = Gtk.TreeViewColumn(_("Package"), Gtk.CellRendererText(), markup=UPDATE_ALIAS)
@@ -2283,9 +2307,9 @@ try:
 
     treeview_update.set_tooltip_column(UPDATE_TOOLTIP)
 
+    treeview_update.append_column(column1)
     treeview_update.append_column(column7)
     treeview_update.append_column(column3)
-    treeview_update.append_column(column1)
     treeview_update.append_column(column2)
     treeview_update.append_column(column4)
     treeview_update.append_column(column5)
@@ -2301,9 +2325,7 @@ try:
     wTree.get_object("window").connect("delete_event", close_window, wTree.get_object("vpaned1"))
     wTree.get_object("window").connect("show", realize_window_cb, wTree)
     wTree.get_object("tool_apply").connect("clicked", install, treeview_update, wTree)
-    wTree.get_object("tool_clear").connect("clicked", clear, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
-    wTree.get_object("tool_select_all").connect("clicked", select_all, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
-    wTree.get_object("tool_refresh").connect("clicked", force_refresh, treeview_update, wTree)
+    column1.connect("clicked", select_all, treeview_update, statusbar, wTree.get_object("tool_apply"), context_id)
 
     aist=AutoInstallScheduleThread(treeview_update, wTree)
     aist.start()
@@ -2311,34 +2333,8 @@ try:
     global is_pref_opened
     is_pref_opened = False
 
-
-#    print(1)
-#    menu = wTree.get_object("popupmenu")
-#    menuitem1 = wTree.get_object("refreshmenu")
-#    menuitem1.set_label(_("_Refresh"))
-#    menuitem1.connect("activate", force_refresh, treeview_update, statusIcon, wTree)
-#    print(2)
-#
-#    menuitem2 = wTree.get_object("infomenu")
-#    menuitem2.set_label(_("Information"))
-#    menuitem2.connect("activate", open_information)
-#
-#    menuitem3 = wTree.get_object("prefmenu")
-#    menuitem3.set_label(_("_Preferences"))
-#    menuitem3.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
-#
-#    menuitem4 = wTree.get_object("quitmenu")
-#    menuitem4.set_label(_("_Quit"))
-#    menuitem4.connect("activate", quit_cb, wTree.get_object("window"), wTree.get_object("vpaned1"), statusIcon)
-#
-#    statusIcon.connect("activate", activate_icon_cb, None, wTree)
-#    statusIcon.connect("popup-menu", popup_menu_cb, menu)
-
     # Set text for all visible widgets (because of i18n)
     wTree.get_object("tool_apply").set_label(_("Install Updates"))
-    wTree.get_object("tool_refresh").set_label(_("Refresh"))
-    wTree.get_object("tool_select_all").set_label(_("Select All"))
-    wTree.get_object("tool_clear").set_label(_("Clear"))
     wTree.get_object("label9").set_text(_("Description"))
     wTree.get_object("label8").set_text(_("Changelog"))
 
@@ -2349,122 +2345,108 @@ try:
 
     wTree.get_object("vpaned1").set_position(prefs['dimensions_pane_position'])
 
+    menubtn = wTree.get_object("menu_button")
+    headerbar.pack_start(menubtn)
+
+    """file menu"""
     fileMenu = wTree.get_object("filemenu")
     fileMenu.set_label(_("_File"))
-    fileSubmenu = Gtk.Menu()
-    fileMenu.set_submenu(fileSubmenu)
     synaptic_exe = "/usr/bin/synaptic-pkexec"
     synaptic_desktop = "/usr/share/applications/synaptic.desktop"
     if (os.path.exists(synaptic_exe) and os.path.exists(synaptic_desktop)):
-        synapticMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
-        synaptic_icon = "/usr/share/pixmaps/synaptic.png"
-        if os.path.exists(synaptic_icon):
-            synapticMenuItem.set_image(Gtk.Image.new_from_file(synaptic_icon))
-
+        synapticMenuItem = wTree.get_object("synapticMenuItem")
         synapticMenuItem.set_label(_("Synaptic Package Manager"))
         synapticMenuItem.connect("activate", open_synaptic_package_manager)
-        fileSubmenu.append(synapticMenuItem)
 
-    closeMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_CLOSE)
+    closeMenuItem = wTree.get_object("closeMenuItem")
     closeMenuItem.set_label(_("Close"))
     closeMenuItem.connect("activate", hide_window, wTree.get_object("window"))
-    fileSubmenu.append(closeMenuItem)
 
+    """edit menu"""
     editMenu = wTree.get_object("editmenu")
     editMenu.set_label(_("_Edit"))
-    editSubmenu = Gtk.Menu()
-    editMenu.set_submenu(editSubmenu)
-    prefsMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
+    prefsMenuItem = wTree.get_object("prefsMenuItem")
     prefsMenuItem.set_label(_("Preferences"))
-    #prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     prefsMenuItem.connect("activate", open_preferences, treeview_update, wTree)
-    editSubmenu.append(prefsMenuItem)
 
     if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         if os.system("systemctl status gooroom-agent"):
-            sourcesMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_PREFERENCES)
-            sourcesMenuItem.set_image(Gtk.Image.new_from_file("/usr/lib/gooroom/gooroomUpdate/icons/software-properties.png"))
+            sourcesMenuItem = wTree.get_object("sourcesMenuItem")
             sourcesMenuItem.set_label(_("Software sources"))
             sourcesMenuItem.connect("activate", open_repositories)
-            editSubmenu.append(sourcesMenuItem)
+            sourcesMenuItem.show()
 
+    """view menu"""
     viewMenu = wTree.get_object("viewmenu")
     viewMenu.set_label(_("_View"))
-    viewSubmenu = Gtk.Menu()
-    viewMenu.set_submenu(viewSubmenu)
-    historyMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_INDEX)
+    historyMenuItem = wTree.get_object("historyMenuItem")
     historyMenuItem.set_label(_("History of updates"))
     historyMenuItem.connect("activate", open_history)
-    infoMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_DIALOG_INFO)
+
+    infoMenuItem = wTree.get_object("infoMenuItem")
     infoMenuItem.set_label(_("Information"))
     infoMenuItem.connect("activate", open_information)
-    visibleColumnsMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_DIALOG_INFO)
-    visibleColumnsMenuItem.set_label(_("Visible columns"))
-    visibleColumnsMenu = Gtk.Menu()
-    visibleColumnsMenuItem.set_submenu(visibleColumnsMenu)
 
-    typeColumnMenuItem = Gtk.CheckMenuItem(label=_("Type"))
+    visibleColumnsMenuItem = wTree.get_object("visibleColumnsMenuItem")
+    visibleColumnsMenuItem.set_label(_("Visible columns"))
+
+    typeColumnMenuItem = wTree.get_object("typeColumnMenuItem")
+    typeColumnMenuItem.set_label(_("Type"))
     typeColumnMenuItem.set_active(prefs["type_column_visible"])
     column7.set_visible(prefs["type_column_visible"])
     typeColumnMenuItem.connect("toggled", setVisibleColumn, column7, "type")
-    visibleColumnsMenu.append(typeColumnMenuItem)
 
-    levelColumnMenuItem = Gtk.CheckMenuItem(label=_("Level"))
+    levelColumnMenuItem = wTree.get_object("levelColumnMenuItem")
+    levelColumnMenuItem.set_label(_("Level"))
     levelColumnMenuItem.set_active(prefs["level_column_visible"])
     column3.set_visible(prefs["level_column_visible"])
     levelColumnMenuItem.connect("toggled", setVisibleColumn, column3, "level")
-    visibleColumnsMenu.append(levelColumnMenuItem)
 
-    packageColumnMenuItem = Gtk.CheckMenuItem(label=_("Package"))
+    packageColumnMenuItem = wTree.get_object("packageColumnMenuItem")
+    packageColumnMenuItem.set_label(_("Package"))
     packageColumnMenuItem.set_active(prefs["package_column_visible"])
     column2.set_visible(prefs["package_column_visible"])
     packageColumnMenuItem.connect("toggled", setVisibleColumn, column2, "package")
-    visibleColumnsMenu.append(packageColumnMenuItem)
 
-    oldVersionColumnMenuItem = Gtk.CheckMenuItem(label=_("Old version"))
+    oldVersionColumnMenuItem = wTree.get_object("oldVersionColumnMenuItem")
+    oldVersionColumnMenuItem.set_label(_("Old version"))
     oldVersionColumnMenuItem.set_active(prefs["old_version_column_visible"])
     column4.set_visible(prefs["old_version_column_visible"])
     oldVersionColumnMenuItem.connect("toggled", setVisibleColumn, column4, "old_version")
-    visibleColumnsMenu.append(oldVersionColumnMenuItem)
 
-    newVersionColumnMenuItem = Gtk.CheckMenuItem(label=_("New version"))
+    newVersionColumnMenuItem = wTree.get_object("newVersionColumnMenuItem")
+    newVersionColumnMenuItem.set_label(_("New version"))
     newVersionColumnMenuItem.set_active(prefs["new_version_column_visible"])
     column5.set_visible(prefs["new_version_column_visible"])
     newVersionColumnMenuItem.connect("toggled", setVisibleColumn, column5, "new_version")
-    visibleColumnsMenu.append(newVersionColumnMenuItem)
 
-    sizeColumnMenuItem = Gtk.CheckMenuItem(label=_("Size"))
+    sizeColumnMenuItem = wTree.get_object("sizeColumnMenuItem")
+    sizeColumnMenuItem.set_label(_("Size"))
     sizeColumnMenuItem.set_active(prefs["size_column_visible"])
     column6.set_visible(prefs["size_column_visible"])
     sizeColumnMenuItem.connect("toggled", setVisibleColumn, column6, "size")
-    visibleColumnsMenu.append(sizeColumnMenuItem)
 
-    viewSubmenu.append(visibleColumnsMenuItem)
-
-    descriptionsMenuItem = Gtk.CheckMenuItem(label=_("Show descriptions"))
+    descriptionsMenuItem = wTree.get_object("descriptionsMenuItem")
+    descriptionsMenuItem.set_label(_("Show descriptions"))
     descriptionsMenuItem.set_active(prefs["descriptions_visible"])
-#    descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, statusIcon, wTree, prefs)
     descriptionsMenuItem.connect("toggled", setVisibleDescriptions, treeview_update, wTree, prefs)
-    viewSubmenu.append(descriptionsMenuItem)
-
-    viewSubmenu.append(historyMenuItem)
-    viewSubmenu.append(infoMenuItem)
 
     helpMenu = wTree.get_object("helpmenu")
     helpMenu.set_label(_("_Help"))
-    helpSubmenu = Gtk.Menu()
-    helpMenu.set_submenu(helpSubmenu)
-    if os.path.exists("/usr/share/gooroom-yelp-adjustments/"):
-        helpMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_HELP)
+    if os.path.exists("/usr/share/gooroom-yelp-adjustments/") and os.path.exists("/usr/bin/yelp"):
+        helpMenuItem = wTree.get_object("helpMenuItem")
         helpMenuItem.set_label(_("Contents"))
         helpMenuItem.connect("activate", open_help)
         key, mod = Gtk.accelerator_parse("F1")
         helpMenuItem.add_accelerator("activate", accel_group, key, mod, Gtk.AccelFlags.VISIBLE)
-        helpSubmenu.append(helpMenuItem)
-    aboutMenuItem = Gtk.ImageMenuItem(label=Gtk.STOCK_ABOUT)
+        helpMenuItem.show()
+    aboutMenuItem = wTree.get_object("aboutMenuItem")
     aboutMenuItem.set_label(_("About"))
     aboutMenuItem.connect("activate", open_about)
-    helpSubmenu.append(aboutMenuItem)
+
+    wTree.get_object("label_head").set_label(_("List of updates"))
+    wTree.get_object("refresh_button").set_label(_("Refresh"))
+    wTree.get_object("refresh_button").connect("clicked", force_refresh, treeview_update, wTree)
 
     if len(sys.argv) > 1:
         showWindow = sys.argv[1]
