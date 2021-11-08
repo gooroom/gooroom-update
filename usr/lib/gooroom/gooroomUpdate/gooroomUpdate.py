@@ -276,10 +276,10 @@ class ChangelogRetriever(threading.Thread):
                 if self.origin == "gooroom":
                     output = self.get_gooroom_changelog(source)
                     if output:
-                        changelog = str(output)
+                        changelog = output
 
         Gdk.threads_enter()
-        self.wTree.get_object("textview_changes").get_buffer().set_text(changelog)
+        self.wTree.get_object("textview_changes").get_buffer().set_text(str(changelog))
         Gdk.threads_leave()
 
 class AutomaticRefreshThread(threading.Thread):
