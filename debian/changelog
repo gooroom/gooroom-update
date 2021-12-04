@@ -1,3 +1,18 @@
+gooroom-update (1.3.0+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [68a2a55d] porting to python3
+  * [1120e023] put gooroom-update into integration-applet
+  * [27558f36] removed icon path in information.glade
+  * [4c8fa373] fixed information and about dialog size
+  * [2cdda649] Modified UI for gooroom-3.0
+  * [17ef5000] [Bug:4223] Fixed changelog type error issue
+
+  [ boyeon.choi ]
+  * [c5453bdd] Hide menus when synaptic.desktop is not present
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sat, 04 Dec 2021 16:49:28 +0900
+
 gooroom-update (1.1.4+grm2u1) unstable; urgency=medium
 
   [ subin.kim ]
