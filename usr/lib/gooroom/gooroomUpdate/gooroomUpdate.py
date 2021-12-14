@@ -907,6 +907,9 @@ class RefreshThread(threading.Thread):
                     update_dbus.onIconChanged (icon_unknown)
                     current_icon = icon_unknown
                     statusbar.push(context_id, _("Another application is using APT"))
+                    status_str =  _("Another application is using APT")
+                    statusbar.push(context_id, status_str)
+                    update_dbus.onStatusStringChanged(_("Another application is using APT"))
                     log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
                     log.flush()
                     self.wTree.get_object("window").get_window().set_cursor(None)
@@ -1224,8 +1227,8 @@ class RefreshThread(threading.Thread):
                                 self.statusString += "\n : " + _("Network connection is %s") % net_status
                             elif (num_ignored > 0):
                                 self.statusString = _("%(recommended)d recommended updates available (%(size)s), %(ignored)d ignored") % {'recommended':num_safe, 'size':size_to_string(download_size), 'ignored':num_ignored}
-                                update_dbus.onStatusStringChanged(status_str)
                                 status_str = self.statusString
+                                update_dbus.onStatusStringChanged(status_str)
                                 self.statusString += "\n : " + _("Network connection is %s") % net_status
                         update_dbus.onIconChanged (icon_updates)
                         current_icon = icon_updates
