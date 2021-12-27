@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 try:
+    import signal
     import dbus
     import dbus.service
     import os
@@ -906,7 +907,6 @@ class RefreshThread(threading.Thread):
                     Gdk.threads_enter()
                     update_dbus.onIconChanged (icon_unknown)
                     current_icon = icon_unknown
-                    statusbar.push(context_id, _("Another application is using APT"))
                     status_str =  _("Another application is using APT")
                     statusbar.push(context_id, status_str)
                     update_dbus.onStatusStringChanged(_("Another application is using APT"))
@@ -2123,6 +2123,12 @@ def setVisibleDescriptions(checkmenuitem, treeView, wTree, prefs):
     refresh = RefreshThread(treeView, wTree)
     refresh.start()
 
+def sigint_handler(sig, frame):
+    if sig == signal.SIGINT:
+        os.system("killall gooroomUpdate")
+    else:
+        raise ValueError("Undefined handler for '{}'".format(sig))
+
 class UpdateDBus(dbus.service.Object):
     def __init__(self, wTree):
         try:
@@ -2132,6 +2138,7 @@ class UpdateDBus(dbus.service.Object):
 
             self._loop = None
             self._loop = GLib.MainLoop()
+            signal.signal(signal.SIGINT, sigint_handler)
 
             bus_name = dbus.service.BusName(DBUS_NAME, BUS)
             dbus.service.Object.__init__(self, bus_name, DBUS_OBJ)
