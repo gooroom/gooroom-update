@@ -1617,6 +1617,13 @@ def read_configuration():
         prefs["dimensions_pane_position"] = 3
 
     return prefs
+def pre_open_synaptic_package_manager(widget):
+    status_str =  _("Another application is using APT")
+    statusbar.push(context_id, status_str)
+    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
+
+    wTree.get_object("window").set_sensitive(False)
+    GLib.timeout_add(30, open_synaptic_package_manager, widget)
 
 def open_synaptic_package_manager(widget):
     file_stat = os.stat("/usr/bin/synaptic-pkexec")
@@ -1634,6 +1641,9 @@ def open_synaptic_package_manager(widget):
         if response == Gtk.ResponseType.OK or response == Gtk.ResponseType.DELETE_EVENT:
             permissionAlertDialog.hide()
             permissionAlertDialog.destroy()
+
+    refresh = RefreshThread(treeview_update, wTree)
+    refresh.start()
 
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
@@ -2371,7 +2381,7 @@ try:
     if (os.path.exists(synaptic_exe) and os.path.exists(synaptic_desktop)):
         synapticMenuItem = wTree.get_object("synapticMenuItem")
         synapticMenuItem.set_label(_("Synaptic Package Manager"))
-        synapticMenuItem.connect("activate", open_synaptic_package_manager)
+        synapticMenuItem.connect("activate", pre_open_synaptic_package_manager)
 
     closeMenuItem = wTree.get_object("closeMenuItem")
     closeMenuItem.set_label(_("Close"))
