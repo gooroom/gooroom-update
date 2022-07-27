@@ -271,7 +271,7 @@ class ChangelogRetriever(threading.Thread):
                 url.close()
 
                 changelog = ""
-                changelog = source
+                changelog = str(source)[2:-1]
                 break
             except:
                 if self.origin == "gooroom":
@@ -1281,7 +1281,7 @@ class RefreshThread(threading.Thread):
             Gdk.threads_enter()
             update_dbus.onIconChanged (icon_error)
             current_icon = icon_error
-#            self.wTree.get_object("window").get_window().set_cursor(None)
+            #self.wTree.get_object("window").get_window().set_cursor(None)
             self.wTree.get_object("window").set_sensitive(True)
             status_str =  _("Could not refresh the list of updates")
             statusbar.push(context_id, status_str)

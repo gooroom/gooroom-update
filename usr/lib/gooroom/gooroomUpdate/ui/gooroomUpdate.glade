@@ -422,6 +422,7 @@
                         <property name="show-border">False</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow3">
+                            <property name="height-request">100</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="border-width">6</property>
