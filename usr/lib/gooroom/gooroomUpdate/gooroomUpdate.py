@@ -1285,7 +1285,7 @@ class RefreshThread(threading.Thread):
             self.wTree.get_object("window").set_sensitive(True)
             status_str =  _("Could not refresh the list of updates")
             statusbar.push(context_id, status_str)
-            show_noti(None, title, status_str, wTree)
+            #show_noti(None, title, status_str, wTree)
             update_dbus.onStatusStringChanged(status_str)
             wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
