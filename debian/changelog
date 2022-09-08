@@ -1,3 +1,11 @@
+gooroom-update (1.3.2+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [68c15d03] Third-party changelog type changed from bytes to str & enlarged details notebook
+  * [93e156ab] show error noti once
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Thu, 08 Sep 2022 15:35:07 +0900
+
 gooroom-update (1.3.1+grm3u1) unstable; urgency=medium
 
   [ subin.kim ]
