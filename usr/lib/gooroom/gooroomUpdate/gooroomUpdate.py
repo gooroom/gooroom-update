@@ -875,13 +875,17 @@ class RefreshThread(threading.Thread):
         vpaned_position = wTree.get_object("vpaned1").get_position()
         Gdk.threads_leave()
 
+        file_stat = os.stat("/usr/sbin/synaptic")
+        if not file_stat.st_mode & stat.S_IXOTH:
+            err_synaptic_perm()
+            return
+
         try:
             log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "++ Starting refresh\n")
             log.flush()
             Gdk.threads_enter()
             statusbar.push(context_id, _("Starting refresh..."))
             self.wTree.get_object("notebook_status").set_current_page(TAB_UPDATES)
-#           self.wTree.get_object("window").get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.WATCH))
             self.wTree.get_object("window").set_sensitive(False)
 
             prefs = read_configuration()
@@ -1285,7 +1289,6 @@ class RefreshThread(threading.Thread):
             self.wTree.get_object("window").set_sensitive(True)
             status_str =  _("Could not refresh the list of updates")
             statusbar.push(context_id, status_str)
-            #show_noti(None, title, status_str, wTree)
             update_dbus.onStatusStringChanged(status_str)
             wTree.get_object("vpaned1").set_position(vpaned_position)
             Gdk.threads_leave()
@@ -1617,33 +1620,39 @@ def read_configuration():
         prefs["dimensions_pane_position"] = 3
 
     return prefs
-def pre_open_synaptic_package_manager(widget):
-    status_str =  _("Another application is using APT")
-    statusbar.push(context_id, status_str)
-    log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
 
-    wTree.get_object("window").set_sensitive(False)
-    GLib.timeout_add(30, open_synaptic_package_manager, widget)
+def err_synaptic_perm():
+    current_icon = icon_error
+    title = _("Error Launching Program")
+    status_str =  _("Package addition/deletion blocking Function is on.")
+    statusbar.push(context_id, status_str)
+    show_noti(None, title, status_str + _("Please contact the administrator."), wTree)
+
+    update_dbus.onIconChanged (icon_error)
+    update_dbus.onStatusStringChanged (status_str)
+
+def pre_open_synaptic_package_manager(widget):
+    file_stat = os.stat("/usr/bin/synaptic-pkexec")
+    if not file_stat.st_mode & stat.S_IXOTH:
+        wTree.get_object("window").set_sensitive(True)
+        err_synaptic_perm()
+    else:
+        status_str =  _("Another application is using APT")
+        statusbar.push(context_id, status_str)
+        log.writelines(datetime.datetime.now().strftime("%m.%d@%H:%M ") + "-- Another application is using APT\n")
+
+        wTree.get_object("window").set_sensitive(False)
+        GLib.timeout_add(30, open_synaptic_package_manager, widget)
 
 def open_synaptic_package_manager(widget):
-    file_stat = os.stat("/usr/bin/synaptic-pkexec")
-    if file_stat.st_mode & stat.S_IXOTH:
-        os.system("/usr/bin/synaptic-pkexec")
+    file_stat = os.stat("/usr/sbin/synaptic")
+    if not file_stat.st_mode & stat.S_IXOTH:
+        wTree.get_object("window").set_sensitive(True)
+        err_synaptic_perm()
     else:
-        permissionAlertDialog = Gtk.MessageDialog(None, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, None)
-        permissionAlertDialog.set_title(_("Error Launching Program"))
-
-        message = "<span font_weight='bold' size='large'>%s</span>" % _("Can't execute Synpatic Package Manager.\nThis software is prohibited to run.")
-        permissionAlertDialog.set_markup(message)
-        permissionAlertDialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-
-        response = permissionAlertDialog.run()
-        if response == Gtk.ResponseType.OK or response == Gtk.ResponseType.DELETE_EVENT:
-            permissionAlertDialog.hide()
-            permissionAlertDialog.destroy()
-
-    refresh = RefreshThread(treeview_update, wTree)
-    refresh.start()
+        os.system("/usr/bin/synaptic-pkexec")
+        refresh = RefreshThread(treeview_update, wTree)
+        refresh.start()
 
 def open_repositories(widget):
     if os.path.exists("/usr/bin/software-sources"):
