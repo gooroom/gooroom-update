@@ -1339,6 +1339,8 @@ def move_update_window (self, window):
     x = workarea.x + (workarea.width/2)-(alloc.width/2)
     y = workarea.y + (workarea.height/2)-(alloc.height/2)
 
+    if y < 0: y = 0
+
     window.get_window().move(x, y)
 
 def force_refresh(widget, treeview, wTree):

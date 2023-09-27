@@ -5,9 +5,11 @@
 /*  -gtk-icon-effect: none; */
   -gtk-icon-shadow: none; }
 
+  /*
 .vbox {
   margin: 5px 5px 8px 5px;
   }
+  */
 
 .submenu{
   min-height:24px;
@@ -51,9 +53,11 @@
   min-height: 23px;
   border:none ;}
   
+/*
 .scrolledwindow2 {
   min-width:500px;
   min-height:300px;}
+*/
 
 .darker-label{
   color: #000100;}
