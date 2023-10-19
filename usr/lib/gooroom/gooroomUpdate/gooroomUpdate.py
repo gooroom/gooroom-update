@@ -1441,8 +1441,11 @@ def pref_apply(widget, prefs_tree, treeview, wTree):
 
     config['auto_upgrade']= {}
     config['auto_upgrade']['date']= int(prefs_tree.get_object("auto_upgrade_date").get_active())
-    config['auto_upgrade']['time']= int(prefs_tree.get_object("auto_upgrade_time").get_active())
-
+    meridiem = int(prefs_tree.get_object("auto_upgrade_meridiem").get_active())
+    if meridiem == 1:
+        config['auto_upgrade']['time']= int(prefs_tree.get_object("auto_upgrade_time").get_active()) + 12
+    else:
+        config['auto_upgrade']['time']= int(prefs_tree.get_object("auto_upgrade_time").get_active())
 
     #Write update config
     config['update'] = {}
@@ -1529,6 +1532,7 @@ def read_configuration():
     try:
         prefs["auto_upgrade"]= get_auto_upgrade()
         prefs["auto_upgrade_date"]= int(config['auto_upgrade']['date'])
+        print ("BOYEON: ", config['auto_upgrade']['time'])
         prefs["auto_upgrade_time"] = int(config['auto_upgrade']['time'])
     except:
         prefs["auto_upgrade"]= False
@@ -1718,30 +1722,44 @@ def open_preferences(widget, treeview, wTree):
     prefs_tree.get_object("auto_upgrade_date").insert_text(0, _("Every Sunday"))
     prefs_tree.get_object("auto_upgrade_date").insert_text(0, _("Every Day"))
 
+    """
     prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 12:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 1:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 2:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 3:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 4:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 5:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 6:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 7:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 8:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 9:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 10:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("AM 11:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 12:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 1:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 2:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 3:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 4:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 5:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 6:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 7:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 8:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 9:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 10:00"))
-    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("PM 11:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(1, _("AM 1:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(2, _("AM 2:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(3, _("AM 3:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(4, _("AM 4:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(5, _("AM 5:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(6, _("AM 6:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(6, _("AM 7:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(8, _("AM 8:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(9, _("AM 9:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(10, _("AM 10:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(11, _("AM 11:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(12, _("PM 12:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(13, _("PM 1:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(14, _("PM 2:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(15, _("PM 3:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(16, _("PM 4:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(17, _("PM 5:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(18, _("PM 6:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(19, _("PM 7:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(20, _("PM 8:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(21, _("PM 9:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(22, _("PM 10:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(23, _("PM 11:00"))
+    """
+    prefs_tree.get_object("auto_upgrade_time").insert_text(0, _("12:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(1, _("1:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(2, _("2:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(3, _("3:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(4, _("4:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(5, _("5:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(6, _("6:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(6, _("7:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(8, _("8:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(9, _("9:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(10, _("10:00"))
+    prefs_tree.get_object("auto_upgrade_time").insert_text(11, _("11:00"))
 
     prefs_tree.get_object("checkbutton_dist_upgrade").set_label(_("Include updates which require the installation of new packages or the removal of installed packages"))
 
@@ -1775,7 +1793,12 @@ def open_preferences(widget, treeview, wTree):
 
     prefs_tree.get_object("auto_upgrade").set_active(prefs["auto_upgrade"])
     prefs_tree.get_object("auto_upgrade_date").set_active(prefs["auto_upgrade_date"])
-    prefs_tree.get_object("auto_upgrade_time").set_active(prefs["auto_upgrade_time"])
+    if int(prefs["auto_upgrade_time"]/12) < 1:
+	    prefs_tree.get_object("auto_upgrade_meridiem").set_active(0)
+    else: 
+	    prefs_tree.get_object("auto_upgrade_meridiem").set_active(1)
+
+    prefs_tree.get_object("auto_upgrade_time").set_active(prefs["auto_upgrade_time"]%12)
     prefs_tree.get_object("auto_upgrade").connect("toggled", set_auto_upgrade, prefs_tree)
 
     if prefs_tree.get_object("auto_upgrade").get_active()== False:
