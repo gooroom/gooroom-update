@@ -1171,7 +1171,7 @@ class RefreshThread(threading.Thread):
                             print ("network connection ok")
                             net_status = _("OK")
 
-                    except urllib.error.URLError as err:
+                    except urllib.error.HTTPError as err:
                         if err.code == 200 or err.code == 403:
                             print ("network connection ok")
                             net_status = _("OK")
