@@ -1499,6 +1499,7 @@ def set_auto_upgrade(widget, prefs_tree):
     toggle = prefs_tree.get_object("auto_upgrade").get_active()
 
     prefs_tree.get_object("auto_upgrade_time").set_sensitive(toggle)
+    prefs_tree.get_object("auto_upgrade_meridiem").set_sensitive(toggle)
     prefs_tree.get_object("auto_upgrade_date").set_sensitive(toggle)
 
 def get_auto_upgrade():
@@ -1803,9 +1804,11 @@ def open_preferences(widget, treeview, wTree):
 
     if prefs_tree.get_object("auto_upgrade").get_active()== False:
         prefs_tree.get_object("auto_upgrade_date").set_sensitive(False)
+        prefs_tree.get_object("auto_upgrade_meridiem").set_sensitive(False)
         prefs_tree.get_object("auto_upgrade_time").set_sensitive(False)
     else:
         prefs_tree.get_object("auto_upgrade_date").set_sensitive(True)
+        prefs_tree.get_object("auto_upgrade_meridiem").set_sensitive(True)
         prefs_tree.get_object("auto_upgrade_time").set_sensitive(True)
 
     prefs_tree.get_object("checkbutton_dist_upgrade").set_active(prefs["dist_upgrade"])
