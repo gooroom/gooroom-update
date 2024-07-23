@@ -1533,7 +1533,6 @@ def read_configuration():
     try:
         prefs["auto_upgrade"]= get_auto_upgrade()
         prefs["auto_upgrade_date"]= int(config['auto_upgrade']['date'])
-        print ("BOYEON: ", config['auto_upgrade']['time'])
         prefs["auto_upgrade_time"] = int(config['auto_upgrade']['time'])
     except:
         prefs["auto_upgrade"]= False

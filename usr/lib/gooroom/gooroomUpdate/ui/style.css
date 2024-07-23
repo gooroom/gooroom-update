@@ -6,30 +6,25 @@
   -gtk-icon-shadow: none; }
 
 .vbox {
-  margin: 5px 5px 8px 5px;
-  }
+  margin: 5px 5px 8px 5px; }
 
 .submenu{
   min-height:24px;
   border-radius: 10px;}
 
 .button {
-  padding: 6px 15px 5px 15px;
-  color: #fff;
   border-radius: 10px;
-  background-color: #3e6ddc;}
-  .button:disabled label{
-  color: #fff;
-  opacity: 0.5;}
-  .refresh-button {
+  padding: 6px 15px 5px 15px; }
+
+.refresh-button {
   border: none;
   background-color: transparent;
   color: #3e6ddc;}
   .refresh-button:hover {
-  font-weight:bold;
-  border: none;
-  background-color: transparent;
-  color: #3e6ddc;}
+    font-weight:bold;
+    border: none;
+    background-color: transparent;
+    color: #3e6ddc;}
 
 .scrolledwindow {
   border-color: rgba(106, 159, 221, 0.05);
@@ -62,35 +57,35 @@
   margin:0px 10px 0px 0px;
   color: rgba(0, 1, 0, 0.5);}
 
-.general-box{
-  }
-  .general-checkbtn label {
-    color: #000100;
-    margin: 0px 10px 0px 10px;}
+.general-checkbtn label {
+  color: #000100;
+  margin: 0px 10px 0px 10px;}
   .sections {
     font-size:16px;}
 
-.level-box{
-  }
-  .head-row {
-    min-width: 90px;
-    min-height: 24px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.1);}
-  .lighter-row {
-    min-width: 90px;
-    min-height: 24px;
-    border-radius: 10px;
-    background-color: rgba(106, 159, 221, 0.1);}
-  .darker-row {
+.head-row {
+  min-width: 90px;
+  min-height: 24px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.1);}
+
+.lighter-row {
+  min-width: 90px;
+  min-height: 24px;
+  border-radius: 10px;
+  background-color: rgba(106, 159, 221, 0.1);}
+
+.darker-row {
     min-width: 90px;
     min-height: 24px;
     border-radius: 10px;
     background-color: rgba(106, 159, 221, 0.05);}
-  .table {
-    min-height: 34px;
-    border-radius: 10px;}
-  .column {
-    min-width:54px;
-    padding: 0px 5px 0px 5px;
-    margin: 17px 8px 17px 8px;}
+
+.table {
+  min-height: 34px;
+  border-radius: 10px;}
+
+.column {
+  min-width:54px;
+  padding: 0px 5px 0px 5px;
+  margin: 17px 8px 17px 8px;}

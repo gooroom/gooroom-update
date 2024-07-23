@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkCheckButton">
@@ -19,7 +19,8 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="right-justified">True</property>
-        <property name="label" translatable="yes">File</property>
+        <property name="label" translatable="yes">_File</property>
+        <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
@@ -57,7 +58,8 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="right-justified">True</property>
-        <property name="label" translatable="yes">Edit</property>
+        <property name="label" translatable="yes">_Edit</property>
+        <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu" id="editSubmenu">
             <property name="visible">True</property>
@@ -93,7 +95,8 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="right-justified">True</property>
-        <property name="label" translatable="yes">View</property>
+        <property name="label" translatable="yes">_View</property>
+        <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
@@ -218,7 +221,8 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="right-justified">True</property>
-        <property name="label" translatable="yes">Help</property>
+        <property name="label" translatable="yes">_Help</property>
+        <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
@@ -743,9 +747,9 @@
                         <property name="can-focus">True</property>
                         <property name="focus-on-click">False</property>
                         <property name="receives-default">True</property>
-                        <property name="relief">none</property>
                         <style>
                           <class name="button"/>
+                          <class name="suggested-action"/>
                         </style>
                       </object>
                       <packing>

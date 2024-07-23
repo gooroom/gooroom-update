@@ -112,8 +112,8 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-left">20</property>
-            <property name="margin-right">20</property>
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
             <property name="margin-top">20</property>
             <property name="margin-bottom">20</property>
             <property name="orientation">vertical</property>
@@ -122,7 +122,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="margin-left">15</property>
+                <property name="margin-start">15</property>
                 <property name="margin-top">20</property>
                 <property name="label" translatable="yes">General</property>
                 <attributes>
@@ -226,7 +226,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="halign">start</property>
-                    <property name="margin-left">30</property>
+                    <property name="margin-start">30</property>
                     <property name="label" translatable="yes">The system will be upgraded automatically with the latest software if it is on and running at the time.</property>
                     <property name="xalign">0</property>
                     <style>
@@ -250,7 +250,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="halign">start</property>
-                        <property name="margin-left">30</property>
+                        <property name="margin-start">30</property>
                         <child>
                           <object class="GtkLabel" id="label4">
                             <property name="visible">True</property>
@@ -346,9 +346,6 @@
                     <property name="position">7</property>
                   </packing>
                 </child>
-                <style>
-                  <class name="general-box"/>
-                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -361,7 +358,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="margin-left">15</property>
+                <property name="margin-start">15</property>
                 <property name="margin-top">20</property>
                 <property name="label" translatable="yes">Levels</property>
                 <attributes>
@@ -426,7 +423,7 @@
                       <object class="GtkLabel" id="label54">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="margin-left">18</property>
+                        <property name="margin-start">18</property>
                         <property name="label" translatable="yes" context="yes">&lt;b&gt;Origin&lt;/b&gt;</property>
                         <property name="use-markup">True</property>
                         <style>
@@ -479,7 +476,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">center</property>
-                        <property name="margin-left">18</property>
+                        <property name="margin-start">18</property>
                         <property name="use-underline">True</property>
                         <property name="draw-indicator">True</property>
                         <style>
@@ -519,7 +516,7 @@
                             <property name="can-focus">False</property>
                             <property name="tooltip-text" translatable="yes">Packages provided by Gooroom</property>
                             <property name="halign">start</property>
-                            <property name="margin-right">10</property>
+                            <property name="margin-end">10</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -556,8 +553,8 @@
                         <property name="can-focus">True</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
-                        <property name="margin-left">15</property>
-                        <property name="margin-right">15</property>
+                        <property name="margin-start">15</property>
+                        <property name="margin-end">15</property>
                         <property name="margin-top">15</property>
                         <property name="margin-bottom">15</property>
                       </object>
@@ -589,7 +586,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">center</property>
-                        <property name="margin-left">18</property>
+                        <property name="margin-start">18</property>
                         <property name="use-underline">True</property>
                         <property name="draw-indicator">True</property>
                         <style>
@@ -624,8 +621,8 @@
                         <property name="can-focus">True</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
-                        <property name="margin-left">15</property>
-                        <property name="margin-right">15</property>
+                        <property name="margin-start">15</property>
+                        <property name="margin-end">15</property>
                         <property name="margin-top">15</property>
                         <property name="margin-bottom">15</property>
                       </object>
@@ -647,7 +644,7 @@
                             <property name="can-focus">False</property>
                             <property name="tooltip-text" translatable="yes">Packages provided by Debian</property>
                             <property name="halign">start</property>
-                            <property name="margin-right">10</property>
+                            <property name="margin-end">10</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -699,7 +696,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">center</property>
-                        <property name="margin-left">18</property>
+                        <property name="margin-start">18</property>
                         <property name="use-underline">True</property>
                         <property name="draw-indicator">True</property>
                         <style>
@@ -734,8 +731,8 @@
                         <property name="can-focus">True</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
-                        <property name="margin-left">15</property>
-                        <property name="margin-right">15</property>
+                        <property name="margin-start">15</property>
+                        <property name="margin-end">15</property>
                         <property name="margin-top">15</property>
                         <property name="margin-bottom">15</property>
                       </object>
@@ -757,7 +754,7 @@
                             <property name="can-focus">False</property>
                             <property name="tooltip-text" translatable="yes">Packages provided by 3rd-party</property>
                             <property name="halign">start</property>
-                            <property name="margin-right">10</property>
+                            <property name="margin-end">10</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -810,7 +807,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="margin-left">15</property>
+                <property name="margin-start">15</property>
                 <property name="margin-top">40</property>
                 <property name="label" translatable="yes">Auto-refresh</property>
                 <attributes>
@@ -876,8 +873,8 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="margin-left">5</property>
-                        <property name="margin-right">10</property>
+                        <property name="margin-start">5</property>
+                        <property name="margin-end">10</property>
                         <property name="label" translatable="yes" context="yes">minutes</property>
                         <property name="xalign">0</property>
                       </object>
@@ -910,8 +907,8 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="margin-left">5</property>
-                        <property name="margin-right">10</property>
+                        <property name="margin-start">5</property>
+                        <property name="margin-end">10</property>
                         <property name="label" translatable="yes" context="yes">hours</property>
                         <property name="xalign">0</property>
                       </object>
@@ -944,7 +941,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="margin-left">5</property>
+                        <property name="margin-start">5</property>
                         <property name="label" translatable="yes" context="yes">days</property>
                         <property name="xalign">0</property>
                       </object>
@@ -1019,6 +1016,7 @@
                             <property name="use-stock">True</property>
                             <style>
                               <class name="button"/>
+                              <class name="suggested-action"/>
                             </style>
                           </object>
                           <packing>
