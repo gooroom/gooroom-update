@@ -1,3 +1,13 @@
+gooroom-update (4.1.0+grm4u1) unstable; urgency=medium
+
+  [ boyeon.choi ]
+  * [750b8b76] [Bug:5686] the auto_upgrade_meridiem list box is disabled when the check box was turned off
+
+  [ cjheo ]
+  * [9c0c0e10] Update UI/UX and Fix bugs
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 30 Aug 2024 15:13:20 +0900
+
 gooroom-update (4.0.0+grm4u1) unstable; urgency=medium
 
   [ jongkyung.woo ]
